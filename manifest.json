@@ -2,12 +2,12 @@
   "name": "مجموعة الجدوع التجارية",
   "short_name": "الجدوع",
   "description": "نظام التسوية اليومية - مجموعة الجدوع التجارية - إدارة الواردات والصادرات والملاعب والهواتف",
-  "start_url": "/",
+  ""start_url": "/aljodoo-trading-group/",
   "display": "standalone",
   "background_color": "#FFD700",
   "theme_color": "#FFD700",
   "orientation": "any",
-  "scope": "/",
+  "scope": "/aljodoo-trading-group/",
   "lang": "ar",
   "dir": "rtl",
   "categories": [
@@ -96,7 +96,7 @@
   "shortcuts": [
     {
       "name": "الواردات",
-      "url": "/?action=warid",
+      "url": "/?action=warid" → "url": "/aljodoo-trading-group/?action=warid"
       "description": "إدارة الواردات",
       "icons": [
         {
@@ -107,7 +107,7 @@
     },
     {
       "name": "البحث الاحترافي",
-      "url": "/?action=search",
+      url": "/?action=search" → "url": "/aljodoo-trading-group/?action=se
       "description": "البحث في السجلات",
       "icons": [
         {
