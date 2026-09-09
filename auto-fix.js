@@ -1,4 +1,5 @@
-// تصليح تلقائي لكل الأجهزة القديمة - يحل مشكلة مهند
+
+// تصليح تلقائي + اخفاء ارقام المدير
 try {
   let raw = localStorage.getItem("taswiya_users");
   if (raw) {
@@ -7,7 +8,16 @@ try {
     if (!hasMudir) {
       localStorage.removeItem("taswiya_users");
       localStorage.removeItem("taswiya_users_ts");
-      console.log("✅ Auto-fix: تم مسح اليوزرات القديمة المضروبة");
     }
   }
 } catch(e) {}
+
+// اخفاء جملة المدير الافتراضي
+setInterval(()=>{
+  document.querySelectorAll('*').forEach(el=>{
+    if(el.textContent && el.textContent.includes('المدير الافتراضي') && el.children.length===0){
+      el.style.display='none';
+      if(el.parentElement) el.parentElement.style.borderTop='none';
+    }
+  });
+}, 500);
