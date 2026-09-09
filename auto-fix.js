@@ -1,5 +1,4 @@
-
-// تصليح تلقائي + اخفاء ارقام المدير
+// تصليح + اخفاء نهائي
 try {
   let raw = localStorage.getItem("taswiya_users");
   if (raw) {
@@ -12,12 +11,21 @@ try {
   }
 } catch(e) {}
 
-// اخفاء جملة المدير الافتراضي
-setInterval(()=>{
-  document.querySelectorAll('*').forEach(el=>{
-    if(el.textContent && el.textContent.includes('المدير الافتراضي') && el.children.length===0){
+function hidePinHint(){
+  document.querySelectorAll('div, p, span, small').forEach(el=>{
+    let t = (el.innerText||'').trim();
+    if(t.includes('المدير الافتراضي') && t.includes('PIN')){
       el.style.display='none';
-      if(el.parentElement) el.parentElement.style.borderTop='none';
+      el.style.visibility='hidden';
+      el.style.height='0px';
     }
   });
-}, 500);
+}
+setInterval(hidePinHint, 300);
+document.addEventListener('DOMContentLoaded', hidePinHint);
+window.addEventListener('load', hidePinHint);
+
+// اضافة CSS احتياطي
+let st = document.createElement('style');
+st.innerHTML = `*{ -webkit-text-security: none !important; }`;
+document.head.appendChild(st);
