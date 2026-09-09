@@ -50,38 +50,38 @@
     window.__fbSkipNextRemote = false;
 
     window.__fbSaveData = function(obj, ts){
-      window.__fbSkipNextRemote = true;
-      window.__fbAuthReady.then(function(){
-        setDoc(dataRef, { data: obj, updatedAt: ts || Date.now() }).catch(function(e){
-          console.error("Firebase save error:", e);
-        });
-      });
-    };
+  window.__fbSkipNextRemote = true;
+  window.__fbAuthReady.then(function(){
+    setDoc(dataRef, { data: obj, updatedAt: ts || Date.now() }, { merge: true }).catch(function(e){
+      console.error("Firebase save error:", e);
+    });
+  });
+};
 
-    window.__fbSubscribe = function(callback){
-      window.__fbAuthReady.then(function(){
-        onSnapshot(dataRef, function(snap){
-          if (window.__fbSkipNextRemote) { window.__fbSkipNextRemote = false; return; }
-          if (snap.exists()) {
-            var d = snap.data();
-            if (d && d.data) callback(d.data, d.updatedAt || 0);
-          }
-        }, function(err){
-          console.error("Firebase sync error:", err);
-        });
-      });
-    };
+window.__fbSubscribe = function(callback){
+  window.__fbAuthReady.then(function(){
+    onSnapshot(dataRef, function(snap){
+      if (window.__fbSkipNextRemote) { window.__fbSkipNextRemote = false; return; }
+      if (snap.exists()) {
+        var d = snap.data();
+        if (d && d.data) callback(d.data, d.updatedAt || 0);
+      }
+    }, function(err){
+      console.error("Firebase sync error:", err);
+    });
+  });
+};
 
-    window.__fbSkipNextRemoteUsers = false;
+window.__fbSkipNextRemoteUsers = false;
 
-    window.__fbSaveUsers = function(obj, ts){
-      window.__fbSkipNextRemoteUsers = true;
-      window.__fbAuthReady.then(function(){
-        setDoc(usersRef, { users: obj, updatedAt: ts || Date.now() }).catch(function(e){
-          console.error("Firebase users save error:", e);
-        });
-      });
-    };
+window.__fbSaveUsers = function(obj, ts){
+  window.__fbSkipNextRemoteUsers = true;
+  window.__fbAuthReady.then(function(){
+    setDoc(usersRef, { users: obj, updatedAt: ts || Date.now() }, { merge: true }).catch(function(e){
+      console.error("Firebase users save error:", e);
+    });
+  });
+};
 
     window.__fbSubscribeUsers = function(callback){
       window.__fbAuthReady.then(function(){
