@@ -1,31 +1,23 @@
-// تصليح + اخفاء نهائي
-try {
-  let raw = localStorage.getItem("taswiya_users");
-  if (raw) {
-    let arr = JSON.parse(raw);
-    let hasMudir = Array.isArray(arr) && arr.some(u => u.name === "المدير");
-    if (!hasMudir) {
-      localStorage.removeItem("taswiya_users");
-      localStorage.removeItem("taswiya_users_ts");
-    }
-  }
-} catch(e) {}
+// اخفاء نهائي - v4
+try{let r=localStorage.getItem("taswiya_users");if(r){let a=JSON.parse(r);if(Array.isArray(a)&&!a.some(u=>u.name==="المدير")){localStorage.removeItem("taswiya_users");localStorage.removeItem("taswiya_users_ts");}}}catch(e){}
 
-function hidePinHint(){
-  document.querySelectorAll('div, p, span, small').forEach(el=>{
-    let t = (el.innerText||'').trim();
+// حقن CSS يخفي الشريط الجوة مباشر
+let css=document.createElement('style');
+css.innerHTML=`
+  .mt-6.pt-4.border-t{display:none !important;}
+  p.text-\\[10px\\].text-gray-400{display:none !important;}
+`;
+document.head.appendChild(css);
+
+function hideIt(){
+  document.querySelectorAll('div, p').forEach(el=>{
+    let t=(el.innerText||'');
     if(t.includes('المدير الافتراضي') && t.includes('PIN')){
-      el.style.display='none';
-      el.style.visibility='hidden';
-      el.style.height='0px';
+      el.style.setProperty('display','none','important');
+      let parent=el.closest('.mt-6');
+      if(parent) parent.style.setProperty('display','none','important');
     }
   });
 }
-setInterval(hidePinHint, 300);
-document.addEventListener('DOMContentLoaded', hidePinHint);
-window.addEventListener('load', hidePinHint);
-
-// اضافة CSS احتياطي
-let st = document.createElement('style');
-st.innerHTML = `*{ -webkit-text-security: none !important; }`;
-document.head.appendChild(st);
+setInterval(hideIt,200);
+new MutationObserver(hideIt).observe(document.documentElement,{childList:true,subtree:true});
