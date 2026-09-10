@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>تقارير مجموعة الجدوع - مع عمولة منفصلة</title>
+<style>
+*{box-sizing:border-box}body{font-family:system-ui,Arial;margin:0;padding:12px;background:#f8fafc;color:#111}
+h1{font-size:18px;text-align:center;margin:12px 0}
+.card{background:#fff;border-radius:16px;padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.06);margin-bottom:12px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+select,input{flex:1;height:42px;border-radius:10px;border:1px solid #ddd;padding:0 12px;font-size:14px;min-width:100px}
+button{height:42px;border-radius:10px;border:none;padding:0 16px;font-size:14px;font-weight:700;cursor:pointer}
+#gen{background:#1e3a8a;color:#fff}
+#print{background:#16a34a;color:#fff;width:100%;margin-top:12px}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}
+th,td{padding:9px 8px;text-align:right;border:1px solid #e5e7eb}
+th{background:#f1f5f9;font-weight:800}
+.comm{background:#fffbeb;border:1px solid #fcd34d;padding:10px;border-radius:10px;margin:10px 0;text-align:center;color:#92400e;font-size:12px}
+.blue{background:#eff6ff;border:1px solid #bfdbfe;padding:10px;border-radius:10px;margin-top:8px;font-size:12px}
+.total{background:#FFF7D6;font-weight:800}
+.note{font-size:11px;color:#64748b;text-align:center;margin-top:8px}
+a.back{display:inline-block;margin-bottom:10px;color:#1e3a8a;text-decoration:none;font-size:13px}
+</style>
+</head>
+<body>
+<a class="back" href="./index.html">← رجوع للنظام الرئيسي</a>
+<h1>📊 تقارير مجموعة الجدوع - مع عمولة الدفع الإلكتروني منفصلة</h1>
+<div class="card">
+<div class="row">
+<select id="mode"><option value="day">يومي</option><option value="month" selected>شهري</option><option value="year">سنوي</option></select>
+<input id="day" type="date" style="display:none">
+<input id="month" type="month">
+<input id="year" type="number" placeholder="2026" style="display:none">
+<button id="gen">عرض التقرير</button>
+</div>
+<div id="result"><div class="note">اختر التاريخ واضغط عرض - البيانات من نفس النظام (taswiya_data)</div></div>
+<button id="print">🖨️ طباعة / حفظ PDF</button>
+<div class="note">عمولة الدفع الإلكتروني = عمولة الإيداع + عمولة السحب - لا تدخل بالحسابات الباقية</div>
+</div>
+<script>
+var CATS=[
+{key:"malab",label:"الملعب",waredArrs:function(d){return [d.malab?.hujuzat, d.malab?.taira]},sahbArrs:function(d){return [d.malab?.sahb]}},
+{key:"hawatif",label:"الهواتف والموبايلات",waredArrs:function(d){return [d.hawatif?.wared]},sahbArrs:function(d){return [d.hawatif?.sahb]}},
+{key:"albisa",label:"الألبسة",waredArrs:function(d){return [d.albisa?.wared]},sahbArrs:function(d){return [d.albisa?.sahb]}},
+{key:"super",label:"السوبر ماركت",waredArrs:function(d){return [d.super?.sabah, d.super?.masai]},sahbArrs:function(d){return [d.super?.sahb]}},
+{key:"idara",label:"الإدارة",waredArrs:function(d){return [d.idara?.wared]},sahbArrs:function(d){return [d.idara?.sahb]}},
+{key:"electronic",label:"الدفع الإلكتروني",waredArrs:function(d){return [d.electronic?.ida]},sahbArrs:function(d){return [d.electronic?.sahb]}},
+{key:"electronic_comm",label:"عمولة الدفع الإلكتروني",field:"commission",waredArrs:function(d){return [d.electronic?.ida]},sahbArrs:function(d){return [d.electronic?.sahb]}},
+{key:"waredat",label:"الواردات الخارجية",waredArrs:function(d){return [d.waredat?.khareji, d.waredat?.whatsapp]},sahbArrs:function(d){return []}},
+{key:"saderat",label:"الصادرات",waredArrs:function(d){return []},sahbArrs:function(d){return [d.saderat?.awaliya, d.saderat?.sarfiyat]}}
+];
+function toWestern(s){return String(s||"").replace(/[\u0660-\u0669]/g,function(ch){return String(ch.charCodeAt(0)-0x0660);});}
+function parseDMY(s){var t=toWestern(s).replace(/[^\d]+/g," ").trim();var parts=t.split(" ").filter(Boolean);if(parts.length<3)return null;return {y:parts[2],m:parts[1].length===1?"0"+parts[1]:parts[1],d:parts[0].length===1?"0"+parts[0]:parts[0]};}
+function getDateParts(r){if(r.dateISO){var p=r.dateISO.split("-");return {y:p[0],m:p[1],d:p[2]};}return parseDMY(r.date);}
+function sumMatching(arr,matchFn,field){if(!Array.isArray(arr))return 0;var f=field||"amount";return arr.reduce(function(a,r){var pd=getDateParts(r);if(!pd)return a;return a+(matchFn(pd)?(r[f]||0):0);},0);}
+function fmt(n){return Math.round(n||0).toString().replace(/\B(?=(\d{3})+(?!\d))/g,"،");}
+function getAllData(){try{var raw=localStorage.getItem("taswiya_data");return raw?JSON.parse(raw):{};}catch(e){return {};}}
+function buildReport(mode,val){
+var data=getAllData();
+var matchFn=mode==="day"?function(pd){return (pd.y+"-"+pd.m+"-"+pd.d)===val;}:mode==="month"?function(pd){return (pd.y+"-"+pd.m)===val;}:function(pd){return pd.y===val;};
+var totals={};
+CATS.forEach(function(c){var w=0,s=0;c.waredArrs(data).forEach(function(arr){w+=sumMatching(arr,matchFn,c.field);});c.sahbArrs(data).forEach(function(arr){s+=sumMatching(arr,matchFn,c.field);});totals[c.key]={label:c.label,wared:w,sahb:s};});
+return totals;
+}
+function renderTable(totals,mode,val){
+var html='<div style="text-align:center;font-size:12px;color:#666;margin-bottom:8px">تقرير '+(mode==='day'?'يومي: '+val:mode==='month'?'شهري: '+val:'سنوي: '+val)+'</div>';
+html+='<table><tr><th>القسم</th><th>الوارد</th><th>السحب</th><th>الصافي (بدون عمولة)</th></tr>';
+var totW=0,totS=0,commIda=0,commSahb=0;
+Object.keys(totals).forEach(function(k){
+var t=totals[k];
+if(k==='electronic_comm'){commIda=t.wared;commSahb=t.sahb;
+html+='<tr style="background:#fffbeb"><td>'+t.label+' (إيداع + سحب)</td><td>'+fmt(t.wared)+'</td><td>'+fmt(t.sahb)+'</td><td style="font-weight:700;background:#eff6ff">'+fmt(t.wared+t.sahb)+' (منفصلة)</td></tr>';
+}else{totW+=t.wared;totS+=t.sahb;html+='<tr><td>'+t.label+'</td><td>'+fmt(t.wared)+'</td><td>'+fmt(t.sahb)+'</td><td style="font-weight:700">'+fmt(t.wared-t.sahb)+'</td></tr>';}
+});
+html+='<tr class="total"><td>الإجمالي (بدون عمولة)</td><td>'+fmt(totW)+'</td><td>'+fmt(totS)+'</td><td>'+fmt(totW-totS)+'</td></tr></table>';
+html+='<div class="comm">💰 عمولة الدفع الإلكتروني = عمولة الإيداع ('+fmt(commIda)+') + عمولة السحب ('+fmt(commSahb)+') = <b>'+fmt(commIda+commSahb)+' د.ع</b> - لا تدخل بالحسابات الباقية</div>';
+html+='<div class="blue"><b>تقرير عمولة الدفع الإلكتروني:</b><br>عمولة الإيداع: '+fmt(commIda)+' د.ع<br>عمولة السحب: '+fmt(commSahb)+' د.ع<br><b>الإجمالي: '+fmt(commIda+commSahb)+' د.ع</b><br><span style="font-size:10px;color:#666">هذه العمولة = إيداع + سحب وما تدخل بالعمليات الحسابية الباقية</span></div>';
+return html;
+}
+var modeEl=document.getElementById('mode'),dayEl=document.getElementById('day'),monthEl=document.getElementById('month'),yearEl=document.getElementById('year'),resultEl=document.getElementById('result');
+modeEl.addEventListener('change',function(){dayEl.style.display=modeEl.value==='day'?'':'none';monthEl.style.display=modeEl.value==='month'?'':'none';yearEl.style.display=modeEl.value==='year'?'':'none';});
+function gen(){var mode=modeEl.value,val=mode==='day'?dayEl.value:mode==='month'?monthEl.value:yearEl.value;if(!val){alert('اختر التاريخ');return;}var totals=buildReport(mode,val);resultEl.innerHTML=renderTable(totals,mode,val);}
+document.getElementById('gen').addEventListener('click',gen);
+document.getElementById('print').addEventListener('click',function(){var w=window.open('','_blank');w.document.write('<html dir="rtl"><head><meta charset="UTF-8"><title>تقرير</title><style>body{font-family:Arial;padding:20px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:8px;text-align:right}th{background:#f1f5f9}</style></head><body><h1>مجموعة الجدوع - تقرير</h1>'+resultEl.innerHTML+'</body></html>');w.document.close();setTimeout(function(){w.print();},300);});
+var now=new Date();document.getElementById('month').value=now.toISOString().slice(0,7);document.getElementById('day').value=now.toISOString().slice(0,10);document.getElementById('year').value=now.getFullYear();
+setTimeout(gen,400);
+</script>
+</body>
+</html>
