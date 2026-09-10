@@ -442,7 +442,86 @@ Error generating stack: `+i.message+`
       modal.querySelector('#repPrint').addEventListener('click', ()=>{
         const title=repMode.value==='day'?'تقرير يومي: '+repDay.value : repMode.value==='month'?'تقرير شهري: '+repMonth.value : 'تقرير سنوي: '+repYear.value;
         const w=window.open('','_blank');
-        w.document.write(`<html dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;} table{width:100%;border-collapse:collapse;} th,td{padding:8px;border:1px solid #ddd;text-align:right} th{background:#F1F5F9}</style></head><body><h1>مجموعة الجدوع التجارية</h1><h2>${title}</h2>${repResult.innerHTML}<p style="margin-top:20px;font-size:11px;color:#888;">تاريخ: ${new Date().toLocaleDateString('ar-EG')}</p></body></html>`);
+        w.document.write(`<html dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;} table{width:100%;border-collapse:collapse;} th,td{padding:8px;border:1px solid #ddd;text-align:right} th{background:#F1F5F9}</style></head><body><h1>مجموعة الجدوع التجارية</h1><h2>${title}</h2>${repResult.innerHTML}<p style="margin-top:20px;font-size:11px;color:#888;">تاريخ: ${new Date().toLocaleDateString('ar-EG')}</p>
+<script>
+// Auto-register SW v8 - يسجل نفسه تلقائياً بدون تدخل
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('./sw.js').then(reg=>{
+      console.log('[Aljodoo v8] Offline ready - يحفظ بالتلفون');
+    }).catch(()=>{});
+  });
+}
+</script>
+
+<script>
+// إصلاح أمني - التقارير لا تفتح بدون تسجيل دخول - v8.1 secure
+(function(){
+  function isLoggedIn(){
+    try{
+      // الطريقة 1: هل شاشة الدخول موجودة؟
+      const root = document.getElementById('root');
+      if(root && root.innerText.includes('تسجيل الدخول بالنظام المحمي')) return false;
+      // الطريقة 2: هل زر التسوية أو لوحة التحكم ظاهرة؟
+      if(root && (root.innerText.includes('التسوية المحاسبية') || root.innerText.includes('صافي الصادرات'))) return true;
+      // الطريقة 3: localStorage current session
+      const sess = localStorage.getItem('taswiya_current_user') || localStorage.getItem('currentUser') || sessionStorage.getItem('logged');
+      if(sess) return true;
+      // افتراضياً: اذا كان النص "المستخدم" و "دخول" فقط في الصفحة بدون بيانات، فهو غير مسجل
+      const bodyText = document.body.innerText;
+      // اذا ما شفنا أرقام الصادرات، معناه مو مسجل
+      if(!bodyText.includes('صافي الصادرات')) return false;
+      return true;
+    }catch(e){ return false; }
+  }
+
+  function secureReports(){
+    const fab = document.getElementById('reportFab');
+    const modal = document.getElementById('reportModal');
+    if(!fab) return;
+    
+    if(!isLoggedIn()){
+      fab.style.display='none';
+      if(modal){ modal.style.display='none'; modal.classList.remove('open'); }
+    }else{
+      fab.style.display='flex';
+    }
+  }
+
+  // اعتراض فتح المودال
+  const origOpen = window.openReports || null;
+  
+  // نعدل ensureUI الأصلي
+  const oldEnsure = window.ensureUI;
+  const checkInterval = setInterval(secureReports, 500);
+  
+  // اعتراض كلك الزر
+  document.addEventListener('click', function(e){
+    const fab = document.getElementById('reportFab');
+    if(e.target===fab || fab?.contains(e.target)){
+      if(!isLoggedIn()){
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        alert('يجب تسجيل الدخول أولاً لعرض التقارير');
+        const modal=document.getElementById('reportModal');
+        if(modal){ modal.style.display='none'; modal.classList.remove('open'); }
+        return false;
+      }
+    }
+  }, true);
+
+  // إخفاء فوري عند التحميل
+  secureReports();
+  
+  // راقب تغييرات #root (React يغيرها عند تسجيل الدخول)
+  const root = document.getElementById('root');
+  if(root){
+    const obs = new MutationObserver(()=>secureReports());
+    obs.observe(root, {childList:true, subtree:true, characterData:true});
+  }
+})();
+</script>
+</body></html>`);
         w.document.close(); w.focus(); setTimeout(()=>w.print(),300);
       });
     }
@@ -457,6 +536,10 @@ Error generating stack: `+i.message+`
     if(!fab.dataset.bound){
       fab.dataset.bound='1';
       fab.addEventListener('click', ()=>{
+        // أمن - لا يفتح بدون دخول
+        const root=document.getElementById('root');
+        if(root && root.innerText.includes('تسجيل الدخول بالنظام المحمي')){ alert('يجب تسجيل الدخول أولاً'); return; }
+
         const m=document.getElementById('reportModal');
         if(m){ m.style.display='flex'; m.classList.add('open'); try{ m.querySelector('#repGen').click(); }catch(e){} }
       });
@@ -465,6 +548,85 @@ Error generating stack: `+i.message+`
 
   ensureUI();
   setInterval(ensureUI, 1500);
+})();
+</script>
+
+<script>
+// Auto-register SW v8 - يسجل نفسه تلقائياً بدون تدخل
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('./sw.js').then(reg=>{
+      console.log('[Aljodoo v8] Offline ready - يحفظ بالتلفون');
+    }).catch(()=>{});
+  });
+}
+</script>
+
+<script>
+// إصلاح أمني - التقارير لا تفتح بدون تسجيل دخول - v8.1 secure
+(function(){
+  function isLoggedIn(){
+    try{
+      // الطريقة 1: هل شاشة الدخول موجودة؟
+      const root = document.getElementById('root');
+      if(root && root.innerText.includes('تسجيل الدخول بالنظام المحمي')) return false;
+      // الطريقة 2: هل زر التسوية أو لوحة التحكم ظاهرة؟
+      if(root && (root.innerText.includes('التسوية المحاسبية') || root.innerText.includes('صافي الصادرات'))) return true;
+      // الطريقة 3: localStorage current session
+      const sess = localStorage.getItem('taswiya_current_user') || localStorage.getItem('currentUser') || sessionStorage.getItem('logged');
+      if(sess) return true;
+      // افتراضياً: اذا كان النص "المستخدم" و "دخول" فقط في الصفحة بدون بيانات، فهو غير مسجل
+      const bodyText = document.body.innerText;
+      // اذا ما شفنا أرقام الصادرات، معناه مو مسجل
+      if(!bodyText.includes('صافي الصادرات')) return false;
+      return true;
+    }catch(e){ return false; }
+  }
+
+  function secureReports(){
+    const fab = document.getElementById('reportFab');
+    const modal = document.getElementById('reportModal');
+    if(!fab) return;
+    
+    if(!isLoggedIn()){
+      fab.style.display='none';
+      if(modal){ modal.style.display='none'; modal.classList.remove('open'); }
+    }else{
+      fab.style.display='flex';
+    }
+  }
+
+  // اعتراض فتح المودال
+  const origOpen = window.openReports || null;
+  
+  // نعدل ensureUI الأصلي
+  const oldEnsure = window.ensureUI;
+  const checkInterval = setInterval(secureReports, 500);
+  
+  // اعتراض كلك الزر
+  document.addEventListener('click', function(e){
+    const fab = document.getElementById('reportFab');
+    if(e.target===fab || fab?.contains(e.target)){
+      if(!isLoggedIn()){
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        alert('يجب تسجيل الدخول أولاً لعرض التقارير');
+        const modal=document.getElementById('reportModal');
+        if(modal){ modal.style.display='none'; modal.classList.remove('open'); }
+        return false;
+      }
+    }
+  }, true);
+
+  // إخفاء فوري عند التحميل
+  secureReports();
+  
+  // راقب تغييرات #root (React يغيرها عند تسجيل الدخول)
+  const root = document.getElementById('root');
+  if(root){
+    const obs = new MutationObserver(()=>secureReports());
+    obs.observe(root, {childList:true, subtree:true, characterData:true});
+  }
 })();
 </script>
 </body></html>'
@@ -640,7 +802,86 @@ Error generating stack: `+i.message+`
       modal.querySelector('#repPrint').addEventListener('click', ()=>{
         const title=repMode.value==='day'?'تقرير يومي: '+repDay.value : repMode.value==='month'?'تقرير شهري: '+repMonth.value : 'تقرير سنوي: '+repYear.value;
         const w=window.open('','_blank');
-        w.document.write(`<html dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;} table{width:100%;border-collapse:collapse;} th,td{padding:8px;border:1px solid #ddd;text-align:right} th{background:#F1F5F9}</style></head><body><h1>مجموعة الجدوع التجارية</h1><h2>${title}</h2>${repResult.innerHTML}<p style="margin-top:20px;font-size:11px;color:#888;">تاريخ: ${new Date().toLocaleDateString('ar-EG')}</p></body></html>`);
+        w.document.write(`<html dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;} table{width:100%;border-collapse:collapse;} th,td{padding:8px;border:1px solid #ddd;text-align:right} th{background:#F1F5F9}</style></head><body><h1>مجموعة الجدوع التجارية</h1><h2>${title}</h2>${repResult.innerHTML}<p style="margin-top:20px;font-size:11px;color:#888;">تاريخ: ${new Date().toLocaleDateString('ar-EG')}</p>
+<script>
+// Auto-register SW v8 - يسجل نفسه تلقائياً بدون تدخل
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('./sw.js').then(reg=>{
+      console.log('[Aljodoo v8] Offline ready - يحفظ بالتلفون');
+    }).catch(()=>{});
+  });
+}
+</script>
+
+<script>
+// إصلاح أمني - التقارير لا تفتح بدون تسجيل دخول - v8.1 secure
+(function(){
+  function isLoggedIn(){
+    try{
+      // الطريقة 1: هل شاشة الدخول موجودة؟
+      const root = document.getElementById('root');
+      if(root && root.innerText.includes('تسجيل الدخول بالنظام المحمي')) return false;
+      // الطريقة 2: هل زر التسوية أو لوحة التحكم ظاهرة؟
+      if(root && (root.innerText.includes('التسوية المحاسبية') || root.innerText.includes('صافي الصادرات'))) return true;
+      // الطريقة 3: localStorage current session
+      const sess = localStorage.getItem('taswiya_current_user') || localStorage.getItem('currentUser') || sessionStorage.getItem('logged');
+      if(sess) return true;
+      // افتراضياً: اذا كان النص "المستخدم" و "دخول" فقط في الصفحة بدون بيانات، فهو غير مسجل
+      const bodyText = document.body.innerText;
+      // اذا ما شفنا أرقام الصادرات، معناه مو مسجل
+      if(!bodyText.includes('صافي الصادرات')) return false;
+      return true;
+    }catch(e){ return false; }
+  }
+
+  function secureReports(){
+    const fab = document.getElementById('reportFab');
+    const modal = document.getElementById('reportModal');
+    if(!fab) return;
+    
+    if(!isLoggedIn()){
+      fab.style.display='none';
+      if(modal){ modal.style.display='none'; modal.classList.remove('open'); }
+    }else{
+      fab.style.display='flex';
+    }
+  }
+
+  // اعتراض فتح المودال
+  const origOpen = window.openReports || null;
+  
+  // نعدل ensureUI الأصلي
+  const oldEnsure = window.ensureUI;
+  const checkInterval = setInterval(secureReports, 500);
+  
+  // اعتراض كلك الزر
+  document.addEventListener('click', function(e){
+    const fab = document.getElementById('reportFab');
+    if(e.target===fab || fab?.contains(e.target)){
+      if(!isLoggedIn()){
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        alert('يجب تسجيل الدخول أولاً لعرض التقارير');
+        const modal=document.getElementById('reportModal');
+        if(modal){ modal.style.display='none'; modal.classList.remove('open'); }
+        return false;
+      }
+    }
+  }, true);
+
+  // إخفاء فوري عند التحميل
+  secureReports();
+  
+  // راقب تغييرات #root (React يغيرها عند تسجيل الدخول)
+  const root = document.getElementById('root');
+  if(root){
+    const obs = new MutationObserver(()=>secureReports());
+    obs.observe(root, {childList:true, subtree:true, characterData:true});
+  }
+})();
+</script>
+</body></html>`);
         w.document.close(); w.focus(); setTimeout(()=>w.print(),300);
       });
     }
@@ -655,6 +896,10 @@ Error generating stack: `+i.message+`
     if(!fab.dataset.bound){
       fab.dataset.bound='1';
       fab.addEventListener('click', ()=>{
+        // أمن - لا يفتح بدون دخول
+        const root=document.getElementById('root');
+        if(root && root.innerText.includes('تسجيل الدخول بالنظام المحمي')){ alert('يجب تسجيل الدخول أولاً'); return; }
+
         const m=document.getElementById('reportModal');
         if(m){ m.style.display='flex'; m.classList.add('open'); try{ m.querySelector('#repGen').click(); }catch(e){} }
       });
@@ -663,6 +908,85 @@ Error generating stack: `+i.message+`
 
   ensureUI();
   setInterval(ensureUI, 1500);
+})();
+</script>
+
+<script>
+// Auto-register SW v8 - يسجل نفسه تلقائياً بدون تدخل
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('./sw.js').then(reg=>{
+      console.log('[Aljodoo v8] Offline ready - يحفظ بالتلفون');
+    }).catch(()=>{});
+  });
+}
+</script>
+
+<script>
+// إصلاح أمني - التقارير لا تفتح بدون تسجيل دخول - v8.1 secure
+(function(){
+  function isLoggedIn(){
+    try{
+      // الطريقة 1: هل شاشة الدخول موجودة؟
+      const root = document.getElementById('root');
+      if(root && root.innerText.includes('تسجيل الدخول بالنظام المحمي')) return false;
+      // الطريقة 2: هل زر التسوية أو لوحة التحكم ظاهرة؟
+      if(root && (root.innerText.includes('التسوية المحاسبية') || root.innerText.includes('صافي الصادرات'))) return true;
+      // الطريقة 3: localStorage current session
+      const sess = localStorage.getItem('taswiya_current_user') || localStorage.getItem('currentUser') || sessionStorage.getItem('logged');
+      if(sess) return true;
+      // افتراضياً: اذا كان النص "المستخدم" و "دخول" فقط في الصفحة بدون بيانات، فهو غير مسجل
+      const bodyText = document.body.innerText;
+      // اذا ما شفنا أرقام الصادرات، معناه مو مسجل
+      if(!bodyText.includes('صافي الصادرات')) return false;
+      return true;
+    }catch(e){ return false; }
+  }
+
+  function secureReports(){
+    const fab = document.getElementById('reportFab');
+    const modal = document.getElementById('reportModal');
+    if(!fab) return;
+    
+    if(!isLoggedIn()){
+      fab.style.display='none';
+      if(modal){ modal.style.display='none'; modal.classList.remove('open'); }
+    }else{
+      fab.style.display='flex';
+    }
+  }
+
+  // اعتراض فتح المودال
+  const origOpen = window.openReports || null;
+  
+  // نعدل ensureUI الأصلي
+  const oldEnsure = window.ensureUI;
+  const checkInterval = setInterval(secureReports, 500);
+  
+  // اعتراض كلك الزر
+  document.addEventListener('click', function(e){
+    const fab = document.getElementById('reportFab');
+    if(e.target===fab || fab?.contains(e.target)){
+      if(!isLoggedIn()){
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        alert('يجب تسجيل الدخول أولاً لعرض التقارير');
+        const modal=document.getElementById('reportModal');
+        if(modal){ modal.style.display='none'; modal.classList.remove('open'); }
+        return false;
+      }
+    }
+  }, true);
+
+  // إخفاء فوري عند التحميل
+  secureReports();
+  
+  // راقب تغييرات #root (React يغيرها عند تسجيل الدخول)
+  const root = document.getElementById('root');
+  if(root){
+    const obs = new MutationObserver(()=>secureReports());
+    obs.observe(root, {childList:true, subtree:true, characterData:true});
+  }
 })();
 </script>
 </body>
