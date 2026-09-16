@@ -266,11 +266,15 @@ Error generating stack: `+i.message+`
   try{
     if(!window.XLSX){alert("مكتبة تصدير Excel ما تحملت، جرب مرة ثانية أو تأكد من الاتصال بالنت");return}
     let wb=XLSX.utils.book_new(),fmt=(x)=>x?Qt(x):"";
-    let summaryRows=[{القسم:"الصادرات",القيمة:Q.Sr},{القسم:"الواردات",القيمة:Q.mu},{القسم:"الملعب",القيمة:Q.Gp},{القسم:"الهواتف",القيمة:Q.Kp},{القسم:"الألبسة",القيمة:Q.Wp},{القسم:"السوبر ماركت",القيمة:Q.Jp},{القسم:"الإدارة",القيمة:Q.Np},{القسم:"الدفع الإلكتروني",القيمة:Q.Xp},{القسم:"المحول",القيمة:Q.muhawalSum},{القسم:"الرصيد",القيمة:Q.rasid},{القسم:"الفرق النهائي",القيمة:Q.farq}];
+    let summaryRows=[{القسم:"نسخة احتياطية كاملة - تصدير بتاريخ "+bi(),القيمة:""},{القسم:"الصادرات",القيمة:Q.Sr},{القسم:"الواردات",القيمة:Q.mu},{القسم:"الملعب",القيمة:Q.Gp},{القسم:"الهواتف",القيمة:Q.Kp},{القسم:"الألبسة",القيمة:Q.Wp},{القسم:"السوبر ماركت",القيمة:Q.Jp},{القسم:"الإدارة",القيمة:Q.Np},{القسم:"الدفع الإلكتروني",القيمة:Q.Xp},{القسم:"المحول",القيمة:Q.muhawalSum},{القسم:"الرصيد",القيمة:Q.rasid},{القسم:"الفرق النهائي",القيمة:Q.farq}];
     let wsS=XLSX.utils.json_to_sheet(summaryRows);
     XLSX.utils.book_append_sheet(wb,wsS,"ملخص");
+    let sortByDate=(arr)=>[...arr].sort((a,b)=>(a.dateISO||"").localeCompare(b.dateISO||""));
     let addSheet=(name,rows)=>{
-      if(!rows.length)rows=[{"لا توجد بيانات":""}];
+      if(!rows.length){rows=[{"لا توجد بيانات":""}]}else{
+        let total=rows.reduce((s,r)=>s+(Number(r.المبلغ)||0),0);
+        rows=[...rows,{التاريخ:"",المبلغ:total,البيان:"الإجمالي (كل الأيام)"}];
+      }
       let ws=XLSX.utils.json_to_sheet(rows);
       let safeName=name.slice(0,31);
       XLSX.utils.book_append_sheet(wb,ws,safeName);
@@ -278,13 +282,13 @@ Error generating stack: `+i.message+`
     Di.forEach((cat)=>{
       let V=c[cat.key];
       if(Array.isArray(V)){
-        let rows=V.map((it)=>({التاريخ:fmt(it.dateISO)||it.date||"",المبلغ:it.amount||0,البيان:it.note||"",المستخدم:it.user||"",...(it.name?{الاسم:it.name}:{}),...(it.status?{الحالة:it.status}:{}),...(it.receivedBy?{المستلم:it.receivedBy}:{}),...(it.commission?{العمولة:it.commission}:{})}));
+        let rows=sortByDate(V).map((it)=>({التاريخ:fmt(it.dateISO)||it.date||"",المبلغ:it.amount||0,البيان:it.note||"",المستخدم:it.user||"",...(it.name?{الاسم:it.name}:{}),...(it.status?{الحالة:it.status}:{}),...(it.receivedBy?{المستلم:it.receivedBy}:{}),...(it.commission?{العمولة:it.commission}:{})}));
         addSheet(cat.label,rows);
       }else{
         cat.subs.forEach((sub)=>{
           let arr=V?.[sub.key];
           if(!Array.isArray(arr))return;
-          let rows=arr.map((it)=>({التاريخ:fmt(it.dateISO)||it.date||"",المبلغ:it.amount||0,البيان:it.note||"",المستخدم:it.user||"",...(it.commission?{العمولة:it.commission}:{})}));
+          let rows=sortByDate(arr).map((it)=>({التاريخ:fmt(it.dateISO)||it.date||"",المبلغ:it.amount||0,البيان:it.note||"",المستخدم:it.user||"",...(it.commission?{العمولة:it.commission}:{})}));
           addSheet(`${cat.label}-${sub.label}`,rows);
         });
       }
