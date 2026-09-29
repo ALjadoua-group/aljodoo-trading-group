@@ -112,6 +112,62 @@
     html.jd-dark #root .bg-black\/50{background-color:rgba(3,12,30,.7)}
   </style>
 
+  <style id="jd-dark-balance">
+    /* ===== توازن الأصفر والأزرق في الوضع الداكن (نصف/نصف) — يتغلب على القواعد السابقة بالترتيب ===== */
+    html.jd-dark{--jd-gold:#3d3300;--jd-gold2:#4d4000;--jd-line:rgba(255,216,0,.5);--jd-muted:#dbe4f5}
+
+    /* الترويسة: كتلة صفراء كاملة بنص كحلي، وأزرارها كحلية */
+    html.jd-dark #root header.sticky,
+    html.jd-dark #root .bg-\[\#0f172a\]\/90{background-color:#FFD800;border-color:#061a3b;border-bottom-width:3px;color:#061a3b;backdrop-filter:none}
+    html.jd-dark #root header .font-bold.text-\[13px\]{color:#061a3b}
+    html.jd-dark #root header .opacity-60{opacity:.85;color:#3b3000}
+    html.jd-dark #root header img{box-shadow:0 0 0 2px #061a3b}
+    html.jd-dark #root header button{background-color:#061a3b;color:#FFD800;border-color:#061a3b}
+    html.jd-dark #root header button.bg-\[\#1e3a8a\]{background-color:#006ee6;color:#fff}
+
+    /* الأزرار الرئيسية: أصفر بنص كحلي */
+    html.jd-dark #root .bg-\[\#1e3a8a\]{background-color:#FFD800;color:#061a3b;border-color:transparent}
+    html.jd-dark #root .bg-\[\#1e3a8a\].text-white,
+    html.jd-dark #root .bg-\[\#1e3a8a\] .text-white{color:#061a3b}
+
+    /* اللوحات الكبيرة أزرق، واللوحات الداخلية ذهبية → نصف ونصف */
+    html.jd-dark #root .bg-white\/\[0\.02\],
+    html.jd-dark #root .bg-gray-50,
+    html.jd-dark #root .bg-\[\#f9fafb\],
+    html.jd-dark #root .bg-\[\#fbfcfe\],
+    html.jd-dark #root .bg-\[\#fbfdff\],
+    html.jd-dark #root .bg-\[\#fcfcfb\]{background-color:var(--jd-gold);border-color:var(--jd-line)}
+    html.jd-dark #root .bg-white\/5,
+    html.jd-dark #root .bg-white\/10,
+    html.jd-dark #root .bg-gray-100,
+    html.jd-dark #root .bg-gray-200{background-color:var(--jd-gold2);border-color:var(--jd-line)}
+
+    /* بطاقات الأقسام: تتناوب أزرق / ذهبي */
+    html.jd-dark #root button.rounded-\[20px\]:nth-child(even){background-color:var(--jd-gold)}
+    html.jd-dark #root button.rounded-\[20px\]:nth-child(odd){background-color:#0d2b5e}
+
+    /* حدود أوضح بالأصفر على كل العناصر */
+    html.jd-dark #root .border-white\/10,
+    html.jd-dark #root .border-gray-100,
+    html.jd-dark #root .border-gray-200,
+    html.jd-dark #root .border-gray-300{border-color:var(--jd-line)}
+    html.jd-dark #root :is(input,select,textarea):not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]):not([type=color]){border-color:rgba(255,216,0,.65) !important}
+
+    /* النصوص الخافتة أفتح لتظهر على الأزرق والذهبي معاً */
+    html.jd-dark #root .text-gray-400{color:#c3d0ea}
+    html.jd-dark #root .text-gray-500,
+    html.jd-dark #root .text-gray-600{color:var(--jd-muted)}
+    html.jd-dark #root .text-gray-700,
+    html.jd-dark #root .text-gray-800{color:#f1f5ff}
+    html.jd-dark #root .text-blue-700,html.jd-dark #root .text-cyan-700{color:#9fd2ff}
+
+    /* عناوين داخل اللوحات بالأصفر */
+    html.jd-dark #root main .font-bold.text-\[13px\]:not([class*="text-emerald"]):not([class*="text-red"]):not([class*="text-amber"]):not([class*="text-blue"]):not([class*="text-cyan"]):not([class*="text-white"]):not([class*="text-gray"]):not([class*="text-black"]):not(button *):not(button),
+    html.jd-dark #root main .font-bold.text-\[14px\]:not([class*="text-emerald"]):not([class*="text-red"]):not([class*="text-amber"]):not([class*="text-blue"]):not([class*="text-cyan"]):not([class*="text-white"]):not([class*="text-gray"]):not([class*="text-black"]):not(button *):not(button),
+    html.jd-dark #root main .font-bold.text-\[15px\]:not([class*="text-emerald"]):not([class*="text-red"]):not([class*="text-amber"]):not([class*="text-blue"]):not([class*="text-cyan"]):not([class*="text-white"]):not([class*="text-gray"]):not([class*="text-black"]):not(button *):not(button){color:#FFE45C}
+  </style>
+
+
   <script>
   (function(){
     var ICONS={ok:"✓",warn:"⚠",err:"✕",del:"🗑",info:"ⓘ"};
