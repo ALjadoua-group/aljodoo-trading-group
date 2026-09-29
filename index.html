@@ -167,6 +167,38 @@
     html.jd-dark #root main .font-bold.text-\[15px\]:not([class*="text-emerald"]):not([class*="text-red"]):not([class*="text-amber"]):not([class*="text-blue"]):not([class*="text-cyan"]):not([class*="text-white"]):not([class*="text-gray"]):not([class*="text-black"]):not(button *):not(button){color:#FFE45C}
   </style>
 
+  <style id="jd-dark-rows">
+    /* ===== صفوف العمليات في كل الأقسام: خلفية صفراء + خط أزرق غامق (الوضع الداكن فقط) ===== */
+    html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between{background:#FFD800;border-color:#b38f00;color:#061a3b;box-shadow:0 2px 8px rgba(0,0,0,.28)}
+    html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between *{border-color:rgba(6,26,59,.25)}
+    html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between .font-bold.text-\[13px\]{color:#061a3b}
+    html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between .opacity-70,
+    html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between .opacity-60,
+    html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between .opacity-50{opacity:1;color:#0a2a66}
+
+    /* الشارات داخل الصف */
+    html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between .bg-gray-100.text-gray-600{background-color:#061a3b;color:#FFD800;border-color:#061a3b}
+    html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between span.rounded-full[style]{background:#ffffff !important;box-shadow:0 0 0 1px rgba(6,26,59,.35)}
+    html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between .bg-amber-100{background-color:#061a3b;color:#FFD800;border-color:#061a3b}
+    html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between .bg-cyan-50{background-color:#061a3b;color:#9fd2ff;border-color:#061a3b}
+
+    /* أزرار التعديل والحذف */
+    html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between button.bg-blue-50{background-color:#061a3b;color:#FFD800}
+    html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between button.bg-blue-50:hover{background-color:#0d2b5e}
+    html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between button.bg-red-50{background-color:#061a3b;color:#ff8f8f}
+    html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between button.bg-red-50:hover{background-color:#7f1d1d;color:#fff}
+
+    /* لوحة التعديل داخل الصف: كحلية بنص أبيض */
+    html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between .bg-amber-50{background-color:#061a3b;color:#ffffff;border-radius:10px}
+    html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between .bg-amber-50 .bg-gray-100{background-color:#14396f;color:#fff}
+
+    /* منطقة الإعجاب والتعليقات (قسم الواردات واتساب) */
+    html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between .bg-gray-50{background-color:rgba(6,26,59,.12);color:#061a3b}
+    html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between .bg-blue-50{background-color:rgba(6,26,59,.14);color:#061a3b}
+    html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between .border-t{border-color:rgba(6,26,59,.3)}
+  </style>
+
+
 
   <script>
   (function(){
