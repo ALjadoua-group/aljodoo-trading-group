@@ -1110,7 +1110,8 @@ html.jd-dark #jdDash{--bg:#061a3b;--card:#0d2b5e;--tx:#fff;--mu:#c3d0ea;--ln:rgb
 #jdDash .bk{display:flex;gap:8px;margin:6px 0 10px}
 #jdDash .bk button{flex:1;padding:11px;border-radius:12px;border:1px solid var(--acc);background:var(--acc);color:var(--bg);font-weight:700;font-size:13px}
 #jdDash .bk button.s{background:transparent;color:var(--tx)}
-html.jd-dark #root .jd-ylw{color:#061a3b!important}
+html.jd-dark #root .jd-dk{color:#061a3b!important}
+html.jd-dark #root .jd-lt{color:#fff!important}
 </style>
 <script id="jd-dash-js">
 (function(){
@@ -1163,8 +1164,12 @@ else if(a==="im"){var f=m.querySelector("#jdImp");f.value="";f.onchange=function
 function inj(){var t=document.getElementById("jd-tabs");if(!t||t.querySelector("#jdDashBtn"))return;var b=document.createElement("button");b.type="button";b.id="jdDashBtn";b.textContent="📈 المؤشرات";b.addEventListener("click",function(e){e.stopPropagation();open()});t.insertBefore(b,t.querySelector(".jd-close"))}
 function mount(){document.body.appendChild(m);new MutationObserver(inj).observe(document.body,{childList:true,subtree:true});inj()}
 document.body?mount():document.addEventListener("DOMContentLoaded",mount);
-var yq=0;function yl(){yq=0;var r=document.getElementById("root");if(!r)return;r.querySelectorAll("div").forEach(function(e){var y=getComputedStyle(e).backgroundColor==="rgb(255, 216, 0)";if(y!==e.classList.contains("jd-ylw"))e.classList.toggle("jd-ylw",y)})}
-function ys(){if(!yq){yq=1;requestAnimationFrame(yl)}}
+var yq=0;
+function lm(c){var m=(c||"").match(/[\d.]+/g);if(!m||m.length<3)return -1;var v=[0,1,2].map(function(i){var x=m[i]/255;return x<=.03928?x/12.92:Math.pow((x+.055)/1.055,2.4)});return .2126*v[0]+.7152*v[1]+.0722*v[2]}
+function yl(){var r=document.getElementById("root");if(!r||!document.documentElement.classList.contains("jd-dark"))return;var K=new Map();
+function bg(e){if(!e||e===document.documentElement)return 1;if(K.has(e))return K.get(e);var c=getComputedStyle(e).backgroundColor,m=(c||"").match(/[\d.]+/g),v;if(m&&m.length>=3&&(m.length<4||+m[3]>.6))v=lm(c);else v=bg(e.parentElement);K.set(e,v);return v}
+r.querySelectorAll("*").forEach(function(e){if(/^(INPUT|SELECT|TEXTAREA|SCRIPT|STYLE|SVG|PATH)$/i.test(e.tagName))return;var h=false;for(var n=e.firstChild;n;n=n.nextSibling)if(n.nodeType===3&&n.nodeValue.trim()){h=true;break}if(!h)return;var t=lm(getComputedStyle(e).color),b=bg(e);if(t<0)return;if((Math.max(t,b)+.05)/(Math.min(t,b)+.05)<3)e.classList.add(b>.35?"jd-dk":"jd-lt")})}
+function ys(){clearTimeout(yq);yq=setTimeout(yl,250)}
 function yo(){new MutationObserver(ys).observe(document.body,{childList:true,subtree:true});new MutationObserver(ys).observe(document.documentElement,{attributes:true,attributeFilter:["class"]});ys()}
 document.body?yo():document.addEventListener("DOMContentLoaded",yo);
 })();
