@@ -1380,6 +1380,24 @@ html.jd-dark #jdEmp{--bg:#1c1f24;--card:#2a2e35;--fd:#22262c;--tx:#fff;--mu:#d9d
 #jdEmp .fin .cv{font-size:22px}
 #jdEmp .dl{width:100%;border-color:var(--neg);color:var(--neg)}
 #jdEmp .pos{color:var(--pos)}#jdEmp .neg{color:var(--neg)}
+#jdEmp{--nb:#FFE45C;--cb:#FFF1A8;--nbd:#b38f00;--red:#b91c1c}
+html.jd-dark #jdEmp{--nb:#FFD800;--cb:#FFE98A;--nbd:#b38f00;--red:#b91c1c}
+#jdEmp input:not(.tx){background:var(--nb);color:#000;font-weight:800;font-size:18px;border:2px solid var(--nbd);letter-spacing:.3px}
+#jdEmp input:not(.tx)::placeholder{color:rgba(0,0,0,.45);font-weight:600}
+#jdEmp input:not(.tx):focus{border-color:#000;box-shadow:0 0 0 3px rgba(255,216,0,.45)}
+#jdEmp .dy button{background:var(--nb);color:#000;border-color:var(--nbd);font-weight:800}
+#jdEmp .ro .cv{display:inline-block;min-width:96px;text-align:center;padding:5px 14px;border-radius:10px;background:var(--cb);color:#000;border:1px solid var(--nbd);font-size:17px;font-weight:800}
+#jdEmp .ro .cv.neg{color:var(--red)}
+#jdEmp .fin{background:var(--nb);border:2px solid var(--nbd)}
+#jdEmp .fin span:first-child{color:#000;font-size:16px}
+#jdEmp .fin .cv{color:#000;font-size:26px;font-weight:900}
+#jdEmp .fin .cv.neg{color:var(--red)}
+#jdEmp .tf{display:inline-block;background:var(--nb);color:#000;border-radius:10px;padding:3px 12px;border:1px solid var(--nbd)}
+#jdEmp .tf small{color:#333}
+#jdEmp .tf.neg{color:var(--red)}
+#jdEmp .td.dr{color:var(--neg);font-weight:700}
+#jdEmp .sm b{display:inline-block;background:var(--nb);color:#000;border-radius:10px;padding:3px 12px;border:1px solid var(--nbd)}
+#jdEmp .sm div:nth-child(2) b{color:var(--red)}
 </style>
 <script type="module" id="jd-emp-fb">
 import {getApp} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
@@ -1424,7 +1442,7 @@ function cls(v){return v<0?"neg":"pos"}
 function totals(){var L=list(),f=0,d=0;L.forEach(function(e){var c=calc(e);f+=c.fin;d+=c.nd});return{n:L.length,f:f,d:d}}
 function sumUp(){var t=totals(),a=el.querySelector("[data-o=tf]"),b=el.querySelector("[data-o=td]");if(a)a.textContent=fmt(t.f)+" د.ع";if(b)b.textContent=fmt(t.d)+" د.ع"}
 function ltr(e){var n=(e.name||"").trim();return n?n.charAt(0):"؟"}
-function tile(e){var c=calc(e);return '<div class="tl" data-a="op" data-id="'+e.id+'"><div class="av" data-tl="'+e.id+'">'+esc(ltr(e))+'</div><div class="tn" data-tn="'+e.id+'">'+(esc(e.name)||"موظف جديد")+'</div><div class="tf '+cls(c.fin)+'" data-tf="'+e.id+'">'+fmt(c.fin)+'<small> د.ع</small></div><div class="td" data-td="'+e.id+'">'+(c.nd>0?"دين: "+fmt(c.nd):"بلا دين")+'</div></div>'}
+function tile(e){var c=calc(e);return '<div class="tl" data-a="op" data-id="'+e.id+'"><div class="av" data-tl="'+e.id+'">'+esc(ltr(e))+'</div><div class="tn" data-tn="'+e.id+'">'+(esc(e.name)||"موظف جديد")+'</div><div class="tf '+cls(c.fin)+'" data-tf="'+e.id+'">'+fmt(c.fin)+'<small> د.ع</small></div><div class="td'+(c.nd>0?" dr":"")+'" data-td="'+e.id+'">'+(c.nd>0?"دين: "+fmt(c.nd):"بلا دين")+'</div></div>'}
 function row(e,lb,f,v){return '<div class="ro"><span>'+lb+'</span><input data-f="'+f+'" data-id="'+e.id+'" inputmode="numeric" value="'+(v?esc(v):"")+'" placeholder="0"></div>'}
 function out(lb,o,txt,c){return '<div class="ro"><span>'+lb+'</span><span class="cv '+(c||"")+'" data-o="'+o+'">'+txt+'</span></div>'}
 function modal(e){
@@ -1434,7 +1452,7 @@ function modal(e){
   +row(e,"مبلغ الدين الكلي","debt",e.debt?fmt(num(e.debt)):"")+row(e,"مقدار الراتب الكلي","salary",e.salary?fmt(num(e.salary)):"")+'</div>'
   +'<div class="sc"><h4>الغياب</h4><div class="ro"><span>أيام الغياب</span><span class="dy"><button type="button" data-a="dm" data-id="'+e.id+'">−</button><input data-f="days" data-id="'+e.id+'" inputmode="decimal" value="'+(num(e.days)||0)+'"><button type="button" data-a="dp" data-id="'+e.id+'">+</button></span></div>'
   +out("استقطاع الغياب","abs",fmt(c.abs),"neg")+out("صافي الراتب بعد الغياب","net",fmt(c.net))+'</div>'
-  +'<div class="sc"><h4>الدين</h4>'+row(e,"مبلغ استقطاع الدين","ded",e.ded?fmt(num(e.ded)):"")+out("صافي الدين الكلي","nd",fmt(c.nd))+'</div>'
+  +'<div class="sc"><h4>الدين</h4>'+row(e,"مبلغ استقطاع الدين","ded",e.ded?fmt(num(e.ded)):"")+out("صافي الدين الكلي","nd",fmt(c.nd),"neg")+'</div>'
   +'<div class="fin"><span>صافي الراتب</span><span class="cv '+cls(c.fin)+'" data-o="fin">'+fmt(c.fin)+' د.ع</span></div>'
   +'<div class="sc"><h4>الملاحظات</h4><textarea class="tx" data-f="notes" data-id="'+e.id+'" placeholder="ملاحظات">'+esc(e.notes)+'</textarea></div>'
   +'<button type="button" class="dl" data-a="del" data-id="'+e.id+'">حذف الموظف</button></div></div>'}
@@ -1455,7 +1473,7 @@ function refresh(id){
   s('[data-o="abs"]',fmt(c.abs));s('[data-o="net"]',fmt(c.net));s('[data-o="nd"]',fmt(c.nd));s('[data-o="fin"]',fmt(c.fin)+" د.ع",cls(c.fin));
   s('[data-o="mt"]',e.name||"موظف جديد");
   var tf=el.querySelector('[data-tf="'+id+'"]');if(tf){tf.innerHTML=fmt(c.fin)+'<small> د.ع</small>';tf.className="tf "+cls(c.fin)}
-  s('[data-tn="'+id+'"]',e.name||"موظف جديد");s('[data-tl="'+id+'"]',ltr(e));s('[data-td="'+id+'"]',c.nd>0?"دين: "+fmt(c.nd):"بلا دين");
+  s('[data-tn="'+id+'"]',e.name||"موظف جديد");s('[data-tl="'+id+'"]',ltr(e));var tdn=el.querySelector('[data-td="'+id+'"]');if(tdn){tdn.textContent=c.nd>0?"دين: "+fmt(c.nd):"بلا دين";tdn.className="td"+(c.nd>0?" dr":"")}
   sumUp();tk()}
 el.addEventListener("input",function(ev){
   var t=ev.target,f=t.getAttribute&&t.getAttribute("data-f");if(!f)return;var id=t.getAttribute("data-id");
