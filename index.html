@@ -1332,35 +1332,54 @@ html.jd-dark #root header .max-w-\[1200px\]>div:first-child,#root header .max-w-
 #root header .max-w-\[1200px\]>div:last-child{flex-shrink:0}
 </style>
 <style id="jd-emp-css">
-#jdEmp{position:fixed;inset:0;z-index:9999996;display:none;background:var(--bg);color:var(--tx);overflow:auto;direction:rtl;font-family:inherit;--bg:#f8fafc;--card:#fff;--tx:#0f172a;--mu:#475569;--ln:#e2e8f0;--pos:#15803d;--neg:#dc2626;--warn:#b45309;--acc:#1e3a8a;--st:#0f766e}
-html.jd-dark #jdEmp{--bg:#061a3b;--card:#0d2b5e;--tx:#fff;--mu:#c3d0ea;--ln:rgba(255,216,0,.35);--pos:#4ade80;--neg:#f87171;--warn:#fbbf24;--acc:#FFD800;--st:#FFD800}
+#jdEmp{position:fixed;inset:0;z-index:9999996;display:none;background:var(--bg);color:var(--tx);overflow:auto;direction:rtl;font-family:inherit;--bg:#f4f4f2;--card:#fff;--fd:#fff;--tx:#111;--mu:#4b5563;--ln:#d6d6d0;--pos:#15803d;--neg:#b91c1c;--acc:#FFD800;--fo:#b38f00}
+html.jd-dark #jdEmp{--bg:#1c1f24;--card:#2a2e35;--fd:#22262c;--tx:#fff;--mu:#d9dee5;--ln:#434852;--pos:#6ee7b7;--neg:#fca5a5;--acc:#FFD800;--fo:#FFD800}
 #jdEmp.open{display:block}
-#jdEmp .w{max-width:560px;margin:auto;padding:14px}
-#jdEmp .hd{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
-#jdEmp button{border:1px solid var(--acc);background:transparent;color:var(--tx);border-radius:999px;padding:8px 14px;font-weight:700;font-size:13px;font-family:inherit}
-#jdEmp button.pr{background:var(--acc);color:#fff}
-html.jd-dark #jdEmp button.pr{color:#061a3b}
-#jdEmp .sm{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
-#jdEmp .sm div{background:var(--card);border:1px solid var(--ln);border-radius:14px;padding:10px;font-size:11px;color:var(--mu)}
-#jdEmp .sm b{display:block;font-size:16px;color:var(--tx);margin-top:2px;font-variant-numeric:tabular-nums}
-#jdEmp .cd{background:var(--card);border:1px solid var(--ln);border-radius:16px;padding:12px;margin-bottom:10px}
-#jdEmp .tp{display:flex;align-items:center;gap:10px;cursor:pointer}
-#jdEmp .nm{flex:1;font-weight:800}#jdEmp .nm small{display:block;font-weight:500;color:var(--mu);font-size:11px}
-#jdEmp .sc{font-size:18px;font-weight:800;font-variant-numeric:tabular-nums}
-#jdEmp .sc small{font-size:11px;color:var(--mu);font-weight:500}
-#jdEmp .ro{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--ln);font-size:13px}
-#jdEmp .ro>span:first-child{flex:none;color:var(--mu)}
-#jdEmp input,#jdEmp textarea{width:150px;max-width:55%;border:1px solid var(--ln);background:transparent;color:var(--tx);border-radius:10px;padding:7px 9px;font-size:14px;font-family:inherit;text-align:left;direction:ltr}
+#jdEmp *{box-sizing:border-box}
+#jdEmp .w{max-width:960px;margin:auto;padding:14px}
+#jdEmp .hd{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}
+#jdEmp .hd b{font-size:18px}
+#jdEmp button{border:1px solid var(--ln);background:var(--card);color:var(--tx);border-radius:999px;padding:9px 15px;font-weight:700;font-size:14px;font-family:inherit;cursor:pointer}
+#jdEmp button.pr{background:var(--acc);color:#000;border-color:var(--acc)}
+#jdEmp .sm{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+#jdEmp .sm div{background:var(--card);border:1px solid var(--ln);border-radius:16px;padding:12px;font-size:13px;color:var(--mu)}
+#jdEmp .sm b{display:block;font-size:18px;color:var(--tx);margin-top:3px;font-variant-numeric:tabular-nums}
+#jdEmp .sy{font-size:12px;color:var(--mu);margin:8px 2px 12px}
+#jdEmp .gr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media(min-width:700px){#jdEmp .gr{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(min-width:1000px){#jdEmp .gr{grid-template-columns:repeat(4,minmax(0,1fr))}}
+#jdEmp .tl{background:var(--card);border:1px solid var(--ln);border-radius:18px;padding:14px 12px;text-align:center;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;min-height:150px;transition:border-color .15s,transform .15s}
+#jdEmp .tl:hover,#jdEmp .tl:active{border-color:var(--acc);transform:translateY(-2px)}
+#jdEmp .av{width:46px;height:46px;border-radius:50%;background:var(--acc);color:#000;font-weight:800;font-size:20px;display:flex;align-items:center;justify-content:center}
+#jdEmp .tn{font-weight:800;font-size:14px;line-height:1.35;color:var(--tx);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;min-height:2.7em;word-break:break-word}
+#jdEmp .tf{font-weight:800;font-size:17px;font-variant-numeric:tabular-nums}
+#jdEmp .tf small{font-size:11px;font-weight:600;color:var(--mu)}
+#jdEmp .td{font-size:12px;color:var(--mu)}
+#jdEmp .em{grid-column:1/-1;text-align:center;color:var(--mu);background:var(--card);border:1px dashed var(--ln);border-radius:16px;padding:28px}
+#jdEmp .bk{position:fixed;inset:0;background:rgba(0,0,0,.62);display:flex;align-items:center;justify-content:center;padding:12px;z-index:2}
+#jdEmp .sh{background:var(--bg);color:var(--tx);border:1px solid var(--ln);border-radius:22px;width:100%;max-width:520px;max-height:94vh;overflow:auto;padding:14px}
+#jdEmp .mh{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+#jdEmp .mh .t{flex:1;text-align:center;font-weight:800;font-size:16px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#jdEmp .mh button{padding:6px 14px;font-size:18px;line-height:1.2}
+#jdEmp .sc{background:var(--card);border:1px solid var(--ln);border-radius:16px;padding:6px 12px 10px;margin-bottom:10px}
+#jdEmp .sc h4{margin:8px 0 4px;font-size:12px;font-weight:800;color:var(--mu);letter-spacing:.3px}
+#jdEmp .ro{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--ln);font-size:14px}
+#jdEmp .sc h4+.ro{border-top:0}
+#jdEmp .ro>span:first-child{flex:none;color:var(--mu);font-weight:600}
+#jdEmp input,#jdEmp textarea{width:170px;max-width:58%;border:1px solid var(--ln);background:var(--fd);color:var(--tx);border-radius:10px;padding:8px 10px;font-size:16px;font-family:inherit;text-align:left;direction:ltr;outline:0}
+#jdEmp input:focus,#jdEmp textarea:focus{border-color:var(--fo);box-shadow:0 0 0 2px rgba(255,216,0,.25)}
 #jdEmp input.tx,#jdEmp textarea{direction:rtl;text-align:right}
-#jdEmp textarea{width:100%;max-width:100%;min-height:54px}
-#jdEmp .ro.nt{flex-direction:column;align-items:stretch}
+#jdEmp textarea{width:100%;max-width:100%;min-height:64px;margin-top:6px}
+#jdEmp .ro.nt{flex-direction:column;align-items:stretch;border-top:0}
 #jdEmp .dy{display:flex;align-items:center;gap:6px}
-#jdEmp .dy button{padding:2px 12px;font-size:18px;line-height:1.3}
-#jdEmp .dy input{width:64px;text-align:center}
-#jdEmp .cv{font-weight:800;font-variant-numeric:tabular-nums}
-#jdEmp .fin{background:rgba(21,128,61,.08);border-radius:10px;padding:8px;margin-top:6px;border-top:0}
-#jdEmp .pos{color:var(--pos)}#jdEmp .neg{color:var(--neg)}#jdEmp .mu{color:var(--mu)}
-#jdEmp .sy{font-size:12px;color:var(--mu);margin:10px 0}
+#jdEmp .dy button{padding:2px 14px;font-size:20px;line-height:1.3}
+#jdEmp .dy input{width:70px;text-align:center}
+#jdEmp .cv{font-weight:800;font-variant-numeric:tabular-nums;font-size:15px}
+#jdEmp .fin{border:2px solid var(--pos);border-radius:16px;padding:12px 14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;background:var(--card)}
+#jdEmp .fin span:first-child{font-weight:800}
+#jdEmp .fin .cv{font-size:22px}
+#jdEmp .dl{width:100%;border-color:var(--neg);color:var(--neg)}
+#jdEmp .pos{color:var(--pos)}#jdEmp .neg{color:var(--neg)}
 </style>
 <script type="module" id="jd-emp-fb">
 import {getApp} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
@@ -1400,40 +1419,43 @@ var tr=0,tm=setInterval(function(){if(sync()||++tr>40)clearInterval(tm)},1500);
 function upd(id,fn){var a=all(),e=a.filter(function(x){return x.id===id})[0];if(!e)return null;fn(e);e.ts=Date.now();e.by=user();e.d=1;put(a);clearTimeout(sv[id]);sv[id]=setTimeout(function(){push(id)},600);return e}
 var el=document.createElement("div");el.id="jdEmp";
 function stat(){var s=el.querySelector("[data-o=sy]");if(s){var dn=all().filter(function(e){return e.d}).length;s.textContent=erF?"⚠ تعذرت المزامنة، البيانات محفوظة على الجهاز. تأكد من الاتصال وصلاحيات قاعدة البيانات.":dn?"⏳ بانتظار المزامنة مع الخادم":"✓ متزامن"}}
+var cur=null;
 function cls(v){return v<0?"neg":"pos"}
 function totals(){var L=list(),f=0,d=0;L.forEach(function(e){var c=calc(e);f+=c.fin;d+=c.nd});return{n:L.length,f:f,d:d}}
 function sumUp(){var t=totals(),a=el.querySelector("[data-o=tf]"),b=el.querySelector("[data-o=td]");if(a)a.textContent=fmt(t.f)+" د.ع";if(b)b.textContent=fmt(t.d)+" د.ع"}
-function row(e,lb,f,v,ph){return '<div class="ro"><span>'+lb+'</span><input data-f="'+f+'" data-id="'+e.id+'" inputmode="numeric" value="'+(v?esc(v):"")+'" placeholder="'+(ph||"0")+'"></div>'}
+function ltr(e){var n=(e.name||"").trim();return n?n.charAt(0):"؟"}
+function tile(e){var c=calc(e);return '<div class="tl" data-a="op" data-id="'+e.id+'"><div class="av" data-tl="'+e.id+'">'+esc(ltr(e))+'</div><div class="tn" data-tn="'+e.id+'">'+(esc(e.name)||"موظف جديد")+'</div><div class="tf '+cls(c.fin)+'" data-tf="'+e.id+'">'+fmt(c.fin)+'<small> د.ع</small></div><div class="td" data-td="'+e.id+'">'+(c.nd>0?"دين: "+fmt(c.nd):"بلا دين")+'</div></div>'}
+function row(e,lb,f,v){return '<div class="ro"><span>'+lb+'</span><input data-f="'+f+'" data-id="'+e.id+'" inputmode="numeric" value="'+(v?esc(v):"")+'" placeholder="0"></div>'}
 function out(lb,o,txt,c){return '<div class="ro"><span>'+lb+'</span><span class="cv '+(c||"")+'" data-o="'+o+'">'+txt+'</span></div>'}
+function modal(e){
+  var c=calc(e);
+  return '<div class="bk" data-a="bk"><div class="sh"><div class="mh"><button type="button" data-a="nx" title="التالي">›</button><span class="t" data-o="mt">'+(esc(e.name)||"موظف جديد")+'</span><button type="button" data-a="pv" title="السابق">‹</button><button type="button" data-a="cl" title="إغلاق">✕</button></div>'
+  +'<div class="sc"><h4>البيانات الأساسية</h4><div class="ro"><span>الاسم الثلاثي</span><input class="tx" data-f="name" data-id="'+e.id+'" value="'+esc(e.name)+'" placeholder="الاسم الثلاثي"></div>'
+  +row(e,"مبلغ الدين الكلي","debt",e.debt?fmt(num(e.debt)):"")+row(e,"مقدار الراتب الكلي","salary",e.salary?fmt(num(e.salary)):"")+'</div>'
+  +'<div class="sc"><h4>الغياب</h4><div class="ro"><span>أيام الغياب</span><span class="dy"><button type="button" data-a="dm" data-id="'+e.id+'">−</button><input data-f="days" data-id="'+e.id+'" inputmode="decimal" value="'+(num(e.days)||0)+'"><button type="button" data-a="dp" data-id="'+e.id+'">+</button></span></div>'
+  +out("استقطاع الغياب","abs",fmt(c.abs),"neg")+out("صافي الراتب بعد الغياب","net",fmt(c.net))+'</div>'
+  +'<div class="sc"><h4>الدين</h4>'+row(e,"مبلغ استقطاع الدين","ded",e.ded?fmt(num(e.ded)):"")+out("صافي الدين الكلي","nd",fmt(c.nd))+'</div>'
+  +'<div class="fin"><span>صافي الراتب</span><span class="cv '+cls(c.fin)+'" data-o="fin">'+fmt(c.fin)+' د.ع</span></div>'
+  +'<div class="sc"><h4>الملاحظات</h4><textarea class="tx" data-f="notes" data-id="'+e.id+'" placeholder="ملاحظات">'+esc(e.notes)+'</textarea></div>'
+  +'<button type="button" class="dl" data-a="del" data-id="'+e.id+'">حذف الموظف</button></div></div>'}
 function draw(){
   if(!el.classList.contains("open"))return;
-  var t=totals(),L=list(),h='<div class="w"><div class="hd"><button type="button" data-a="x">→ رجوع للرئيسية</button><b>👥 الموظفين</b><button type="button" class="pr" data-a="add">+ موظف</button></div>';
-  h+='<div class="sm"><div>مجموع صافي الرواتب<b data-o="tf">'+fmt(t.f)+' د.ع</b></div><div>مجموع صافي الديون<b data-o="td">'+fmt(t.d)+' د.ع</b></div></div><div class="sy" data-o="sy"></div>';
-  if(!L.length)h+='<div class="cd mu" style="text-align:center">لا يوجد موظفون بعد. اضغط (+ موظف) للإضافة.</div>';
-  L.forEach(function(e){
-    var c=calc(e);
-    h+='<div class="cd" data-c="'+e.id+'"><div class="tp" data-a="tg" data-id="'+e.id+'"><span class="nm"><span data-o="hn">'+(esc(e.name)||"موظف جديد")+'</span><small>'+(OP[e.id]?"اضغط للطي":"اضغط للتفاصيل")+'</small></span><span class="sc '+cls(c.fin)+'"><span data-o="hf">'+fmt(c.fin)+'</span><small> د.ع</small></span></div>';
-    if(OP[e.id]){
-      h+='<div class="ro"><span>اسم الموظف الثلاثي</span><input class="tx" data-f="name" data-id="'+e.id+'" value="'+esc(e.name)+'" placeholder="الاسم الثلاثي"></div>';
-      h+=row(e,"مبلغ الدين الكلي","debt",e.debt?fmt(num(e.debt)):"");
-      h+=row(e,"مقدار الراتب الكلي","salary",e.salary?fmt(num(e.salary)):"");
-      h+='<div class="ro"><span>أيام الغياب</span><span class="dy"><button type="button" data-a="dm" data-id="'+e.id+'">−</button><input data-f="days" data-id="'+e.id+'" inputmode="decimal" value="'+(num(e.days)||0)+'"><button type="button" data-a="dp" data-id="'+e.id+'">+</button></span></div>';
-      h+=out("استقطاع الغياب","abs",fmt(c.abs),"neg");
-      h+=out("صافي الراتب بعد استقطاع الغياب","net",fmt(c.net));
-      h+=row(e,"مبلغ استقطاع الدين","ded",e.ded?fmt(num(e.ded)):"");
-      h+=out("صافي الدين الكلي","nd",fmt(c.nd));
-      h+='<div class="ro fin"><span style="color:var(--tx);font-weight:800">صافي الراتب</span><span class="cv '+cls(c.fin)+'" data-o="fin" style="font-size:18px">'+fmt(c.fin)+' د.ع</span></div>';
-      h+='<div class="ro nt"><span>الملاحظات</span><textarea class="tx" data-f="notes" data-id="'+e.id+'" placeholder="ملاحظات">'+esc(e.notes)+'</textarea></div>';
-      h+='<div class="ro" style="border-top:0"><span></span><button type="button" data-a="del" data-id="'+e.id+'" style="border-color:var(--neg);color:var(--neg)">حذف الموظف</button></div>'}
-    h+='</div>'});
-  h+='<div class="sy">الراتب على أساس 30 يوماً: استقطاع الغياب = الراتب ÷ 30 × أيام الغياب، ويُقرَّب صافي الراتب بعد الغياب إلى أقرب رقم صحيح للأعلى. التقييم والموظفون لا يدخلان في حسابات التسوية.</div></div>';
-  var y=el.scrollTop;el.innerHTML=h;el.scrollTop=y;stat()}
+  var t=totals(),L=list(),h='<div class="w"><div class="hd"><button type="button" data-a="x">→ رجوع للرئيسية</button><b>الموظفين</b><button type="button" class="pr" data-a="add">+ موظف</button></div>';
+  h+='<div class="sm"><div>مجموع صافي الرواتب<b data-o="tf">'+fmt(t.f)+' د.ع</b></div><div>مجموع صافي الديون<b data-o="td">'+fmt(t.d)+' د.ع</b></div></div><div class="sy" data-o="sy"></div><div class="gr">';
+  if(!L.length)h+='<div class="em">لا يوجد موظفون بعد. اضغط (+ موظف) للإضافة.</div>';
+  L.forEach(function(e){h+=tile(e)});
+  h+='</div><div class="sy" style="margin-top:14px">الراتب على أساس 30 يوماً: استقطاع الغياب = الراتب ÷ 30 × أيام الغياب، ويُقرَّب صافي الراتب بعد الغياب إلى أقرب رقم صحيح للأعلى.</div></div>';
+  var cu=cur&&L.filter(function(x){return x.id===cur})[0];if(!cu)cur=null;
+  if(cu)h+=modal(cu);
+  var y=el.scrollTop,sy=0,sh=el.querySelector(".sh");if(sh)sy=sh.scrollTop;
+  el.innerHTML=h;el.scrollTop=y;if(cu&&sy){var n=el.querySelector(".sh");if(n)n.scrollTop=sy}stat()}
 function refresh(id){
-  var e=all().filter(function(x){return x.id===id})[0],card=el.querySelector('[data-c="'+id+'"]');if(!e||!card)return;
-  var c=calc(e);function s(o,t,cl){var n=card.querySelector('[data-o="'+o+'"]');if(n){n.textContent=t;if(cl){n.className="cv "+cl}}}
-  s("abs",fmt(c.abs));s("net",fmt(c.net));s("nd",fmt(c.nd));s("fin",fmt(c.fin)+" د.ع",cls(c.fin));
-  var hf=card.querySelector('[data-o="hf"]');if(hf){hf.textContent=fmt(c.fin);hf.parentNode.className="sc "+cls(c.fin)}
-  var hn=card.querySelector('[data-o="hn"]');if(hn)hn.textContent=e.name||"موظف جديد";
+  var e=all().filter(function(x){return x.id===id})[0];if(!e)return;var c=calc(e);
+  function s(q,t,cl){var n=el.querySelector(q);if(n){n.textContent=t;if(cl)n.className="cv "+cl}}
+  s('[data-o="abs"]',fmt(c.abs));s('[data-o="net"]',fmt(c.net));s('[data-o="nd"]',fmt(c.nd));s('[data-o="fin"]',fmt(c.fin)+" د.ع",cls(c.fin));
+  s('[data-o="mt"]',e.name||"موظف جديد");
+  var tf=el.querySelector('[data-tf="'+id+'"]');if(tf){tf.innerHTML=fmt(c.fin)+'<small> د.ع</small>';tf.className="tf "+cls(c.fin)}
+  s('[data-tn="'+id+'"]',e.name||"موظف جديد");s('[data-tl="'+id+'"]',ltr(e));s('[data-td="'+id+'"]',c.nd>0?"دين: "+fmt(c.nd):"بلا دين");
   sumUp();tk()}
 el.addEventListener("input",function(ev){
   var t=ev.target,f=t.getAttribute&&t.getAttribute("data-f");if(!f)return;var id=t.getAttribute("data-id");
@@ -1441,13 +1463,19 @@ el.addEventListener("input",function(ev){
 el.addEventListener("focusout",function(ev){
   var t=ev.target,f=t.getAttribute&&t.getAttribute("data-f");if(!f||f==="name"||f==="notes"||f==="days")return;
   var e=all().filter(function(x){return x.id===t.getAttribute("data-id")})[0];if(e&&num(e[f]))t.value=fmt(num(e[f]))});
+function step(d){var L=list();if(!L.length)return;var i=-1;L.forEach(function(e,j){if(e.id===cur)i=j});cur=L[(i+d+L.length)%L.length].id;draw()}
 el.addEventListener("click",function(ev){
   var t=ev.target.closest("[data-a]");if(!t)return;var a=t.getAttribute("data-a"),id=t.getAttribute("data-id");
-  if(a==="x")el.classList.remove("open");
-  else if(a==="tg"){OP[id]=!OP[id];draw()}
-  else if(a==="add"){var n={id:"e"+Date.now().toString(36)+Math.random().toString(36).slice(2,5),name:"",debt:0,salary:0,days:0,ded:0,notes:"",ts:Date.now(),by:user(),d:1},arr=all();arr.push(n);put(arr);OP[n.id]=true;push(n.id);draw()}
+  if(a==="bk"){if(ev.target===t){cur=null;draw()}return}
+  if(a==="x"){cur=null;el.classList.remove("open")}
+  else if(a==="op"){cur=id;draw()}
+  else if(a==="cl"){cur=null;draw()}
+  else if(a==="nx"){step(1)}
+  else if(a==="pv"){step(-1)}
+  else if(a==="add"){var n={id:"e"+Date.now().toString(36)+Math.random().toString(36).slice(2,5),name:"",debt:0,salary:0,days:0,ded:0,notes:"",ts:Date.now(),by:user(),d:1},arr=all();arr.push(n);put(arr);cur=n.id;push(n.id);draw()}
   else if(a==="dp"||a==="dm"){var e=upd(id,function(e){var d=num(e.days)+(a==="dp"?1:-1);e.days=Math.min(30,Math.max(0,d))});var inp=el.querySelector('input[data-f="days"][data-id="'+id+'"]');if(inp&&e)inp.value=e.days;refresh(id)}
-  else if(a==="del"){if(!confirm("متأكد من حذف هذا الموظف؟ لا يمكن التراجع."))return;upd(id,function(e){e.del=1});push(id);draw();tk()}});
+  else if(a==="del"){if(!confirm("متأكد من حذف هذا الموظف؟ لا يمكن التراجع."))return;upd(id,function(e){e.del=1});push(id);cur=null;draw();tk()}});
+document.addEventListener("keydown",function(ev){if(ev.key==="Escape"&&el.classList.contains("open")){if(cur){cur=null;draw()}else el.classList.remove("open")}});
 function open(){sync();pushDirty();el.classList.add("open");draw()}
 function inject(){
   var r=document.getElementById("root");if(!r)return;
