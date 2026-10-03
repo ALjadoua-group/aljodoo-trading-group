@@ -1424,6 +1424,37 @@ html.jd-dark #jdEmp{--nb:#FFD800;--cb:#FFE98A;--nbd:#b38f00;--red:#b91c1c}
 #jdEmp .cl.tdy{box-shadow:inset 0 -4px 0 var(--fo)}
 #jdEmp .cl.sel{border-color:var(--tx)}
 #jdEmp .hn{font-size:12px;color:var(--mu);margin-top:8px}
+/* ===== تحسينات الواجهة ===== */
+#jdEmp .sm{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+#jdEmp .sm div{padding:10px 8px;font-size:12px;text-align:center}
+#jdEmp .sm i{font-style:normal;display:block;font-size:18px;margin-bottom:2px}
+#jdEmp .sm b{display:block;font-size:14px;padding:3px 6px;margin-top:6px;word-break:break-word}
+#jdEmp .sm div:nth-child(3) b{color:var(--red)}
+#jdEmp input.sq{width:100%;max-width:100%;margin-bottom:10px;padding:10px 12px}
+#jdEmp .tl{position:relative;overflow:hidden}
+#jdEmp .tl:active{transform:scale(.97)}
+#jdEmp .tl.ts-p{border-top:5px solid #22c55e}
+#jdEmp .tl.ts-x{border-top:5px solid #ef4444}
+#jdEmp .tl.ts-e{border-top:5px solid #FFD800}
+#jdEmp .dbi{position:absolute;top:8px;left:8px;font-size:15px}
+#jdEmp button.bp{background:rgba(34,197,94,.16);color:#4ade80;border:1.5px solid rgba(34,197,94,.7);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+#jdEmp button.bx{background:rgba(239,68,68,.16);color:#f87171;border:1.5px solid rgba(239,68,68,.7);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+#jdEmp button.be{background:rgba(255,216,0,.18);color:#FFD800;border:1.5px solid rgba(255,216,0,.75);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+html:not(.jd-dark) #jdEmp button.bp{color:#15803d}
+html:not(.jd-dark) #jdEmp button.bx{color:#b91c1c}
+html:not(.jd-dark) #jdEmp button.be{color:#7a5f00;background:rgba(255,216,0,.3)}
+#jdEmp button.bp:not(.on),#jdEmp button.bx:not(.on),#jdEmp button.be:not(.on){opacity:1}
+html #jdEmp button.bp.on{background:#22c55e;color:#04210f;border-color:#22c55e;box-shadow:0 0 14px rgba(34,197,94,.55)}
+html #jdEmp button.bx.on{background:#ef4444;color:#fff;border-color:#ef4444;box-shadow:0 0 14px rgba(239,68,68,.55)}
+html #jdEmp button.be.on{background:#FFD800;color:#000;border-color:#FFD800;box-shadow:0 0 14px rgba(255,216,0,.55)}
+@keyframes jdUp{from{transform:translateY(46px);opacity:.4}to{transform:none;opacity:1}}
+#jdEmp .sh.an{animation:jdUp .24s ease-out}
+#jdEmp .mh{position:sticky;top:-14px;margin:-14px -14px 10px;padding:14px;background:var(--bg);z-index:3}
+#jdEmp .fin{position:sticky;bottom:8px;z-index:2;box-shadow:0 -6px 18px rgba(0,0,0,.35)}
+@media(max-width:700px){
+  #jdEmp .bk{align-items:flex-end;padding:0}
+  #jdEmp .sh{max-width:100%;border-radius:22px 22px 0 0;max-height:92vh;border-bottom:0}
+}
 </style>
 <script type="module" id="jd-emp-fb">
 import {getApp} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
@@ -1459,7 +1490,7 @@ function xcount(e){var y=ymOf(e),n=0,a=e.att||{};for(var k in a)if(a[k]==="x"&&k
 function tdays(e){return Math.min(30,Math.max(0,num(e.days)+xcount(e)))}
 function dfmt(n){return String(Math.round(n*100)/100)}
 function todayS(){var d=new Date();return d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate())}
-var sd="";
+var sd="",fresh=false,qs="";
 function defSd(e){var y=ymOf(e),t=todayS();return t.slice(0,7)===y?t:y+"-01"}
 function setSd(id){var x=all().filter(function(z){return z.id===id})[0];if(x)sd=defSd(x)}
 function setAtt(id,dt,st){upd(id,function(e){var a={};for(var k in (e.att||{}))a[k]=e.att[k];if(!st||a[dt]===st)delete a[dt];else a[dt]=st;e.att=a})}
@@ -1484,7 +1515,10 @@ function stat(){var s=el.querySelector("[data-o=sy]");if(s){var dn=all().filter(
 var cur=null;
 function cls(v){return v<0?"neg":"pos"}
 function totals(y){var L=listM(y||MO()),f=0,d=0;L.forEach(function(e){var c=calc(e);f+=c.fin;d+=c.nd});return{n:L.length,f:f,d:d}}
-function sumUp(){var t=totals(),a=el.querySelector("[data-o=tf]"),b=el.querySelector("[data-o=td]");if(a)a.textContent=fmt(t.f)+" د.ع";if(b)b.textContent=fmt(t.d)+" د.ع"}
+function absInfo(){var y=MO(),L=listM(y);if(y===ymNow()){var t=todayS(),n=L.filter(function(x){return (x.att||{})[t]==="x"}).length;return["غائبون اليوم",String(n),n]}var sm=0;L.forEach(function(x){sm+=tdays(x)});return["إجمالي أيام الغياب",dfmt(sm),sm]}
+function sumUp(){var t=totals(),a=el.querySelector("[data-o=tf]"),b=el.querySelector("[data-o=td]"),c=el.querySelector("[data-o=ta]"),l=el.querySelector("[data-o=tl3]"),ai=absInfo();if(a)a.textContent=fmt(t.f)+" د.ع";if(b)b.textContent=fmt(t.d)+" د.ع";if(c)c.textContent=ai[1];if(l)l.textContent=ai[0]}
+function gridHtml(L){var q=(qs||"").trim(),h="";if(!L.length)return '<div class="em">لا يوجد موظفون في هذا الشهر. اضغط (+ موظف) للإضافة.</div>';
+  var F=q?L.filter(function(x){return (x.name||"").indexOf(q)>-1}):L;if(!F.length)return '<div class="em">لا توجد نتائج مطابقة.</div>';F.forEach(function(x){h+=tile(x)});return h}
 function ltr(e){var n=(e.name||"").trim();return n?n.charAt(0):"؟"}
 function quick(e){
   if(ymOf(e)!==ymNow())return "";var cs=(e.att||{})[todayS()]||"";
@@ -1502,12 +1536,12 @@ function attend(e){
   for(i=0;i<off;i++)h+='<div></div>';
   for(i=1;i<=dim;i++){var dt=y+"-"+p2(i),st=a[dt]||"";h+='<div class="cl'+(st?" st-"+st:"")+(dt===sd?" sel":"")+(dt===td?" tdy":"")+'" data-a="dy" data-dt="'+dt+'">'+i+'</div>'}
   return h+'</div><div class="hn">الأيام غير المسجّلة تُعتبر حضوراً، والغياب بعذر لا يُخصم من الراتب.</div></div>'}
-function tile(e){var c=calc(e);return '<div class="tl" data-a="op" data-id="'+e.id+'"><div class="av" data-tl="'+e.id+'">'+esc(ltr(e))+'</div><div class="tn" data-tn="'+e.id+'">'+(esc(e.name)||"موظف جديد")+'</div><div class="tf '+cls(c.fin)+'" data-tf="'+e.id+'">'+fmt(c.fin)+'<small> د.ع</small></div><div class="td'+(c.nd>0?" dr":"")+'" data-td="'+e.id+'">'+(c.nd>0?"دين: "+fmt(c.nd):"بلا دين")+'</div>'+quick(e)+'</div>'}
+function tile(e){var c=calc(e);var ts=ymOf(e)===ymNow()?((e.att||{})[todayS()]||""):"";return '<div class="tl'+(ts?" ts-"+ts:"")+'" data-a="op" data-id="'+e.id+'"><span class="dbi" data-di="'+e.id+'" style="display:'+(c.nd>0?"block":"none")+'">💳</span><div class="av" data-tl="'+e.id+'">'+esc(ltr(e))+'</div><div class="tn" data-tn="'+e.id+'">'+(esc(e.name)||"موظف جديد")+'</div><div class="tf '+cls(c.fin)+'" data-tf="'+e.id+'">'+fmt(c.fin)+'<small> د.ع</small></div><div class="td'+(c.nd>0?" dr":"")+'" data-td="'+e.id+'">'+(c.nd>0?"دين: "+fmt(c.nd):"بلا دين")+'</div>'+quick(e)+'</div>'}
 function row(e,lb,f,v){return '<div class="ro"><span>'+lb+'</span><input data-f="'+f+'" data-id="'+e.id+'" inputmode="numeric" value="'+(v?esc(v):"")+'" placeholder="0"></div>'}
 function out(lb,o,txt,c){return '<div class="ro"><span>'+lb+'</span><span class="cv '+(c||"")+'" data-o="'+o+'">'+txt+'</span></div>'}
 function modal(e){
   var c=calc(e);
-  return '<div class="bk" data-a="bk"><div class="sh"><div class="mh"><button type="button" data-a="nx" title="التالي">›</button><span class="t" data-o="mt">'+(esc(e.name)||"موظف جديد")+'</span><button type="button" data-a="pv" title="السابق">‹</button><button type="button" data-a="cl" title="إغلاق">✕</button></div>'
+  return '<div class="bk" data-a="bk"><div class="sh'+(fresh?" an":"")+'"><div class="mh"><button type="button" data-a="nx" title="التالي">›</button><span class="t" data-o="mt">'+(esc(e.name)||"موظف جديد")+'</span><button type="button" data-a="pv" title="السابق">‹</button><button type="button" data-a="cl" title="إغلاق">✕</button></div>'
   +'<div class="sc"><h4>البيانات الأساسية</h4><div class="ro"><span>شهر البيانات</span><input type="month" data-f="ym" data-id="'+e.id+'" value="'+ymOf(e)+'"></div><div class="ro"><span>الاسم الثلاثي</span><input class="tx" data-f="name" data-id="'+e.id+'" value="'+esc(e.name)+'" placeholder="الاسم الثلاثي"></div>'
   +row(e,"مبلغ الدين الكلي","debt",e.debt?fmt(num(e.debt)):"")+row(e,"مقدار الراتب الكلي","salary",e.salary?fmt(num(e.salary)):"")+'</div>'
   +attend(e)+'<div class="sc"><h4>الغياب</h4>'+out("أيام الغياب المسجلة","xc",xcount(e))+'<div class="ro"><span>تعديل يدوي (±)</span><span class="dy"><button type="button" data-a="dm" data-id="'+e.id+'">−</button><input data-f="days" data-id="'+e.id+'" inputmode="decimal" value="'+(num(e.days)||0)+'"><button type="button" data-a="dp" data-id="'+e.id+'">+</button></span></div>'
@@ -1519,28 +1553,31 @@ function modal(e){
 function draw(){
   if(!el.classList.contains("open"))return;
   var ym=MO(),t=totals(ym),L=listM(ym),h='<div class="w"><div class="hd"><button type="button" data-a="x">→ رجوع للرئيسية</button><b>الموظفين</b><button type="button" class="pr" data-a="add">+ موظف</button></div>';
-  h+='<div class="sm"><div>مجموع صافي الرواتب<b data-o="tf">'+fmt(t.f)+' د.ع</b></div><div>مجموع صافي الديون<b data-o="td">'+fmt(t.d)+' د.ع</b></div></div><div class="sy" data-o="sy"></div>';
+  h+='<div class="sm"><div><i>💰</i>صافي الرواتب<b data-o="tf">'+fmt(t.f)+' د.ع</b></div><div><i>💳</i>صافي الديون<b data-o="td">'+fmt(t.d)+' د.ع</b></div><div><i>🚫</i><span data-o="tl3">'+absInfo()[0]+'</span><b data-o="ta">'+absInfo()[1]+'</b></div></div><div class="sy" data-o="sy"></div>';
   h+='<div class="nv"><button type="button" data-a="mp">›</button><span>'+mLabel(ym)+'</span><button type="button" data-a="mn">‹</button></div>';
   var have={};L.forEach(function(x){have[(x.name||"").trim()]=1});var miss=listM(ymShift(ym,-1)).filter(function(x){var k=(x.name||"").trim();return k&&!have[k]}).length;
   if(miss)h+='<button type="button" data-a="cy" style="width:100%;margin-bottom:10px">⇣ جلب '+miss+' موظف من الشهر السابق</button>';
+  var tdy=todayS(),un=ym===ymNow()?L.filter(function(x){return !(x.att||{})[tdy]}).length:0;
+  if(un)h+='<button type="button" class="bp ap" data-a="ap" style="width:100%;margin-bottom:10px">✓ تسجيل الباقين حاضرين اليوم ('+un+')</button>';
+  if(L.length)h+='<input class="tx sq" data-q="1" placeholder="🔍 بحث بالاسم" value="'+esc(qs)+'">';
   h+='<div class="gr">';
-  if(!L.length)h+='<div class="em">لا يوجد موظفون في هذا الشهر. اضغط (+ موظف) للإضافة.</div>';
-  L.forEach(function(e){h+=tile(e)});
+  h+=gridHtml(L);
   h+='</div><div class="sy" style="margin-top:14px">الراتب على أساس 30 يوماً: استقطاع الغياب = الراتب ÷ 30 × أيام الغياب، ويُقرَّب صافي الراتب بعد الغياب إلى أقرب رقم صحيح للأعلى. أيام الغياب = الأيام المسجّلة «غائب» + التعديل اليدوي، والغياب بعذر لا يُخصم.</div></div>';
   var cu=cur&&L.filter(function(x){return x.id===cur})[0];if(!cu)cur=null;
-  if(cu)h+=modal(cu);
+  if(cu)h+=modal(cu);fresh=false;
   var y=el.scrollTop,sy=0,sh=el.querySelector(".sh");if(sh)sy=sh.scrollTop;
   el.innerHTML=h;el.scrollTop=y;if(cu&&sy){var n=el.querySelector(".sh");if(n)n.scrollTop=sy}stat()}
 function refresh(id){
   var e=all().filter(function(x){return x.id===id})[0];if(!e)return;var c=calc(e);
   function s(q,t,cl){var n=el.querySelector(q);if(n){n.textContent=t;if(cl)n.className="cv "+cl}}
-  s('[data-o="abs"]',fmt(c.abs));s('[data-o="dt"]',dfmt(tdays(e)));s('[data-o="net"]',fmt(c.net));s('[data-o="nd"]',fmt(c.nd));s('[data-o="fin"]',fmt(c.fin)+" د.ع",cls(c.fin));
+  s('[data-o="abs"]',fmt(c.abs));var di=el.querySelector('[data-di="'+id+'"]');if(di)di.style.display=c.nd>0?"block":"none";s('[data-o="dt"]',dfmt(tdays(e)));s('[data-o="net"]',fmt(c.net));s('[data-o="nd"]',fmt(c.nd));s('[data-o="fin"]',fmt(c.fin)+" د.ع",cls(c.fin));
   s('[data-o="mt"]',e.name||"موظف جديد");
   var tf=el.querySelector('[data-tf="'+id+'"]');if(tf){tf.innerHTML=fmt(c.fin)+'<small> د.ع</small>';tf.className="tf "+cls(c.fin)}
   s('[data-tn="'+id+'"]',e.name||"موظف جديد");s('[data-tl="'+id+'"]',ltr(e));var tdn=el.querySelector('[data-td="'+id+'"]');if(tdn){tdn.textContent=c.nd>0?"دين: "+fmt(c.nd):"بلا دين";tdn.className="td"+(c.nd>0?" dr":"")}
   sumUp();tk()}
 el.addEventListener("input",function(ev){
-  var t=ev.target,f=t.getAttribute&&t.getAttribute("data-f");if(!f)return;var id=t.getAttribute("data-id");
+  var t=ev.target;if(t.hasAttribute&&t.hasAttribute("data-q")){qs=t.value;var g=el.querySelector(".gr");if(g)g.innerHTML=gridHtml(listM(MO()));return}
+  var f=t.getAttribute&&t.getAttribute("data-f");if(!f)return;var id=t.getAttribute("data-id");
   if(f==="ym"&&!/^\d{4}-\d{2}$/.test(t.value))return;
   upd(id,function(e){e[f]=(f==="name"||f==="notes"||f==="ym")?t.value:num(t.value)});if(f!=="ym")refresh(id);stat()});
 el.addEventListener("change",function(ev){var t=ev.target;if(t.getAttribute&&t.getAttribute("data-f")==="ym"&&/^\d{4}-\d{2}$/.test(t.value)){mo=t.value;cur=null;draw();tk()}});
@@ -1552,10 +1589,11 @@ el.addEventListener("click",function(ev){
   var t=ev.target.closest("[data-a]");if(!t)return;var a=t.getAttribute("data-a"),id=t.getAttribute("data-id");
   if(a==="bk"){if(ev.target===t){cur=null;draw()}return}
   if(a==="x"){cur=null;el.classList.remove("open")}
-  else if(a==="op"){cur=id;setSd(id);draw()}
+  else if(a==="op"){cur=id;setSd(id);fresh=true;draw()}
   else if(a==="cl"){cur=null;draw()}
   else if(a==="nx"){step(1)}
   else if(a==="pv"){step(-1)}
+  else if(a==="ap"){var td2=todayS(),ar=all(),k2=0,ids={};listM(MO()).forEach(function(x){ids[x.id]=1});ar.forEach(function(x){if(ids[x.id]&&!x.del&&!(x.att||{})[td2]){var at={};for(var k in (x.att||{}))at[k]=x.att[k];at[td2]="p";x.att=at;x.ts=Date.now()+k2;x.by=user();x.d=1;k2++}});if(k2){put(ar);pushDirty()}draw();tk()}
   else if(a==="dy"){sd=t.getAttribute("data-dt");draw()}
   else if(a==="st"){var s2=t.getAttribute("data-s");setAtt(id,sd,s2==="c"?"":s2);draw();tk()}
   else if(a==="q"){setAtt(id,todayS(),t.getAttribute("data-s"));draw();tk()}
@@ -1564,7 +1602,7 @@ el.addEventListener("click",function(ev){
   else if(a==="cy"){var y=MO(),have={},arr=all(),n=0;listM(y).forEach(function(x){have[(x.name||"").trim()]=1});
     listM(ymShift(y,-1)).forEach(function(x){var k=(x.name||"").trim();if(!k||have[k])return;have[k]=1;var c=calc(x);arr.push({id:nid(),name:x.name,ym:y,debt:c.nd,salary:num(x.salary),days:0,ded:0,notes:"",ts:Date.now()+n,by:user(),d:1});n++});
     if(n){put(arr);pushDirty()}draw();tk()}
-  else if(a==="add"){var n={id:nid(),ym:MO(),name:"",debt:0,salary:0,days:0,ded:0,notes:"",ts:Date.now(),by:user(),d:1},arr=all();arr.push(n);put(arr);cur=n.id;sd=defSd(n);push(n.id);draw()}
+  else if(a==="add"){var n={id:nid(),ym:MO(),name:"",debt:0,salary:0,days:0,ded:0,notes:"",ts:Date.now(),by:user(),d:1},arr=all();arr.push(n);put(arr);cur=n.id;sd=defSd(n);fresh=true;push(n.id);draw()}
   else if(a==="dp"||a==="dm"){var e=upd(id,function(e){var d=num(e.days)+(a==="dp"?1:-1);e.days=Math.min(30,Math.max(0,d))});var inp=el.querySelector('input[data-f="days"][data-id="'+id+'"]');if(inp&&e)inp.value=e.days;refresh(id)}
   else if(a==="del"){if(!confirm("متأكد من حذف هذا الموظف؟ لا يمكن التراجع."))return;upd(id,function(e){e.del=1});push(id);cur=null;draw();tk()}});
 document.addEventListener("keydown",function(ev){if(ev.key==="Escape"&&el.classList.contains("open")){if(cur){cur=null;draw()}else el.classList.remove("open")}});
