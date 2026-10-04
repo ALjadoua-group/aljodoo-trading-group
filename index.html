@@ -1376,6 +1376,10 @@ html.jd-dark #root span.rounded-full.font-bold.bg-red-100{background:rgba(239,68
 html.jd-dark #reportModal table tr[style*="#fffbeb"]>td{background:rgba(255,216,0,.14) !important;color:#fff !important}
 html.jd-dark #reportModal table tr[style*="#FFF7D6"]>td{background:rgba(255,216,0,.24) !important;color:#FFD800 !important;font-weight:800}
 html.jd-dark #reportModal table tr:nth-child(even):not([style*="#fffbeb"]):not([style*="#FFF7D6"])>td{background:rgba(255,255,255,.05)}
+#jdSync{position:absolute;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:5;pointer-events:auto;transition:background .25s}
+#jdSync[data-s=ok]{background:#2fb872}
+#jdSync[data-s=bad]{background:#e5484d;animation:jdPulse 1.6s infinite}
+@keyframes jdPulse{0%,100%{opacity:1}50%{opacity:.55}}
 </style>
 <script id="jd-ui-polish-js">
 (function(){
@@ -1424,15 +1428,341 @@ function tint(){
 function run(){
   var root=document.getElementById("root");
   if(root){search(root);chips(root);wakeel(root);nums(root)}
-  tint()}
+  tint();syncUI()}
+
+/* ===== أيقونة المزامنة: أخضر = متزامن، أحمر = غير متزامن ===== */
+var lastErr=0,pendSince=0;
+(function(){var oe=console.error;console.error=function(){try{var m=String(arguments[0]||"");if(/firebase|firestore/i.test(m))lastErr=Date.now()}catch(e){}return oe.apply(console,arguments)}})();
+function syncBad(){
+  var why="";
+  if(!navigator.onLine)why="لا يوجد اتصال بالإنترنت";
+  else{
+    var pn=(window.__fbPendingCount||0)>0;if(pn){if(!pendSince)pendSince=Date.now()}else pendSince=0;
+    if(pendSince&&Date.now()-pendSince>6000)why="عمليات حفظ لم تصل للخادم بعد";
+    else if(Date.now()-lastErr<30000)why="تعذّر الاتصال بقاعدة البيانات";
+    else if(window.__jdEmpBad)why="تعذّرت مزامنة بيانات الموظفين"}
+  return why}
+var SVG_OK='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 18 8.6 4.8 4.8 0 0 1 17.5 18z"/><path d="M9.2 12.6l2.2 2.2 3.8-4"/></svg>';
+var SVG_BAD='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 18 8.6 4.8 4.8 0 0 1 17.5 18z"/><path d="M10 11.2l4 4M14 11.2l-4 4"/></svg>';
+function syncUI(){
+  var hd=document.querySelector("#root header");if(!hd)return;
+  var img=hd.querySelector("img");if(!img)return;
+  var el=document.getElementById("jdSync");
+  if(!el||el.parentNode!==hd){if(el)el.remove();el=document.createElement("div");el.id="jdSync";hd.appendChild(el)}
+  var why=syncBad(),st=why?"bad":"ok";
+  if(el.getAttribute("data-s")!==st){el.setAttribute("data-s",st);el.innerHTML=why?SVG_BAD:SVG_OK}
+  el.title=why?("غير متزامن: "+why):"متزامن مع الخادم";
+  var hr=hd.getBoundingClientRect(),ir=img.getBoundingClientRect();
+  el.style.left=Math.round(ir.left-hr.left+ir.width-15)+"px";el.style.top=Math.round(ir.top-hr.top+ir.height-15)+"px";
+  el.style.boxShadow="0 0 0 2px "+(getComputedStyle(hd).backgroundColor||"#1f2d4a")}
+setInterval(syncUI,2000);
+window.addEventListener("online",syncUI);window.addEventListener("offline",syncUI);window.addEventListener("fb-pending-change",syncUI);window.addEventListener("resize",syncUI);
 var t=0;function tk(){clearTimeout(t);t=setTimeout(run,250)}
 function mount(){new MutationObserver(tk).observe(document.body,{childList:true,subtree:true,characterData:true});run()}
 document.body?mount():document.addEventListener("DOMContentLoaded",mount);
 })();
 </script>
+<style id="jd-dark-calm">
+/* ===== وضع داكن هادئ: ألوان أقل وتباين مريح (يلغي الأصفر الصارخ والكحلي المشبع) ===== */
+/* jd-dark-theme */
+html.jd-dark{--jd-bg:#0e1626;--jd-surface:#16223a;--jd-surface2:#1c2a47;--jd-blue:#2f5fa8;--jd-yellow:#E3C458;--jd-line:rgba(227,196,88,.22);--jd-text:#eaf0fa;--jd-muted:#b4c0d8}
+html.jd-dark,html.jd-dark body{background:var(--jd-bg)}
+:where(html.jd-dark #root) *,:where(html.jd-dark #root) :after,:where(html.jd-dark #root) :before{border-color:var(--jd-line)}
+html.jd-dark #root .bg-\[\#0f172a\]{background-color:var(--jd-bg)}
+html.jd-dark #root .bg-\[\#0f172a\]\/90{background-color:rgba(255,255,255,.14);border-color:rgba(227,196,88,.45)}
+html.jd-dark #root .bg-\[\#f6f7fb\]{background-color:var(--jd-bg)}
+html.jd-dark #root .bg-white,
+    html.jd-dark #root .bg-\[\#1e293b\],
+    html.jd-dark #root .bg-\[\#111827\]{background-color:var(--jd-surface)}
+html.jd-dark #root .bg-white\/90{background-color:rgba(13,43,94,.92)}
+html.jd-dark #root .bg-gray-50,
+    html.jd-dark #root .bg-\[\#f9fafb\],
+    html.jd-dark #root .bg-\[\#fbfcfe\],
+    html.jd-dark #root .bg-\[\#fbfdff\],
+    html.jd-dark #root .bg-\[\#fcfcfb\]{background-color:#142038}
+html.jd-dark #root .bg-gray-100,
+    html.jd-dark #root .bg-gray-200{background-color:var(--jd-surface2)}
+html.jd-dark #root .bg-white\/\[0\.02\]{background-color:rgba(120,160,220,0.05)}
+html.jd-dark #root .bg-white\/\[0\.03\]{background-color:rgba(120,160,220,0.08)}
+html.jd-dark #root .bg-white\/\[0\.04\]{background-color:rgba(120,160,220,0.09)}
+html.jd-dark #root .bg-white\/5{background-color:rgba(120,160,220,0.12)}
+html.jd-dark #root .bg-white\/10{background-color:rgba(120,160,220,0.18)}
+html.jd-dark #root .bg-\[\#1e3a8a\]{background-color:var(--jd-blue)}
+html.jd-dark #root .border-white\/10,
+    html.jd-dark #root .border-gray-100,
+    html.jd-dark #root .border-gray-200,
+    html.jd-dark #root .border-gray-300{border-color:var(--jd-line)}
+html.jd-dark #root .border-white\/20{border-color:rgba(227,196,88,.4)}
+html.jd-dark #root .text-black,
+    html.jd-dark #root .text-\[\#111827\]{color:var(--jd-text)}
+html.jd-dark #root .text-gray-400{color:#9fb0cf}
+html.jd-dark #root .text-gray-500{color:#b4c0d8}
+html.jd-dark #root .text-gray-600{color:#c9d3e6}
+html.jd-dark #root .text-gray-700{color:#d3dcec}
+html.jd-dark #root .text-gray-800{color:#e4ebf7}
+html.jd-dark #root .bg-emerald-50,html.jd-dark #root .bg-emerald-100{background-color:rgba(111,207,154,.18)}
+html.jd-dark #root .text-emerald-600,html.jd-dark #root .text-emerald-700,html.jd-dark #root .text-emerald-800,html.jd-dark #root .text-emerald-900{color:#6fcf9a}
+html.jd-dark #root .border-emerald-200,html.jd-dark #root .border-emerald-300{border-color:rgba(111,207,154,.45)}
+html.jd-dark #root .bg-red-50,html.jd-dark #root .bg-red-100{background-color:rgba(239,154,154,.18)}
+html.jd-dark #root .text-red-500,html.jd-dark #root .text-red-600,html.jd-dark #root .text-red-700,html.jd-dark #root .text-red-900{color:#ef9a9a}
+html.jd-dark #root .border-red-200,html.jd-dark #root .border-red-300{border-color:rgba(239,154,154,.45)}
+html.jd-dark #root .bg-amber-50,html.jd-dark #root .bg-amber-100,html.jd-dark #root .bg-\[\#fef3c7\]{background-color:rgba(227,196,88,.14)}
+html.jd-dark #root .text-amber-700,html.jd-dark #root .text-amber-800,html.jd-dark #root .text-\[\#92400e\]{color:var(--jd-yellow)}
+html.jd-dark #root .border-amber-200{border-color:rgba(227,196,88,.45)}
+html.jd-dark #root .bg-blue-50,html.jd-dark #root .bg-cyan-50{background-color:rgba(120,160,220,0.14)}
+html.jd-dark #root .text-blue-700,html.jd-dark #root .text-cyan-700{color:#9bc6f5}
+html.jd-dark #root .border-blue-200,html.jd-dark #root .border-cyan-200,html.jd-dark #root .border-cyan-500\/20{border-color:rgba(120,160,220,0.38)}
+html.jd-dark #root .ring-cyan-100{--tw-ring-color:rgba(120,160,220,0.26)}
+html.jd-dark #root :is(input,select,textarea):not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]):not([type=color]){background-color:#101c33 !important;color:#eaf0fa !important;-webkit-text-fill-color:#eaf0fa;border-color:rgba(227,196,88,.38) !important;color-scheme:dark}
+html.jd-dark #root :is(input,textarea)::placeholder{color:#8a9bbd !important;opacity:1}
+html.jd-dark #root :is(input,select,textarea):focus{outline:none;border-color:var(--jd-yellow) !important;box-shadow:0 0 0 3px rgba(227,196,88,.28)}
+html.jd-dark #root option{background:#16223a;color:#eaf0fa}
+html.jd-dark #root button.bg-white.text-black{background-color:var(--jd-yellow);color:#e8edf7;border-color:transparent;font-weight:700}
+html.jd-dark #root header img{box-shadow:0 0 0 2px var(--jd-yellow)}
+html.jd-dark #root header .font-bold.text-\[13px\]{color:var(--jd-yellow)}
+html.jd-dark #root [style*="border-width: 2px"]{outline:1px solid rgba(227,196,88,.35)}
+html.jd-dark #root a{color:#EBD58A}
+html.jd-dark #root .bg-black\/50{background-color:rgba(3,12,30,.7)}
+/* jd-dark-balance */
+html.jd-dark{--jd-gold:#1f2d4a;--jd-gold2:#26365a;--jd-line:rgba(227,196,88,.5);--jd-muted:#c9d3e6}
+html.jd-dark #root header.sticky,
+    html.jd-dark #root .bg-\[\#0f172a\]\/90{background-color:#1f2d4a;border-color:rgba(255,255,255,.14);border-bottom-width:3px;color:#e8edf7;backdrop-filter:none}
+html.jd-dark #root header .font-bold.text-\[13px\]{color:#e8edf7}
+html.jd-dark #root header .opacity-60{opacity:.85;color:#e8edf7}
+html.jd-dark #root header img{box-shadow:0 0 0 2px rgba(0,0,0,.35)}
+html.jd-dark #root header button{background-color:#0e1626;color:#E3C458;border-color:rgba(255,255,255,.14)}
+html.jd-dark #root header button.bg-\[\#1e3a8a\]{background-color:#2f5fa8;color:#eaf0fa}
+html.jd-dark #root .bg-\[\#1e3a8a\]{background-color:#1f2d4a;color:#e8edf7;border-color:transparent}
+html.jd-dark #root .bg-\[\#1e3a8a\].text-white,
+    html.jd-dark #root .bg-\[\#1e3a8a\] .text-white{color:#e8edf7}
+html.jd-dark #root .bg-white\/\[0\.02\],
+    html.jd-dark #root .bg-gray-50,
+    html.jd-dark #root .bg-\[\#f9fafb\],
+    html.jd-dark #root .bg-\[\#fbfcfe\],
+    html.jd-dark #root .bg-\[\#fbfdff\],
+    html.jd-dark #root .bg-\[\#fcfcfb\]{background-color:var(--jd-gold);border-color:var(--jd-line)}
+html.jd-dark #root .bg-white\/5,
+    html.jd-dark #root .bg-white\/10,
+    html.jd-dark #root .bg-gray-100,
+    html.jd-dark #root .bg-gray-200{background-color:var(--jd-gold2);border-color:var(--jd-line)}
+html.jd-dark #root button.rounded-\[20px\]:nth-child(even){background-color:var(--jd-gold)}
+html.jd-dark #root button.rounded-\[20px\]:nth-child(odd){background-color:#16223a}
+html.jd-dark #root .border-white\/10,
+    html.jd-dark #root .border-gray-100,
+    html.jd-dark #root .border-gray-200,
+    html.jd-dark #root .border-gray-300{border-color:var(--jd-line)}
+html.jd-dark #root :is(input,select,textarea):not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]):not([type=color]){border-color:rgba(227,196,88,.65) !important}
+html.jd-dark #root .text-gray-400{color:#b4c0d8}
+html.jd-dark #root .text-gray-500,
+    html.jd-dark #root .text-gray-600{color:var(--jd-muted)}
+html.jd-dark #root .text-gray-700,
+    html.jd-dark #root .text-gray-800{color:#e4ebf7}
+html.jd-dark #root .text-blue-700,html.jd-dark #root .text-cyan-700{color:#9bc6f5}
+html.jd-dark #root main .font-bold.text-\[13px\]:not([class*="text-emerald"]):not([class*="text-red"]):not([class*="text-amber"]):not([class*="text-blue"]):not([class*="text-cyan"]):not([class*="text-white"]):not([class*="text-gray"]):not([class*="text-black"]):not(button *):not(button),
+    html.jd-dark #root main .font-bold.text-\[14px\]:not([class*="text-emerald"]):not([class*="text-red"]):not([class*="text-amber"]):not([class*="text-blue"]):not([class*="text-cyan"]):not([class*="text-white"]):not([class*="text-gray"]):not([class*="text-black"]):not(button *):not(button),
+    html.jd-dark #root main .font-bold.text-\[15px\]:not([class*="text-emerald"]):not([class*="text-red"]):not([class*="text-amber"]):not([class*="text-blue"]):not([class*="text-cyan"]):not([class*="text-white"]):not([class*="text-gray"]):not([class*="text-black"]):not(button *):not(button){color:#EBD58A}
+/* jd-dark-rows */
+html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between{background:#1f2d4a;border-color:rgba(227,196,88,.35);color:#e8edf7;box-shadow:0 2px 8px rgba(0,0,0,.28)}
+html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between *{border-color:rgba(255,255,255,.14)}
+html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between .font-bold.text-\[13px\]{color:#e8edf7}
+html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between .opacity-70,
+    html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between .opacity-60,
+    html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between .opacity-50{opacity:1;color:#e8edf7}
+html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between .bg-gray-100.text-gray-600{background-color:#0e1626;color:#E3C458;border-color:rgba(255,255,255,.14)}
+html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between span.rounded-full[style]{background:#fff !important;box-shadow:0 0 0 1px rgba(255,255,255,.14)}
+html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between .bg-amber-100{background-color:#0e1626;color:#E3C458;border-color:rgba(255,255,255,.14)}
+html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between .bg-cyan-50{background-color:#0e1626;color:#9bc6f5;border-color:rgba(255,255,255,.14)}
+html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between button.bg-blue-50{background-color:#0e1626;color:#E3C458}
+html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between button.bg-blue-50:hover{background-color:#16223a}
+html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between button.bg-red-50{background-color:#0e1626;color:#ef9a9a}
+html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between button.bg-red-50:hover{background-color:#5b2a2a;color:#eaf0fa}
+html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between .bg-amber-50{background-color:#0e1626;color:#eaf0fa;border-radius:10px}
+html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between .bg-amber-50 .bg-gray-100{background-color:#1c2a47;color:#eaf0fa}
+html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between .bg-gray-50{background-color:rgba(255,255,255,.07);color:#e8edf7}
+html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between .bg-blue-50{background-color:rgba(255,255,255,.07);color:#e8edf7}
+html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between .border-t{border-color:rgba(255,255,255,.14)}
+html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between .font-bold.text-\[13px\]{color:#e8edf7 !important;font-size:16px;font-weight:800;letter-spacing:.2px;text-shadow:none}
+html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between .opacity-70,html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between .opacity-60,html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between .opacity-50{opacity:1 !important;color:#e8edf7 !important}
+/* jd-dark-cards */
+html.jd-dark #root button.rounded-\[20px\].p-4 .font-bold[style]{color:#E3C458 !important}
+html.jd-dark #root button.rounded-\[20px\].p-4 .font-bold.text-\[14px\]{font-size:16px;font-weight:800}
+html.jd-dark #root button.rounded-\[20px\].p-4 .font-bold.text-\[12px\]{font-size:14px;font-weight:800}
+html.jd-dark #root button.rounded-\[20px\].p-4 .opacity-70{opacity:1 !important;color:#EBD58A !important;font-size:12px;font-weight:600}
+/* jd-dark-yellow */
+html.jd-dark #root .bg-white\/\[0\.02\],
+    html.jd-dark #root .bg-gray-50,
+    html.jd-dark #root .bg-\[\#f9fafb\],
+    html.jd-dark #root .bg-\[\#fbfcfe\],
+    html.jd-dark #root .bg-\[\#fbfdff\],
+    html.jd-dark #root .bg-\[\#fcfcfb\],
+    html.jd-dark #root .bg-white\/5,
+    html.jd-dark #root .bg-white\/10,
+    html.jd-dark #root .bg-gray-100,
+    html.jd-dark #root .bg-gray-200,
+    html.jd-dark #root .bg-amber-50,
+    html.jd-dark #root .bg-amber-100,
+    html.jd-dark #root .bg-\[\#fef3c7\],
+    html.jd-dark #root button.rounded-\[20px\].p-4:nth-child(even){background-color:#1f2d4a !important;border-color:rgba(227,196,88,.35) !important;color:#e8edf7 !important}
+html.jd-dark #root .bg-white\/5,html.jd-dark #root .bg-white\/10,html.jd-dark #root .bg-gray-100,html.jd-dark #root .bg-gray-200{background-color:#26365a !important}
+html.jd-dark #root .bg-white\/\[0\.02\] :is(.text-gray-300,.text-gray-400,.text-gray-500,.text-gray-600,.text-gray-700,.text-gray-800,.text-black,.text-white,.text-amber-700,.text-amber-800,.opacity-50,.opacity-60,.opacity-70),
+    html.jd-dark #root .bg-gray-50 :is(.text-gray-300,.text-gray-400,.text-gray-500,.text-gray-600,.text-gray-700,.text-gray-800,.text-black,.text-white,.text-amber-700,.text-amber-800,.opacity-50,.opacity-60,.opacity-70),
+    html.jd-dark #root .bg-\[\#f9fafb\] :is(.text-gray-300,.text-gray-400,.text-gray-500,.text-gray-600,.text-gray-700,.text-gray-800,.text-black,.text-white,.text-amber-700,.text-amber-800,.opacity-50,.opacity-60,.opacity-70),
+    html.jd-dark #root .bg-\[\#fbfcfe\] :is(.text-gray-300,.text-gray-400,.text-gray-500,.text-gray-600,.text-gray-700,.text-gray-800,.text-black,.text-white,.text-amber-700,.text-amber-800,.opacity-50,.opacity-60,.opacity-70),
+    html.jd-dark #root .bg-\[\#fbfdff\] :is(.text-gray-300,.text-gray-400,.text-gray-500,.text-gray-600,.text-gray-700,.text-gray-800,.text-black,.text-white,.text-amber-700,.text-amber-800,.opacity-50,.opacity-60,.opacity-70),
+    html.jd-dark #root .bg-\[\#fcfcfb\] :is(.text-gray-300,.text-gray-400,.text-gray-500,.text-gray-600,.text-gray-700,.text-gray-800,.text-black,.text-white,.text-amber-700,.text-amber-800,.opacity-50,.opacity-60,.opacity-70),
+    html.jd-dark #root .bg-white\/5 :is(.text-gray-300,.text-gray-400,.text-gray-500,.text-gray-600,.text-gray-700,.text-gray-800,.text-black,.text-white,.text-amber-700,.text-amber-800,.opacity-50,.opacity-60,.opacity-70),
+    html.jd-dark #root .bg-white\/10 :is(.text-gray-300,.text-gray-400,.text-gray-500,.text-gray-600,.text-gray-700,.text-gray-800,.text-black,.text-white,.text-amber-700,.text-amber-800,.opacity-50,.opacity-60,.opacity-70),
+    html.jd-dark #root .bg-gray-100 :is(.text-gray-300,.text-gray-400,.text-gray-500,.text-gray-600,.text-gray-700,.text-gray-800,.text-black,.text-white,.text-amber-700,.text-amber-800,.opacity-50,.opacity-60,.opacity-70),
+    html.jd-dark #root .bg-gray-200 :is(.text-gray-300,.text-gray-400,.text-gray-500,.text-gray-600,.text-gray-700,.text-gray-800,.text-black,.text-white,.text-amber-700,.text-amber-800,.opacity-50,.opacity-60,.opacity-70),
+    html.jd-dark #root .bg-amber-50 :is(.text-gray-300,.text-gray-400,.text-gray-500,.text-gray-600,.text-gray-700,.text-gray-800,.text-black,.text-white,.text-amber-700,.text-amber-800,.opacity-50,.opacity-60,.opacity-70),
+    html.jd-dark #root .bg-amber-100 :is(.text-gray-300,.text-gray-400,.text-gray-500,.text-gray-600,.text-gray-700,.text-gray-800,.text-black,.text-white,.text-amber-700,.text-amber-800,.opacity-50,.opacity-60,.opacity-70),
+    html.jd-dark #root .bg-\[\#fef3c7\] :is(.text-gray-300,.text-gray-400,.text-gray-500,.text-gray-600,.text-gray-700,.text-gray-800,.text-black,.text-white,.text-amber-700,.text-amber-800,.opacity-50,.opacity-60,.opacity-70),
+    html.jd-dark #root button.rounded-\[20px\].p-4:nth-child(even) :is(.text-gray-300,.text-gray-400,.text-gray-500,.text-gray-600,.text-gray-700,.text-gray-800,.text-black,.text-white,.text-amber-700,.text-amber-800,.opacity-50,.opacity-60,.opacity-70){color:#e8edf7 !important;opacity:1 !important}
+html.jd-dark #root .bg-white\/\[0\.02\] :is(.text-emerald-600,.text-emerald-700,.text-emerald-800,.text-emerald-900),
+    html.jd-dark #root .bg-gray-50 :is(.text-emerald-600,.text-emerald-700,.text-emerald-800,.text-emerald-900),
+    html.jd-dark #root .bg-\[\#f9fafb\] :is(.text-emerald-600,.text-emerald-700,.text-emerald-800,.text-emerald-900),
+    html.jd-dark #root .bg-\[\#fbfcfe\] :is(.text-emerald-600,.text-emerald-700,.text-emerald-800,.text-emerald-900),
+    html.jd-dark #root .bg-\[\#fbfdff\] :is(.text-emerald-600,.text-emerald-700,.text-emerald-800,.text-emerald-900),
+    html.jd-dark #root .bg-\[\#fcfcfb\] :is(.text-emerald-600,.text-emerald-700,.text-emerald-800,.text-emerald-900),
+    html.jd-dark #root .bg-white\/5 :is(.text-emerald-600,.text-emerald-700,.text-emerald-800,.text-emerald-900),
+    html.jd-dark #root .bg-white\/10 :is(.text-emerald-600,.text-emerald-700,.text-emerald-800,.text-emerald-900),
+    html.jd-dark #root .bg-gray-100 :is(.text-emerald-600,.text-emerald-700,.text-emerald-800,.text-emerald-900),
+    html.jd-dark #root .bg-gray-200 :is(.text-emerald-600,.text-emerald-700,.text-emerald-800,.text-emerald-900),
+    html.jd-dark #root .bg-amber-50 :is(.text-emerald-600,.text-emerald-700,.text-emerald-800,.text-emerald-900),
+    html.jd-dark #root .bg-amber-100 :is(.text-emerald-600,.text-emerald-700,.text-emerald-800,.text-emerald-900),
+    html.jd-dark #root .bg-\[\#fef3c7\] :is(.text-emerald-600,.text-emerald-700,.text-emerald-800,.text-emerald-900),
+    html.jd-dark #root button.rounded-\[20px\].p-4:nth-child(even) :is(.text-emerald-600,.text-emerald-700,.text-emerald-800,.text-emerald-900){color:#6fcf9a !important}
+html.jd-dark #root .bg-white\/\[0\.02\] :is(.text-red-500,.text-red-600,.text-red-700,.text-red-900),
+    html.jd-dark #root .bg-gray-50 :is(.text-red-500,.text-red-600,.text-red-700,.text-red-900),
+    html.jd-dark #root .bg-\[\#f9fafb\] :is(.text-red-500,.text-red-600,.text-red-700,.text-red-900),
+    html.jd-dark #root .bg-\[\#fbfcfe\] :is(.text-red-500,.text-red-600,.text-red-700,.text-red-900),
+    html.jd-dark #root .bg-\[\#fbfdff\] :is(.text-red-500,.text-red-600,.text-red-700,.text-red-900),
+    html.jd-dark #root .bg-\[\#fcfcfb\] :is(.text-red-500,.text-red-600,.text-red-700,.text-red-900),
+    html.jd-dark #root .bg-white\/5 :is(.text-red-500,.text-red-600,.text-red-700,.text-red-900),
+    html.jd-dark #root .bg-white\/10 :is(.text-red-500,.text-red-600,.text-red-700,.text-red-900),
+    html.jd-dark #root .bg-gray-100 :is(.text-red-500,.text-red-600,.text-red-700,.text-red-900),
+    html.jd-dark #root .bg-gray-200 :is(.text-red-500,.text-red-600,.text-red-700,.text-red-900),
+    html.jd-dark #root .bg-amber-50 :is(.text-red-500,.text-red-600,.text-red-700,.text-red-900),
+    html.jd-dark #root .bg-amber-100 :is(.text-red-500,.text-red-600,.text-red-700,.text-red-900),
+    html.jd-dark #root .bg-\[\#fef3c7\] :is(.text-red-500,.text-red-600,.text-red-700,.text-red-900),
+    html.jd-dark #root button.rounded-\[20px\].p-4:nth-child(even) :is(.text-red-500,.text-red-600,.text-red-700,.text-red-900){color:#ef9a9a !important}
+html.jd-dark #root .bg-white\/\[0\.02\] :is(.text-blue-700,.text-cyan-700),
+    html.jd-dark #root .bg-gray-50 :is(.text-blue-700,.text-cyan-700),
+    html.jd-dark #root .bg-\[\#f9fafb\] :is(.text-blue-700,.text-cyan-700),
+    html.jd-dark #root .bg-\[\#fbfcfe\] :is(.text-blue-700,.text-cyan-700),
+    html.jd-dark #root .bg-\[\#fbfdff\] :is(.text-blue-700,.text-cyan-700),
+    html.jd-dark #root .bg-\[\#fcfcfb\] :is(.text-blue-700,.text-cyan-700),
+    html.jd-dark #root .bg-white\/5 :is(.text-blue-700,.text-cyan-700),
+    html.jd-dark #root .bg-white\/10 :is(.text-blue-700,.text-cyan-700),
+    html.jd-dark #root .bg-gray-100 :is(.text-blue-700,.text-cyan-700),
+    html.jd-dark #root .bg-gray-200 :is(.text-blue-700,.text-cyan-700),
+    html.jd-dark #root .bg-amber-50 :is(.text-blue-700,.text-cyan-700),
+    html.jd-dark #root .bg-amber-100 :is(.text-blue-700,.text-cyan-700),
+    html.jd-dark #root .bg-\[\#fef3c7\] :is(.text-blue-700,.text-cyan-700),
+    html.jd-dark #root button.rounded-\[20px\].p-4:nth-child(even) :is(.text-blue-700,.text-cyan-700){color:#9bbcf0 !important}
+html.jd-dark #root .bg-white\/\[0\.02\] .font-bold[style],
+    html.jd-dark #root .bg-gray-50 .font-bold[style],
+    html.jd-dark #root .bg-\[\#f9fafb\] .font-bold[style],
+    html.jd-dark #root .bg-\[\#fbfcfe\] .font-bold[style],
+    html.jd-dark #root .bg-\[\#fbfdff\] .font-bold[style],
+    html.jd-dark #root .bg-\[\#fcfcfb\] .font-bold[style],
+    html.jd-dark #root .bg-white\/5 .font-bold[style],
+    html.jd-dark #root .bg-white\/10 .font-bold[style],
+    html.jd-dark #root .bg-gray-100 .font-bold[style],
+    html.jd-dark #root .bg-gray-200 .font-bold[style],
+    html.jd-dark #root .bg-amber-50 .font-bold[style],
+    html.jd-dark #root .bg-amber-100 .font-bold[style],
+    html.jd-dark #root .bg-\[\#fef3c7\] .font-bold[style],
+    html.jd-dark #root button.rounded-\[20px\].p-4:nth-child(even) .font-bold[style]{color:#e8edf7 !important}
+html.jd-dark #root button.rounded-\[20px\].p-4:nth-child(even) .rounded-full{background-color:#0e1626 !important;color:#E3C458 !important}
+html.jd-dark #root button.rounded-\[20px\].p-4:nth-child(odd) .rounded-full{background-color:#1f2d4a !important;color:#e8edf7 !important}
+html.jd-dark #root header button:not(#jd-x){background-color:#0e1626 !important;color:#E3C458 !important;border-color:rgba(255,255,255,.14) !important}
+html.jd-dark #root header button.bg-\[\#1e3a8a\]:not(#jd-x){background-color:#2f5fa8 !important;color:#eaf0fa !important}
+html.jd-dark #root header .opacity-60{opacity:1 !important;color:#e8edf7 !important}
+html.jd-dark #root header{color:#e8edf7}
+html.jd-dark #reportModal .box{background:#16223a !important;color:#eaf0fa !important;border:1px solid rgba(227,196,88,.5)}
+html.jd-dark #reportModal .box h2{color:#E3C458}
+html.jd-dark #reportModal select,html.jd-dark #reportModal input[type=date],html.jd-dark #reportModal input[type=month],html.jd-dark #reportModal input[type=number]{background:#101c33 !important;color:#eaf0fa !important;border:1px solid rgba(227,196,88,.6) !important;border-radius:8px;padding:6px 8px;color-scheme:dark}
+html.jd-dark #reportModal #repGen{background:#1f2d4a !important;color:#e8edf7 !important;font-weight:700}
+html.jd-dark #reportModal #repClose{background:transparent !important;color:#E3C458 !important;border:1px solid rgba(227,196,88,.5) !important}
+html.jd-dark #reportModal #repPrint{background:#1f2d4a !important;color:#e8edf7 !important;font-weight:700}
+html.jd-dark #reportModal a{color:#EBD58A !important}
+html.jd-dark #reportModal #repResult table tr{background:transparent !important;border-color:rgba(227,196,88,.3) !important;color:#eaf0fa}
+html.jd-dark #reportModal #repResult table tr:first-child{background:#1f2d4a !important;color:#e8edf7}
+html.jd-dark #reportModal #repResult table tr[style*="FFF7D6"],html.jd-dark #reportModal #repResult table tr[style*="fef3c7"],html.jd-dark #reportModal #repResult table tr[style*="fffbeb"]{background:#1f2d4a !important;color:#e8edf7 !important}
+html.jd-dark #reportModal #repResult table td[style*="eff6ff"]{background:rgba(120,160,220,0.19) !important}
+/* jd-dark-fix2 */
+html.jd-dark #root .rounded-\[20px\].bg-white :is(.text-black):not([class*="bg-"]){color:#eaf0fa !important;opacity:1 !important}
+html.jd-dark #root .rounded-\[20px\].bg-white :is(.text-gray-400,.text-gray-500,.text-gray-600,.text-gray-700,.text-gray-800):not([class*="bg-"]){color:#c9d3e6 !important;opacity:1 !important}
+html.jd-dark #root .rounded-\[20px\].bg-white :is(.text-emerald-600,.text-emerald-700):not([class*="bg-"]){color:#6fcf9a !important}
+html.jd-dark #root .rounded-\[20px\].bg-white .bg-emerald-100{color:#6fcf9a !important;border-color:rgba(110,231,183,.5) !important}
+html.jd-dark #root .rounded-\[20px\].bg-white .bg-red-50{color:#ef9a9a !important;border-color:rgba(252,165,165,.55) !important}
+html.jd-dark #root button.px-4.py-2.rounded-full.text-\[12px\].font-bold{color:#eaf0fa !important;border-color:rgba(255,255,255,.14) !important}
+html.jd-dark #root button.px-4.py-2.rounded-full.text-\[12px\].font-bold.bg-\[\#111827\]{background-color:#0e1626 !important;color:#E3C458 !important;border-color:rgba(255,255,255,.14) !important;box-shadow:0 0 0 2px rgba(227,196,88,.6)}
+html.jd-dark #root header .max-w-\[1200px\]>div:first-child,#root header .max-w-\[1200px\]>div:first-child{min-width:0;flex:1 1 0}
+/* polish */
+html:not(.jd-dark) #root div.flex.gap-2.mt-4.mb-3>button:not(.bg-\[\#111827\]){-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+html:not(.jd-dark) #root div.flex.gap-2.mt-4.mb-3>button:nth-child(1):not(.bg-\[\#111827\]){background:rgba(227,196,88,.22) !important}
+html:not(.jd-dark) #root div.flex.gap-2.mt-4.mb-3>button:nth-child(2):not(.bg-\[\#111827\]){background:rgba(34,197,94,.16) !important}
+html.jd-dark #root button.w-full.rounded-xl.text-white.font-bold:not([class*="bg-"]){background:#0e1626 !important;color:#E3C458 !important;border:2px solid rgba(227,196,88,.5) !important}
+html.jd-dark #root button.w-full.rounded-xl.text-white.font-bold:not([class*="bg-"]):disabled{opacity:.6}
+html.jd-dark #root input.rounded-xl.border{border:2px solid rgba(227,196,88,.35) !important;font-size:16px}
+html.jd-dark .jd-pl span:first-child{color:#6fcf9a}
+html.jd-dark .jd-pl span:last-child{color:#ef9a9a}
+html.jd-dark #root span.rounded-full.font-bold.bg-emerald-100{background:rgba(34,197,94,.22) !important;color:#6fcf9a !important}
+html.jd-dark #root span.rounded-full.font-bold.bg-red-100{background:rgba(239,154,154,.22) !important;color:#ef9a9a !important}
+html.jd-dark #reportModal table tr[style*="#fffbeb"]>td{background:rgba(227,196,88,.14) !important;color:#eaf0fa !important}
+html.jd-dark #reportModal table tr[style*="#FFF7D6"]>td{background:rgba(227,196,88,.24) !important;color:#E3C458 !important;font-weight:800}
+html.jd-dark #reportModal table tr:nth-child(even):not([style*="#fffbeb"]):not([style*="#FFF7D6"])>td{background:rgba(255,255,255,.05)}
+/* ===== لوحات مستقلة (متغيرات) ===== */
+html.jd-dark #jdDash{--bg:#0e1626;--card:#16223a;--tx:#e8edf7;--mu:#a9b6cf;--ln:rgba(227,196,88,.25);--pos:#6fcf9a;--neg:#ef9a9a;--warn:#E3C458;--acc:#E3C458}
+html.jd-dark #jdRate{--bg:#0e1626;--card:#16223a;--tx:#e8edf7;--mu:#a9b6cf;--ln:rgba(227,196,88,.25);--pos:#6fcf9a;--neg:#ef9a9a;--warn:#E3C458;--acc:#E3C458;--st:#E3C458}
+html.jd-dark #jd-rep-host{--card:#16223a;--text:#e8edf7;--muted:#a9b6cf;--line:rgba(227,196,88,.28);--acc:#E3C458;--acc-t:#0e1626;--th:#22314f;--th-t:#E3C458;--zebra:rgba(255,255,255,.05);--pos:#6fcf9a;--neg:#ef9a9a;--net:#E3C458}
+html.jd-dark #jd-tabs button{border-color:#E3C458;color:#E3C458}
+html.jd-dark #jd-tabs button.on{background:#E3C458;color:#0e1626}
+html.jd-dark #jdDash .hd button,html.jd-dark #jdDash .bk button{color:#0e1626}
+html.jd-dark #jdDash .bk button.s{color:#e8edf7}
+html.jd-dark #jdRate .rk{color:#0e1626}
+/* ===== استعادة التمييز للأزرار الرئيسية ===== */
+html.jd-dark #root .bg-\[\#1e3a8a\]{background-color:#E3C458 !important;color:#0e1626 !important}
+html.jd-dark #root .bg-\[\#1e3a8a\].text-white,html.jd-dark #root .bg-\[\#1e3a8a\] .text-white{color:#0e1626 !important}
+html.jd-dark #root header button.bg-\[\#1e3a8a\]:not(#jd-x){background-color:#2f5fa8 !important;color:#eaf0fa !important}
+html.jd-dark #root button.w-full.rounded-xl.text-white.font-bold:not([class*="bg-"]){background:#E3C458 !important;color:#0e1626 !important;border:0 !important}
+html.jd-dark #reportModal #repGen,html.jd-dark #reportModal #repPrint{background:#E3C458 !important;color:#0e1626 !important}
+html.jd-dark #reportModal #repClose{color:#E3C458 !important;border-color:rgba(227,196,88,.6) !important}
+/* ===== بطاقات الأقسام: حدود موحّدة بدل ألوان كل قسم ===== */
+html.jd-dark #root button.rounded-\[20px\].p-4{border-color:rgba(227,196,88,.3) !important}
+html.jd-dark #root button.rounded-\[20px\].p-4>div:first-child>div:first-child{border-color:rgba(227,196,88,.45) !important}
+html.jd-dark #root button.rounded-\[20px\].p-4 .font-bold[style]:is(:nth-child(odd),:nth-child(even)){color:#EBD58A !important}
+html.jd-dark #root button.rounded-\[20px\].p-4:is(:nth-child(odd),:nth-child(even)) .opacity-70{color:#b4c0d8 !important}
+html.jd-dark #root button.rounded-\[20px\].p-4:nth-child(odd){background-color:#16223a !important}
+html.jd-dark #root button.rounded-\[20px\].p-4:nth-child(even){background-color:#1c2a47 !important}
+html.jd-dark #root button.rounded-\[20px\].p-4:nth-child(odd) .rounded-full,html.jd-dark #root button.rounded-\[20px\].p-4:nth-child(even) .rounded-full{background-color:#0e1626 !important;color:#E3C458 !important}
+/* ===== شرائط الحالة والشارات ===== */
+html.jd-dark #root .rounded-\[20px\].bg-white.p-4:has(.bg-emerald-100){box-shadow:inset -6px 0 0 #6fcf9a !important}
+html.jd-dark #root .rounded-\[20px\].bg-white.p-4:has(.bg-\[\#fef3c7\]){box-shadow:inset -6px 0 0 #E3C458 !important}
+html.jd-dark #root .rounded-\[20px\].bg-white.p-4:has(.border-red-200.text-red-600){box-shadow:inset -6px 0 0 #ef9a9a !important}
+html.jd-dark #root .rounded-\[14px\].p-3.flex .flex-wrap>span.font-bold:first-child{background:#E3C458 !important;color:#0e1626 !important;border-color:#b79b3c}
+html.jd-dark #root .jd-num{background:#0e1626;color:#E3C458 !important;border-color:rgba(227,196,88,.4)}
+html.jd-dark #root .jd-num.jd-pos{color:#6fcf9a !important}
+html.jd-dark #root .jd-num.jd-neg{color:#ef9a9a !important}
+html.jd-dark #root .jd-num.jd-zero{background:transparent;color:inherit !important}
+html.jd-dark #jdTrQ{background:#101c33;color:#eaf0fa;border-color:rgba(227,196,88,.4)}
+html.jd-dark #root div.flex.gap-2.mt-4.mb-3>button:nth-child(1){border-top-color:#E3C458 !important}
+html.jd-dark #root div.flex.gap-2.mt-4.mb-3>button:nth-child(2){border-top-color:#6fcf9a !important}
+html.jd-dark #root div.flex.gap-2.mt-4.mb-3>button:nth-child(3){border-top-color:#8a9bbd !important}
+html.jd-dark #root button[data-jdchip=in]{box-shadow:inset 0 -5px 0 #6fcf9a}
+html.jd-dark #root button[data-jdchip=out]{box-shadow:inset 0 -5px 0 #ef9a9a}
+html.jd-dark .jd-pp{background:#6fcf9a}
+html.jd-dark .jd-pt{background:rgba(239,154,154,.55)}
+html.jd-dark .jd-pl span:first-child{color:#6fcf9a}html.jd-dark .jd-pl span:last-child{color:#ef9a9a}
+html.jd-dark #root header{color:#e8edf7}
+html.jd-dark #root header .font-bold.text-\[13px\]{color:#EBD58A}
+
+</style>
 <style id="jd-emp-css">
 #jdEmp{position:fixed;inset:0;z-index:9999996;display:none;background:var(--bg);color:var(--tx);overflow:auto;direction:rtl;font-family:inherit;--bg:#f4f4f2;--card:#fff;--fd:#fff;--tx:#111;--mu:#4b5563;--ln:#d6d6d0;--pos:#15803d;--neg:#b91c1c;--acc:#FFD800;--fo:#b38f00}
-html.jd-dark #jdEmp{--bg:#1c1f24;--card:#2a2e35;--fd:#22262c;--tx:#fff;--mu:#d9dee5;--ln:#434852;--pos:#6ee7b7;--neg:#fca5a5;--acc:#FFD800;--fo:#FFD800}
+html.jd-dark #jdEmp{--bg:#181b20;--card:#232830;--fd:#1c2027;--tx:#e8edf7;--mu:#b4bdcc;--ln:#3a414d;--pos:#6fcf9a;--neg:#ef9a9a;--acc:#E3C458;--fo:#E3C458}
 #jdEmp.open{display:block}
 #jdEmp *{box-sizing:border-box}
 #jdEmp .w{max-width:960px;margin:auto;padding:14px}
@@ -1480,7 +1810,7 @@ html.jd-dark #jdEmp{--bg:#1c1f24;--card:#2a2e35;--fd:#22262c;--tx:#fff;--mu:#d9d
 #jdEmp .dl{width:100%;border-color:var(--neg);color:var(--neg)}
 #jdEmp .pos{color:var(--pos)}#jdEmp .neg{color:var(--neg)}
 #jdEmp{--nb:#FFE45C;--cb:#FFF1A8;--nbd:#b38f00;--red:#b91c1c}
-html.jd-dark #jdEmp{--nb:#FFD800;--cb:#FFE98A;--nbd:#b38f00;--red:#b91c1c}
+html.jd-dark #jdEmp{--nb:#E3C458;--cb:#EBD58A;--nbd:#9a8332;--red:#b91c1c}
 #jdEmp input:not(.tx){background:var(--nb);color:#000;font-weight:800;font-size:18px;border:2px solid var(--nbd);letter-spacing:.3px}
 #jdEmp input:not(.tx)::placeholder{color:rgba(0,0,0,.45);font-weight:600}
 #jdEmp input:not(.tx):focus{border-color:#000;box-shadow:0 0 0 3px rgba(255,216,0,.45)}
@@ -1610,7 +1940,7 @@ function sync(){
 var tr=0,tm=setInterval(function(){if(sync()||++tr>40)clearInterval(tm)},1500);
 function upd(id,fn){var a=all(),e=a.filter(function(x){return x.id===id})[0];if(!e)return null;fn(e);e.ts=Date.now();e.by=user();e.d=1;put(a);clearTimeout(sv[id]);sv[id]=setTimeout(function(){push(id)},600);return e}
 var el=document.createElement("div");el.id="jdEmp";
-function stat(){var s=el.querySelector("[data-o=sy]");if(s){var dn=all().filter(function(e){return e.d}).length;s.textContent=erF?"⚠ تعذرت المزامنة، البيانات محفوظة على الجهاز. تأكد من الاتصال وصلاحيات قاعدة البيانات.":dn?"⏳ بانتظار المزامنة مع الخادم":"✓ متزامن"}}
+function stat(){window.__jdEmpBad=!!erF;var s=el.querySelector("[data-o=sy]");if(s){var dn=all().filter(function(e){return e.d}).length;s.textContent=erF?"⚠ تعذرت المزامنة، البيانات محفوظة على الجهاز. تأكد من الاتصال وصلاحيات قاعدة البيانات.":dn?"⏳ بانتظار المزامنة مع الخادم":"✓ متزامن"}}
 var cur=null;
 function cls(v){return v<0?"neg":"pos"}
 function totals(y){var L=listM(y||MO()),f=0,d=0;L.forEach(function(e){var c=calc(e);f+=c.fin;d+=c.nd});return{n:L.length,f:f,d:d}}
