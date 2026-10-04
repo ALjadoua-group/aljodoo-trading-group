@@ -1331,6 +1331,49 @@ html.jd-dark #root header .max-w-\[1200px\]>div:first-child,#root header .max-w-
 #root header .leading-tight>div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #root header .max-w-\[1200px\]>div:last-child{flex-shrink:0}
 </style>
+<style id="jd-ui-polish">
+/* شريط حالة جانبي لبطاقات التحويل */
+#root .rounded-\[20px\].bg-white.p-4:has(.bg-emerald-100){border-inline-start:6px solid #22c55e !important}
+#root .rounded-\[20px\].bg-white.p-4:has(.bg-\[\#fef3c7\]){border-inline-start:6px solid #FFD800 !important}
+#root .rounded-\[20px\].bg-white.p-4:has(.border-red-200.text-red-600){border-inline-start:6px solid #ef4444 !important}
+/* المبالغ في سجلات الأقسام: شارة صفراء */
+#root .rounded-\[14px\].p-3.flex .flex-wrap>span.font-bold:first-child{background:#FFD800 !important;color:#000 !important;padding:3px 12px;border-radius:10px;font-size:14px;border:1px solid #b38f00}
+/* تبويبات التحويلات: لون مميز لكل تبويب */
+#root div.flex.gap-2.mt-4.mb-3>button:nth-child(1){border-top:4px solid #FFD800 !important}
+#root div.flex.gap-2.mt-4.mb-3>button:nth-child(2){border-top:4px solid #22c55e !important}
+#root div.flex.gap-2.mt-4.mb-3>button:nth-child(3){border-top:4px solid #94a3b8 !important}
+html:not(.jd-dark) #root div.flex.gap-2.mt-4.mb-3>button:not(.bg-\[\#111827\]){-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+html:not(.jd-dark) #root div.flex.gap-2.mt-4.mb-3>button:nth-child(1):not(.bg-\[\#111827\]){background:rgba(255,216,0,.22) !important}
+html:not(.jd-dark) #root div.flex.gap-2.mt-4.mb-3>button:nth-child(2):not(.bg-\[\#111827\]){background:rgba(34,197,94,.16) !important}
+/* حقل البحث في التحويلات */
+#jdTrQ{width:100%;height:42px;border-radius:12px;border:1px solid rgba(128,128,128,.45);background:#fff;color:#000;font-size:13px;padding:0 14px;margin:0 0 12px;font-family:inherit;outline:0;box-sizing:border-box}
+#jdTrQ:focus{border-color:#b38f00;box-shadow:0 0 0 3px rgba(255,216,0,.4)}
+</style>
+<script id="jd-ui-polish-js">
+(function(){
+var Q="";
+function norm(t){return String(t||"").replace(/[\u0660-\u0669]/g,function(c){return c.charCodeAt(0)-1632}).replace(/,/g,"").toLowerCase()}
+function apply(inp){
+  var list=inp.nextElementSibling;if(!list)return;var q=norm(Q).trim();
+  Array.prototype.forEach.call(list.children,function(c){
+    if(!c.className||String(c.className).indexOf("rounded-[20px]")<0)return;
+    c.style.display=(!q||norm(c.textContent).indexOf(q)>-1)?"":"none"})}
+function run(){
+  var root=document.getElementById("root");if(!root)return;
+  var tabs=Array.prototype.filter.call(root.querySelectorAll("div.flex.gap-2.mt-4.mb-3"),function(d){var b=d.querySelector("button");return b&&/^المرسلة/.test(b.textContent)})[0];
+  if(!tabs)return;
+  var inp=document.getElementById("jdTrQ");
+  if(!inp||inp.previousElementSibling!==tabs){
+    if(inp)inp.remove();
+    inp=document.createElement("input");inp.id="jdTrQ";inp.type="search";inp.placeholder="🔍 بحث بالاسم أو المبلغ أو الملاحظة";inp.value=Q;
+    inp.addEventListener("input",function(){Q=inp.value;apply(inp)});
+    tabs.insertAdjacentElement("afterend",inp)}
+  apply(inp)}
+var t=0;function tk(){clearTimeout(t);t=setTimeout(run,250)}
+function mount(){new MutationObserver(tk).observe(document.body,{childList:true,subtree:true});run()}
+document.body?mount():document.addEventListener("DOMContentLoaded",mount);
+})();
+</script>
 <style id="jd-emp-css">
 #jdEmp{position:fixed;inset:0;z-index:9999996;display:none;background:var(--bg);color:var(--tx);overflow:auto;direction:rtl;font-family:inherit;--bg:#f4f4f2;--card:#fff;--fd:#fff;--tx:#111;--mu:#4b5563;--ln:#d6d6d0;--pos:#15803d;--neg:#b91c1c;--acc:#FFD800;--fo:#b38f00}
 html.jd-dark #jdEmp{--bg:#1c1f24;--card:#2a2e35;--fd:#22262c;--tx:#fff;--mu:#d9dee5;--ln:#434852;--pos:#6ee7b7;--neg:#fca5a5;--acc:#FFD800;--fo:#FFD800}
@@ -1523,19 +1566,19 @@ function ltr(e){var n=(e.name||"").trim();return n?n.charAt(0):"؟"}
 function quick(e){
   if(ymOf(e)!==ymNow())return "";var cs=(e.att||{})[todayS()]||"";
   function b(c,s,l){return '<button type="button" class="'+c+(cs===s?" on":"")+'" data-a="q" data-s="'+s+'" data-id="'+e.id+'">'+l+'</button>'}
-  return '<div class="qk">'+b("bp","p","حاضر")+b("bx","x","غائب")+b("be","e","بعذر")+'</div>'}
+  return '<div class="qk">'+b("bp","p","حاضر")+b("bx","x","غائب")+b("be","e","رخصة")+'</div>'}
 function attend(e){
   var y=ymOf(e),a=e.att||{},first=new Date(+y.slice(0,4),+y.slice(5,7)-1,1),dim=new Date(+y.slice(0,4),+y.slice(5,7),0).getDate(),off=(first.getDay()+1)%7,td=todayS(),cnt={p:0,x:0,e:0},k,i;
   for(k in a)if(k.slice(0,7)===y&&cnt[a[k]]!==undefined)cnt[a[k]]++;
   var cs=a[sd]||"",lb=new Date(sd+"T00:00:00").toLocaleDateString("ar",{weekday:"long",day:"numeric",month:"long",numberingSystem:"latn"});
   function b(c,s,l){return '<button type="button" class="'+c+(cs===s?" on":"")+'" data-a="st" data-s="'+s+'" data-id="'+e.id+'">'+l+'</button>'}
-  var h='<div class="sc"><h4>سجل الحضور اليومي</h4><div class="sdl">التاريخ المختار: <b>'+lb+'</b></div><div class="qk big">'+b("bp","p","حاضر")+b("bx","x","غائب")+b("be","e","بعذر")+'</div>';
+  var h='<div class="sc"><h4>سجل الحضور اليومي</h4><div class="sdl">التاريخ المختار: <b>'+lb+'</b></div><div class="qk big">'+b("bp","p","حاضر")+b("bx","x","غائب")+b("be","e","رخصة")+'</div>';
   h+='<button type="button" class="bc" data-a="st" data-s="c" data-id="'+e.id+'">مسح تسجيل هذا اليوم</button>';
-  h+='<div class="lg"><span class="lp">حاضر <b>'+cnt.p+'</b></span><span class="lx">غائب <b>'+cnt.x+'</b></span><span class="le">بعذر <b>'+cnt.e+'</b></span></div><div class="cal">';
+  h+='<div class="lg"><span class="lp">حاضر <b>'+cnt.p+'</b></span><span class="lx">غائب <b>'+cnt.x+'</b></span><span class="le">رخصة <b>'+cnt.e+'</b></span></div><div class="cal">';
   "سحنثرخج".split("").forEach(function(w){h+='<div class="wk">'+w+'</div>'});
   for(i=0;i<off;i++)h+='<div></div>';
   for(i=1;i<=dim;i++){var dt=y+"-"+p2(i),st=a[dt]||"";h+='<div class="cl'+(st?" st-"+st:"")+(dt===sd?" sel":"")+(dt===td?" tdy":"")+'" data-a="dy" data-dt="'+dt+'">'+i+'</div>'}
-  return h+'</div><div class="hn">الأيام غير المسجّلة تُعتبر حضوراً، والغياب بعذر لا يُخصم من الراتب.</div></div>'}
+  return h+'</div><div class="hn">الأيام غير المسجّلة تُعتبر حضوراً، والرخصة لا تُخصم من الراتب.</div></div>'}
 function tile(e){var c=calc(e);var ts=ymOf(e)===ymNow()?((e.att||{})[todayS()]||""):"";return '<div class="tl'+(ts?" ts-"+ts:"")+'" data-a="op" data-id="'+e.id+'"><span class="dbi" data-di="'+e.id+'" style="display:'+(c.nd>0?"block":"none")+'">💳</span><div class="av" data-tl="'+e.id+'">'+esc(ltr(e))+'</div><div class="tn" data-tn="'+e.id+'">'+(esc(e.name)||"موظف جديد")+'</div><div class="tf '+cls(c.fin)+'" data-tf="'+e.id+'">'+fmt(c.fin)+'<small> د.ع</small></div><div class="td'+(c.nd>0?" dr":"")+'" data-td="'+e.id+'">'+(c.nd>0?"دين: "+fmt(c.nd):"بلا دين")+'</div>'+quick(e)+'</div>'}
 function row(e,lb,f,v){return '<div class="ro"><span>'+lb+'</span><input data-f="'+f+'" data-id="'+e.id+'" inputmode="numeric" value="'+(v?esc(v):"")+'" placeholder="0"></div>'}
 function out(lb,o,txt,c){return '<div class="ro"><span>'+lb+'</span><span class="cv '+(c||"")+'" data-o="'+o+'">'+txt+'</span></div>'}
@@ -1562,7 +1605,7 @@ function draw(){
   if(L.length)h+='<input class="tx sq" data-q="1" placeholder="🔍 بحث بالاسم" value="'+esc(qs)+'">';
   h+='<div class="gr">';
   h+=gridHtml(L);
-  h+='</div><div class="sy" style="margin-top:14px">الراتب على أساس 30 يوماً: استقطاع الغياب = الراتب ÷ 30 × أيام الغياب، ويُقرَّب صافي الراتب بعد الغياب إلى أقرب رقم صحيح للأعلى. أيام الغياب = الأيام المسجّلة «غائب» + التعديل اليدوي، والغياب بعذر لا يُخصم.</div></div>';
+  h+='</div><div class="sy" style="margin-top:14px">الراتب على أساس 30 يوماً: استقطاع الغياب = الراتب ÷ 30 × أيام الغياب، ويُقرَّب صافي الراتب بعد الغياب إلى أقرب رقم صحيح للأعلى. أيام الغياب = الأيام المسجّلة «غائب» + التعديل اليدوي، والرخصة لا تُخصم.</div></div>';
   var cu=cur&&L.filter(function(x){return x.id===cur})[0];if(!cu)cur=null;
   if(cu)h+=modal(cu);fresh=false;
   var y=el.scrollTop,sy=0,sh=el.querySelector(".sh");if(sh)sy=sh.scrollTop;
