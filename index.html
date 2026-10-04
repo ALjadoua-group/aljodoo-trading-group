@@ -1419,6 +1419,10 @@ function addbtn(root){
     var p=b.closest("div.rounded-\\[20px\\]"),h=p?(p.textContent||"").trim().slice(0,40):"",bl=EVEN.some(function(l){return h.indexOf(l)===0});
     if(bl){if(b.getAttribute("data-jdadd")!=="blue")b.setAttribute("data-jdadd","blue")}else if(b.hasAttribute("data-jdadd"))b.removeAttribute("data-jdadd")})}
 function digits(t){return parseInt(String(t).replace(/[^\d]/g,"")||"0",10)}
+function tagY(root){
+  Array.prototype.forEach.call(root.querySelectorAll("div.rounded-\\[20px\\].border.p-4"),function(d){
+    var h=(d.textContent||"").trim().slice(0,40),on=EVEN.some(function(l){return h.indexOf(l)===0})&&h.indexOf("الإجمالي")>-1;
+    if(on){if(d.getAttribute("data-jdy")!=="1")d.setAttribute("data-jdy","1")}else if(d.hasAttribute("data-jdy"))d.removeAttribute("data-jdy")})}
 function wakeel(root){
   Array.prototype.forEach.call(root.querySelectorAll("div.rounded-2xl.p-4.flex.items-center.justify-between"),function(card){
     var tx=card.textContent;if(tx.indexOf("الباقي (إجمالي المبلغ")<0)return;
@@ -1441,7 +1445,7 @@ function tint(){
     if(/^-\d[\d,]*/.test(t)&&td.children.length===0)td.style.color=dk?"#fca5a5":"#b91c1c"})}
 function run(){
   var root=document.getElementById("root");
-  if(root){search(root);chips(root);addbtn(root);wakeel(root);nums(root)}
+  if(root){search(root);chips(root);addbtn(root);tagY(root);wakeel(root);nums(root)}
   tint();syncUI()}
 
 /* ===== أيقونة المزامنة: أخضر = متزامن، أحمر = غير متزامن ===== */
@@ -1782,6 +1786,26 @@ html.jd-dark #root button.rounded-\[20px\].p-4:nth-child(even)>div:first-child>d
 /* زر الإضافة: أزرق داخل أقسام البطاقات الصفراء، ويبقى ذهبياً في الكحلية */
 html.jd-dark #root button.w-full.rounded-xl.text-white.font-bold.bg-\[\#1e3a8a\][data-jdadd=blue],html.jd-dark #root button.w-full.rounded-xl.text-white.font-bold[data-jdadd=blue]{background-color:#2563eb !important;color:#fff !important;border:0 !important}
 html.jd-dark #root button.w-full.rounded-xl.text-white.font-bold[data-jdadd=blue] *{color:#fff !important}
+/* ===== أقسام البطاقات الصفراء: اللوحة من الداخل صفراء بنص أسود، وحقول المبلغ والبيان تبقى داكنة ===== */
+html.jd-dark #root [data-jdy][data-jdy]{background-color:#FFD800 !important;border-color:#b38f00 !important;color:#0a0f1c !important}
+html.jd-dark #root [data-jdy][data-jdy] :is(div,span,label,p,small):not(.absolute):not([style]):not(button *):not(.bg-gray-100):not(.bg-red-50):not(.bg-blue-50){color:#0a0f1c !important}
+html.jd-dark #root [data-jdy][data-jdy] :is(.opacity-50,.opacity-60,.opacity-70){opacity:.85 !important}
+html.jd-dark #root [data-jdy][data-jdy] .rounded-\[16\].border.p-4,html.jd-dark #root [data-jdy][data-jdy] .rounded-\[16px\].border.p-4{background-color:#FFE45C !important;border-color:#b38f00 !important}
+html.jd-dark #root [data-jdy][data-jdy] .rounded-lg.border.bg-gray-50,html.jd-dark #root [data-jdy][data-jdy] .rounded-xl.border.bg-blue-50{background-color:#FFF3B0 !important;border-color:#b38f00 !important}
+html.jd-dark #root [data-jdy][data-jdy] :is(input,select,textarea):not([type=checkbox]){border:2px solid rgba(6,26,59,.75) !important}
+html.jd-dark #root [data-jdy][data-jdy] :is(input,select,textarea)::placeholder{color:#8fa0c0 !important}
+html.jd-dark #root [data-jdy][data-jdy] button.bg-white\/5{background-color:#FFE45C !important;color:#0a0f1c !important;border-color:#b38f00 !important}
+html.jd-dark #root [data-jdy][data-jdy] .rounded-\[14px\].border.p-3.flex{background-color:#FFE45C !important;border-color:#b38f00 !important;box-shadow:0 1px 4px rgba(0,0,0,.18) !important}
+html.jd-dark #root [data-jdy][data-jdy] .rounded-\[14px\].border.p-3.flex .bg-gray-100{background-color:#061a3b !important;color:#FFD800 !important}
+html.jd-dark #root [data-jdy][data-jdy] .rounded-2xl.border-dashed{border-color:rgba(6,26,59,.45) !important}
+/* ===== سجل العمليات المدخلة: صفوف صفراء بنص أسود في كل الأقسام ===== */
+html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between{background-color:#FFD800 !important;border-color:#b38f00 !important;color:#0a0f1c !important}
+html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between :is(div,span):not([style]):not(.bg-gray-100){color:#0a0f1c !important;background-color:transparent !important;border:0 !important}
+html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between .opacity-70,html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between .opacity-60{opacity:.85 !important}
+html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between .bg-gray-100{background-color:#061a3b !important;color:#FFD800 !important}
+html.jd-dark #root .rounded-\[14px\].border.p-3.flex.items-center.justify-between .font-bold.text-\[13px\]{color:#04143a !important;background:transparent !important;padding:0 !important;border:0 !important}
+html.jd-dark #root [data-jdy][data-jdy] .rounded-\[14px\].border.p-3.flex.items-center.justify-between{background-color:#FFE45C !important}
+html.jd-dark #root [data-jdy][data-jdy] .rounded-\[14px\].border.p-3.flex.items-center.justify-between .font-bold.text-\[13px\]{color:#04143a !important}
 </style>
 <style id="jd-emp-css">
 #jdEmp{position:fixed;inset:0;z-index:9999996;display:none;background:var(--bg);color:var(--tx);overflow:auto;direction:rtl;font-family:inherit;--bg:#f4f4f2;--card:#fff;--fd:#fff;--tx:#111;--mu:#4b5563;--ln:#d6d6d0;--pos:#15803d;--neg:#b91c1c;--acc:#FFD800;--fo:#b38f00}
