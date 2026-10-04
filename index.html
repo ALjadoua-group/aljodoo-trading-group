@@ -782,7 +782,7 @@ if('serviceWorker' in navigator){
 
   #jd-rep-host{--card:#fff;--text:#111827;--muted:#475569;--line:#e5e7eb;--acc:#1e3a8a;--acc-t:#fff;--th:#1e3a8a;--th-t:#fff;--zebra:#f1f5f9;--pos:#15803d;--neg:#b91c1c;--net:#1e3a8a;
     display:none;direction:rtl;color:var(--text);font-family:"IBM Plex Sans Arabic",Tajawal,sans-serif;font-size:14px}
-  html.jd-dark #jd-rep-host{--card:#0d2b5e;--text:#ffffff;--muted:#c3d0ea;--line:rgba(255,216,0,.4);--acc:#FFD800;--acc-t:#061a3b;--th:#FFD800;--th-t:#061a3b;--zebra:#0a2454;--pos:#6ee7b7;--neg:#fca5a5;--net:#FFD800}
+  html.jd-dark #jd-rep-host{--card:#0d2b5e;--text:#ffffff;--muted:#c3d0ea;--line:rgba(255,216,0,.4);--acc:#FFD800;--acc-t:#061a3b;--th:#FFD800;--th-t:#061a3b;--zebra:rgba(255,255,255,.07);--pos:#6ee7b7;--neg:#fca5a5;--net:#FFD800}
   #jd-rep-host *{box-sizing:border-box}
   #jd-rep-host button{font-family:inherit;cursor:pointer}
   #jd-rep-host .jr-lbl{font-size:12px;color:var(--muted);margin:2px 2px 4px;font-weight:700}
@@ -809,9 +809,9 @@ if('serviceWorker' in navigator){
   #jd-rep-host .jr-neg{color:var(--neg)}
   #jd-rep-host .jr-tabs{display:flex;gap:8px;margin:4px 0 8px}
   #jd-rep-host .jr-tabs .jr-chip{flex:1;justify-content:center}
-  #jd-rep-host .jr-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+  #jd-rep-host .jr-wrap{overflow:auto;max-height:60vh;border:1px solid var(--line);border-radius:14px;background:var(--card)}
   #jd-rep-host table{border-collapse:collapse;width:100%;min-width:480px}
-  #jd-rep-host th{background:var(--th);color:var(--th-t);padding:9px 10px;font-size:12.5px;text-align:right;white-space:nowrap}
+  #jd-rep-host th{background:var(--th);color:var(--th-t);padding:9px 10px;font-size:12.5px;text-align:right;white-space:nowrap;position:sticky;top:0;z-index:1}
   #jd-rep-host td{padding:9px 10px;border-top:1px solid var(--line);font-size:13px;white-space:nowrap;color:var(--text)}
   #jd-rep-host td.wrap{white-space:normal;min-width:120px}
   #jd-rep-host tbody tr:nth-child(even){background:var(--zebra)}
@@ -1103,6 +1103,9 @@ html.jd-dark #jdDash{--bg:#061a3b;--card:#0d2b5e;--tx:#fff;--mu:#c3d0ea;--ln:rgb
 #jdDash .pos{color:var(--pos)}#jdDash .neg{color:var(--neg)}#jdDash .warn{color:var(--warn)}
 #jdDash .r{display:grid;grid-template-columns:110px 1fr 74px;gap:8px;align-items:center;margin:6px 0;font-size:12.5px}
 #jdDash .bar{height:10px;border-radius:5px;background:var(--ln);position:relative;overflow:hidden}
+html.jd-dark #jdDash .bar{background:rgba(255,255,255,.14)}
+#jdDash .bar:after{content:"";position:absolute;top:0;bottom:0;left:50%;width:2px;background:rgba(255,255,255,.35)}
+#jdDash .g .c:last-child:nth-child(odd){grid-column:1/-1}
 #jdDash .bar i{position:absolute;top:0;bottom:0;border-radius:5px}
 #jdDash table{width:100%;border-collapse:collapse;font-size:12.5px}
 #jdDash td,#jdDash th{padding:7px 6px;border-top:1px solid var(--ln);text-align:right}
@@ -1333,9 +1336,9 @@ html.jd-dark #root header .max-w-\[1200px\]>div:first-child,#root header .max-w-
 </style>
 <style id="jd-ui-polish">
 /* شريط حالة جانبي لبطاقات التحويل */
-#root .rounded-\[20px\].bg-white.p-4:has(.bg-emerald-100){border-inline-start:6px solid #22c55e !important}
-#root .rounded-\[20px\].bg-white.p-4:has(.bg-\[\#fef3c7\]){border-inline-start:6px solid #FFD800 !important}
-#root .rounded-\[20px\].bg-white.p-4:has(.border-red-200.text-red-600){border-inline-start:6px solid #ef4444 !important}
+#root .rounded-\[20px\].bg-white.p-4:has(.bg-emerald-100){box-shadow:inset -6px 0 0 #22c55e !important}
+#root .rounded-\[20px\].bg-white.p-4:has(.bg-\[\#fef3c7\]){box-shadow:inset -6px 0 0 #FFD800 !important}
+#root .rounded-\[20px\].bg-white.p-4:has(.border-red-200.text-red-600){box-shadow:inset -6px 0 0 #ef4444 !important}
 /* المبالغ في سجلات الأقسام: شارة صفراء */
 #root .rounded-\[14px\].p-3.flex .flex-wrap>span.font-bold:first-child{background:#FFD800 !important;color:#000 !important;padding:3px 12px;border-radius:10px;font-size:14px;border:1px solid #b38f00}
 /* تبويبات التحويلات: لون مميز لكل تبويب */
@@ -1348,6 +1351,31 @@ html:not(.jd-dark) #root div.flex.gap-2.mt-4.mb-3>button:nth-child(2):not(.bg-\[
 /* حقل البحث في التحويلات */
 #jdTrQ{width:100%;height:42px;border-radius:12px;border:1px solid rgba(128,128,128,.45);background:#fff;color:#000;font-size:13px;padding:0 14px;margin:0 0 12px;font-family:inherit;outline:0;box-sizing:border-box}
 #jdTrQ:focus{border-color:#b38f00;box-shadow:0 0 0 3px rgba(255,216,0,.4)}
+/* أزرار الإضافة والحقول (الوضع الداكن) */
+html.jd-dark #root button.w-full.rounded-xl.text-white.font-bold:not([class*="bg-"]){background:#061a3b !important;color:#FFD800 !important;border:2px solid #FFD800 !important}
+html.jd-dark #root button.w-full.rounded-xl.text-white.font-bold:not([class*="bg-"]):disabled{opacity:.6}
+html.jd-dark #root input.rounded-xl.border{border:2px solid #b38f00 !important;font-size:16px}
+/* شرائح وارد / سحب */
+#root button[data-jdchip=in]{box-shadow:inset 0 -5px 0 #22c55e}
+#root button[data-jdchip=out]{box-shadow:inset 0 -5px 0 #ef4444}
+/* شريط تقدم الوكيل */
+.jd-pb{flex-basis:100%;width:100%;margin-top:12px}
+.jd-pt{height:12px;border-radius:6px;background:rgba(239,68,68,.6);overflow:hidden;direction:rtl}
+.jd-pp{display:block;height:100%;background:#22c55e;border-radius:6px;transition:width .3s}
+.jd-pl{display:flex;justify-content:space-between;font-size:11px;margin-top:5px;font-weight:700}
+.jd-pl span:first-child{color:#16a34a}.jd-pl span:last-child{color:#dc2626}
+html.jd-dark .jd-pl span:first-child{color:#4ade80}html.jd-dark .jd-pl span:last-child{color:#f87171}
+/* أرقام التسوية */
+#root .jd-num{display:inline-block;background:#061a3b;color:#FFD800 !important;padding:1px 12px;border-radius:9px;font-weight:800;min-width:44px;text-align:center;border:1px solid rgba(255,216,0,.55)}
+#root .jd-num.jd-pos{color:#6ee7b7 !important}
+#root .jd-num.jd-neg{color:#fca5a5 !important}
+#root .jd-num.jd-zero{background:transparent;color:inherit !important;opacity:.5;border-color:transparent;font-weight:600}
+html.jd-dark #root span.rounded-full.font-bold.bg-emerald-100{background:rgba(34,197,94,.22) !important;color:#6ee7b7 !important}
+html.jd-dark #root span.rounded-full.font-bold.bg-red-100{background:rgba(239,68,68,.22) !important;color:#fca5a5 !important}
+/* جدول ملخص الأقسام في نافذة التقرير (الوضع الداكن) */
+html.jd-dark #reportModal table tr[style*="#fffbeb"]>td{background:rgba(255,216,0,.14) !important;color:#fff !important}
+html.jd-dark #reportModal table tr[style*="#FFF7D6"]>td{background:rgba(255,216,0,.24) !important;color:#FFD800 !important;font-weight:800}
+html.jd-dark #reportModal table tr:nth-child(even):not([style*="#fffbeb"]):not([style*="#FFF7D6"])>td{background:rgba(255,255,255,.05)}
 </style>
 <script id="jd-ui-polish-js">
 (function(){
@@ -1358,8 +1386,7 @@ function apply(inp){
   Array.prototype.forEach.call(list.children,function(c){
     if(!c.className||String(c.className).indexOf("rounded-[20px]")<0)return;
     c.style.display=(!q||norm(c.textContent).indexOf(q)>-1)?"":"none"})}
-function run(){
-  var root=document.getElementById("root");if(!root)return;
+function search(root){
   var tabs=Array.prototype.filter.call(root.querySelectorAll("div.flex.gap-2.mt-4.mb-3"),function(d){var b=d.querySelector("button");return b&&/^المرسلة/.test(b.textContent)})[0];
   if(!tabs)return;
   var inp=document.getElementById("jdTrQ");
@@ -1369,8 +1396,37 @@ function run(){
     inp.addEventListener("input",function(){Q=inp.value;apply(inp)});
     tabs.insertAdjacentElement("afterend",inp)}
   apply(inp)}
+function chips(root){
+  Array.prototype.forEach.call(root.querySelectorAll("button"),function(b){
+    var t=b.textContent.trim(),v=/^وارد\s*•/.test(t)?"in":/^سحب\s*•/.test(t)?"out":"";
+    if(v){if(b.getAttribute("data-jdchip")!==v)b.setAttribute("data-jdchip",v)}else if(b.hasAttribute("data-jdchip"))b.removeAttribute("data-jdchip")})}
+function digits(t){return parseInt(String(t).replace(/[^\d]/g,"")||"0",10)}
+function wakeel(root){
+  Array.prototype.forEach.call(root.querySelectorAll("div.rounded-2xl.p-4.flex.items-center.justify-between"),function(card){
+    var tx=card.textContent;if(tx.indexOf("الباقي (إجمالي المبلغ")<0)return;
+    var m=/المبلغ:\s*([\d,]+)/.exec(tx),p=/تسديد:\s*([\d,]+)/.exec(tx);if(!m||!p)return;
+    var tot=digits(m[1]),paid=digits(p[1]),pc=tot>0?Math.max(0,Math.min(100,Math.round(paid/tot*100))):0;
+    card.style.flexWrap="wrap";
+    var pb=card.querySelector(".jd-pb");
+    if(!pb){pb=document.createElement("div");pb.className="jd-pb";pb.innerHTML='<div class="jd-pt"><i class="jd-pp"></i></div><div class="jd-pl"><span></span><span></span></div>';card.appendChild(pb)}
+    pb.querySelector(".jd-pp").style.width=pc+"%";
+    var ls=pb.querySelectorAll(".jd-pl span");ls[0].textContent="المسدد "+pc+"%";ls[1].textContent="الباقي "+(100-pc)+"%"})}
+function nums(root){
+  Array.prototype.forEach.call(root.querySelectorAll("div.rounded-\\[22px\\].border.p-5 .rounded-\\[16px\\] .flex.justify-between>span:last-child"),function(sp){
+    var t=sp.textContent.trim();if(!/^[-\d,.]+(\s*د\.ع)?-?$/.test(t))return;
+    var z=digits(t)===0,ng=/-/.test(t)&&!z;
+    sp.classList.add("jd-num");sp.classList.toggle("jd-zero",z);sp.classList.toggle("jd-neg",ng);sp.classList.toggle("jd-pos",!z&&!ng)})}
+function tint(){
+  var dk=document.documentElement.classList.contains("jd-dark");
+  Array.prototype.forEach.call(document.querySelectorAll("#reportModal table td"),function(td){
+    var t=td.textContent.trim();
+    if(/^-\d[\d,]*/.test(t)&&td.children.length===0)td.style.color=dk?"#fca5a5":"#b91c1c"})}
+function run(){
+  var root=document.getElementById("root");
+  if(root){search(root);chips(root);wakeel(root);nums(root)}
+  tint()}
 var t=0;function tk(){clearTimeout(t);t=setTimeout(run,250)}
-function mount(){new MutationObserver(tk).observe(document.body,{childList:true,subtree:true});run()}
+function mount(){new MutationObserver(tk).observe(document.body,{childList:true,subtree:true,characterData:true});run()}
 document.body?mount():document.addEventListener("DOMContentLoaded",mount);
 })();
 </script>
