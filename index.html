@@ -1272,7 +1272,7 @@ function draw(){
   if(!el.classList.contains("open"))return;
   var ym=YM(),rows=rank(ym),dn=dirty(),h='<div class="w"><div class="hd"><button type="button" data-a="x">→ رجوع للرئيسية</button><b>⭐ تقييم الأقسام</b></div>';
   h+='<div class="nv"><button type="button" data-a="pv">›</button><span>'+new Date(ym+"-01T00:00:00").toLocaleDateString("ar",{month:"long",year:"numeric",numberingSystem:"latn"})+'</span><button type="button" data-a="nx"'+(off>=0?' disabled style="opacity:.3"':'')+'>‹</button></div>';
-  h+='<div class="sy">'+(erF?'⚠ تعذرت المزامنة، البيانات محفوظة على الجهاز. تأكد من اتصالك وصلاحيات قاعدة البيانات.':dn?'⏳ بانتظار المزامنة مع الخادم':'✓ متزامن')+'</div>';
+  h+='<div class="sy sync '+(erF?'bad':dn?'wait':'ok')+'">'+(erF?'⚠ تعذرت المزامنة، البيانات محفوظة على الجهاز. تأكد من اتصالك وصلاحيات قاعدة البيانات.':dn?'⏳ بانتظار المزامنة مع الخادم':'✓ متزامن')+'</div>';
   rows.forEach(function(r,i){
     var S=r.S,op=OP[S.k],tot=S.m.length;
     h+='<div class="cd"><div class="tp" data-a="tg" data-k="'+S.k+'"><span class="rk">'+(r.complete?i+1:"–")+'</span><span class="nm">'+S.l+'<small>'+(r.complete?'التقييم مكتمل':'مدخل '+r.done+' من '+tot+' معايير يدوية')+'</small></span><span class="sc '+(r.complete?col(r.score):"mu")+'">'+r.score+'<small> / 100</small></span></div>';
@@ -1380,6 +1380,15 @@ html.jd-dark #reportModal table tr:nth-child(even):not([style*="#fffbeb"]):not([
 #jdSync[data-s=ok]{background:#2fb872}
 #jdSync[data-s=bad]{background:#e5484d;animation:jdPulse 1.6s infinite}
 @keyframes jdPulse{0%,100%{opacity:1}50%{opacity:.55}}
+/* بطاقة المزامنة الشفافة (التقييم والموظفون) */
+#jdRate .sync,#jdEmp .sync{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:16px;font-weight:700;font-size:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.07);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 2px 10px rgba(0,0,0,.18);margin-bottom:10px}
+#jdRate .sync.ok,#jdEmp .sync.ok{color:#6fcf9a;border-color:rgba(111,207,154,.45);background:rgba(111,207,154,.10)}
+#jdRate .sync.bad,#jdEmp .sync.bad{color:#ef9a9a;border-color:rgba(239,154,154,.5);background:rgba(239,154,154,.10)}
+#jdRate .sync.wait,#jdEmp .sync.wait{color:#E3C458;border-color:rgba(227,196,88,.5);background:rgba(227,196,88,.10)}
+html:not(.jd-dark) #jdRate .sync,html:not(.jd-dark) #jdEmp .sync{background:rgba(255,255,255,.6);border-color:rgba(0,0,0,.08);box-shadow:0 2px 10px rgba(0,0,0,.06)}
+html:not(.jd-dark) #jdRate .sync.ok,html:not(.jd-dark) #jdEmp .sync.ok{color:#15803d;background:rgba(21,128,61,.08)}
+html:not(.jd-dark) #jdRate .sync.bad,html:not(.jd-dark) #jdEmp .sync.bad{color:#b91c1c;background:rgba(185,28,28,.08)}
+html:not(.jd-dark) #jdRate .sync.wait,html:not(.jd-dark) #jdEmp .sync.wait{color:#8a6d00;background:rgba(138,109,0,.08)}
 </style>
 <script id="jd-ui-polish-js">
 (function(){
@@ -1402,8 +1411,13 @@ function search(root){
   apply(inp)}
 function chips(root){
   Array.prototype.forEach.call(root.querySelectorAll("button"),function(b){
-    var t=b.textContent.trim(),v=/^وارد\s*•/.test(t)?"in":/^سحب\s*•/.test(t)?"out":"";
+    var t=b.textContent.trim(),ok=String(b.className).indexOf("rounded-full")>-1&&/^[^•]{1,30}•\s*[-\d,.]+\s*(د\.ع)?$/.test(t),v=!ok?"":/^سحب/.test(t)?"out":"in";
     if(v){if(b.getAttribute("data-jdchip")!==v)b.setAttribute("data-jdchip",v)}else if(b.hasAttribute("data-jdchip"))b.removeAttribute("data-jdchip")})}
+var EVEN=["الواردات","الهواتف","السوبر ماركت","الدفع الإلكتروني","حوالات مؤجلة"];
+function addbtn(root){
+  Array.prototype.forEach.call(root.querySelectorAll("button.w-full.rounded-xl.text-white.font-bold"),function(b){
+    var p=b.closest("div.rounded-\\[20px\\]"),h=p?(p.textContent||"").trim().slice(0,40):"",bl=EVEN.some(function(l){return h.indexOf(l)===0});
+    if(bl){if(b.getAttribute("data-jdadd")!=="blue")b.setAttribute("data-jdadd","blue")}else if(b.hasAttribute("data-jdadd"))b.removeAttribute("data-jdadd")})}
 function digits(t){return parseInt(String(t).replace(/[^\d]/g,"")||"0",10)}
 function wakeel(root){
   Array.prototype.forEach.call(root.querySelectorAll("div.rounded-2xl.p-4.flex.items-center.justify-between"),function(card){
@@ -1427,7 +1441,7 @@ function tint(){
     if(/^-\d[\d,]*/.test(t)&&td.children.length===0)td.style.color=dk?"#fca5a5":"#b91c1c"})}
 function run(){
   var root=document.getElementById("root");
-  if(root){search(root);chips(root);wakeel(root);nums(root)}
+  if(root){search(root);chips(root);addbtn(root);wakeel(root);nums(root)}
   tint();syncUI()}
 
 /* ===== أيقونة المزامنة: أخضر = متزامن، أحمر = غير متزامن ===== */
@@ -1733,11 +1747,7 @@ html.jd-dark #reportModal #repClose{color:#E3C458 !important;border-color:rgba(2
 /* ===== بطاقات الأقسام: حدود موحّدة بدل ألوان كل قسم ===== */
 html.jd-dark #root button.rounded-\[20px\].p-4{border-color:rgba(227,196,88,.3) !important}
 html.jd-dark #root button.rounded-\[20px\].p-4>div:first-child>div:first-child{border-color:rgba(227,196,88,.45) !important}
-html.jd-dark #root button.rounded-\[20px\].p-4 .font-bold[style]:is(:nth-child(odd),:nth-child(even)){color:#EBD58A !important}
-html.jd-dark #root button.rounded-\[20px\].p-4:is(:nth-child(odd),:nth-child(even)) .opacity-70{color:#b4c0d8 !important}
 html.jd-dark #root button.rounded-\[20px\].p-4:nth-child(odd){background-color:#16223a !important}
-html.jd-dark #root button.rounded-\[20px\].p-4:nth-child(even){background-color:#1c2a47 !important}
-html.jd-dark #root button.rounded-\[20px\].p-4:nth-child(odd) .rounded-full,html.jd-dark #root button.rounded-\[20px\].p-4:nth-child(even) .rounded-full{background-color:#0e1626 !important;color:#E3C458 !important}
 /* ===== شرائط الحالة والشارات ===== */
 html.jd-dark #root .rounded-\[20px\].bg-white.p-4:has(.bg-emerald-100){box-shadow:inset -6px 0 0 #6fcf9a !important}
 html.jd-dark #root .rounded-\[20px\].bg-white.p-4:has(.bg-\[\#fef3c7\]){box-shadow:inset -6px 0 0 #E3C458 !important}
@@ -1759,6 +1769,19 @@ html.jd-dark .jd-pl span:first-child{color:#6fcf9a}html.jd-dark .jd-pl span:last
 html.jd-dark #root header{color:#e8edf7}
 html.jd-dark #root header .font-bold.text-\[13px\]{color:#EBD58A}
 
+
+/* ===== بطاقات الصفحة الرئيسية: العمود الكحلي (فردي) كما هو، والعمود الأصفر (زوجي) يعود أصفر بنص غامق ===== */
+html.jd-dark #root button.rounded-\[20px\].p-4:nth-child(odd) .font-bold[style]{color:#EBD58A !important}
+html.jd-dark #root button.rounded-\[20px\].p-4:nth-child(odd) .opacity-70{color:#b4c0d8 !important}
+html.jd-dark #root button.rounded-\[20px\].p-4:nth-child(odd) .rounded-full{background-color:#0e1626 !important;color:#E3C458 !important}
+html.jd-dark #root button.rounded-\[20px\].p-4:nth-child(even){background-color:#FFD800 !important;border-color:#b38f00 !important;color:#04143a !important}
+html.jd-dark #root button.rounded-\[20px\].p-4:nth-child(even) :is(.text-gray-300,.text-gray-400,.text-gray-500,.text-gray-600,.text-gray-700,.text-gray-800,.text-black,.text-white,.text-amber-700,.text-amber-800,.opacity-50,.opacity-60,.opacity-70){color:#0a2456 !important;opacity:1 !important}
+html.jd-dark #root button.rounded-\[20px\].p-4:nth-child(even) .font-bold[style]{color:#04143a !important}
+html.jd-dark #root button.rounded-\[20px\].p-4:nth-child(even) .rounded-full{background-color:#061a3b !important;color:#FFD800 !important}
+html.jd-dark #root button.rounded-\[20px\].p-4:nth-child(even)>div:first-child>div:first-child{border-color:#b38f00 !important}
+/* زر الإضافة: أزرق داخل أقسام البطاقات الصفراء، ويبقى ذهبياً في الكحلية */
+html.jd-dark #root button.w-full.rounded-xl.text-white.font-bold.bg-\[\#1e3a8a\][data-jdadd=blue],html.jd-dark #root button.w-full.rounded-xl.text-white.font-bold[data-jdadd=blue]{background-color:#2563eb !important;color:#fff !important;border:0 !important}
+html.jd-dark #root button.w-full.rounded-xl.text-white.font-bold[data-jdadd=blue] *{color:#fff !important}
 </style>
 <style id="jd-emp-css">
 #jdEmp{position:fixed;inset:0;z-index:9999996;display:none;background:var(--bg);color:var(--tx);overflow:auto;direction:rtl;font-family:inherit;--bg:#f4f4f2;--card:#fff;--fd:#fff;--tx:#111;--mu:#4b5563;--ln:#d6d6d0;--pos:#15803d;--neg:#b91c1c;--acc:#FFD800;--fo:#b38f00}
@@ -1940,7 +1963,7 @@ function sync(){
 var tr=0,tm=setInterval(function(){if(sync()||++tr>40)clearInterval(tm)},1500);
 function upd(id,fn){var a=all(),e=a.filter(function(x){return x.id===id})[0];if(!e)return null;fn(e);e.ts=Date.now();e.by=user();e.d=1;put(a);clearTimeout(sv[id]);sv[id]=setTimeout(function(){push(id)},600);return e}
 var el=document.createElement("div");el.id="jdEmp";
-function stat(){window.__jdEmpBad=!!erF;var s=el.querySelector("[data-o=sy]");if(s){var dn=all().filter(function(e){return e.d}).length;s.textContent=erF?"⚠ تعذرت المزامنة، البيانات محفوظة على الجهاز. تأكد من الاتصال وصلاحيات قاعدة البيانات.":dn?"⏳ بانتظار المزامنة مع الخادم":"✓ متزامن"}}
+function stat(){window.__jdEmpBad=!!erF;var s=el.querySelector("[data-o=sy]");if(s){var dn=all().filter(function(e){return e.d}).length;s.className="sy sync "+(erF?"bad":dn?"wait":"ok");s.textContent=erF?"⚠ تعذرت المزامنة، البيانات محفوظة على الجهاز. تأكد من الاتصال وصلاحيات قاعدة البيانات.":dn?"⏳ بانتظار المزامنة مع الخادم":"✓ متزامن"}}
 var cur=null;
 function cls(v){return v<0?"neg":"pos"}
 function totals(y){var L=listM(y||MO()),f=0,d=0;L.forEach(function(e){var c=calc(e);f+=c.fin;d+=c.nd});return{n:L.length,f:f,d:d}}
