@@ -1,6 +1,41 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
+<script id="jd-latin-digits">
+/* كل الأرقام بالصيغة اللاتينية 2000 في كل البرنامج: عرضاً وكتابةً */
+(function(){
+  function addNu(o){o=o?Object.assign({},o):{};if(!o.numberingSystem)o.numberingSystem="latn";return o}
+  ["toLocaleDateString","toLocaleTimeString","toLocaleString"].forEach(function(k){var f=Date.prototype[k];Date.prototype[k]=function(l,o){return f.call(this,l,addNu(o))}});
+  var nf=Number.prototype.toLocaleString;Number.prototype.toLocaleString=function(l,o){return nf.call(this,l,addNu(o))};
+  ["DateTimeFormat","NumberFormat"].forEach(function(k){var O=Intl[k];var W=function(l,o){return new O(l,addNu(o))};W.prototype=O.prototype;W.supportedLocalesOf=O.supportedLocalesOf;Intl[k]=W});
+  var RX=/[\u0660-\u0669\u06F0-\u06F9\u066B\u066C]/;
+  function conv(t){return String(t).replace(/[\u0660-\u0669]/g,function(c){return String(c.charCodeAt(0)-1632)}).replace(/[\u06F0-\u06F9]/g,function(c){return String(c.charCodeAt(0)-1776)}).replace(/\u066B/g,".").replace(/\u066C/g,",")}
+  function fixNode(n){
+    if(!n)return;
+    if(n.nodeType===3){if(RX.test(n.nodeValue)){var v=conv(n.nodeValue);if(v!==n.nodeValue)n.nodeValue=v}return}
+    if(n.nodeType!==1)return;var tg=n.tagName;if(tg==="SCRIPT"||tg==="STYLE")return;
+    var w=document.createTreeWalker(n,NodeFilter.SHOW_TEXT,null),t;
+    while((t=w.nextNode())){if(RX.test(t.nodeValue)){var v2=conv(t.nodeValue);if(v2!==t.nodeValue)t.nodeValue=v2}}
+    var as=n.querySelectorAll?n.querySelectorAll("[placeholder],[title]"):[];
+    Array.prototype.forEach.call(as,function(e){["placeholder","title"].forEach(function(a){var x=e.getAttribute(a);if(x&&RX.test(x))e.setAttribute(a,conv(x))})})}
+  function start(){
+    fixNode(document.body);
+    new MutationObserver(function(ms){ms.forEach(function(m){if(m.type==="characterData")fixNode(m.target);else Array.prototype.forEach.call(m.addedNodes,fixNode)})}).observe(document.documentElement,{childList:true,subtree:true,characterData:true})}
+  document.body?start():document.addEventListener("DOMContentLoaded",start);
+  /* الكتابة: أي أرقام عربية تُحوَّل فوراً إلى لاتينية داخل حقول الإدخال */
+  document.addEventListener("input",function(ev){
+    var el=ev.target;if(!el||!(el instanceof HTMLInputElement||el instanceof HTMLTextAreaElement))return;
+    if(el instanceof HTMLInputElement&&/^(checkbox|radio|date|month|time|file|range|color)$/.test(el.type))return;
+    var v=el.value;if(!RX.test(v))return;
+    var nv=conv(v);if(nv===v)return;
+    ev.stopImmediatePropagation();ev.stopPropagation();
+    var pos=el.selectionStart,proto=el instanceof HTMLTextAreaElement?HTMLTextAreaElement.prototype:HTMLInputElement.prototype;
+    Object.getOwnPropertyDescriptor(proto,"value").set.call(el,nv);
+    try{el.setSelectionRange(pos,pos)}catch(e){}
+    el.dispatchEvent(new Event("input",{bubbles:true}))},true);
+})();
+</script>
+
   
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
