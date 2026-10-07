@@ -2108,7 +2108,7 @@ function setSd(id){var x=all().filter(function(z){return z.id===id})[0];if(x)sd=
 function setAtt(id,dt,st){upd(id,function(e){var a={};for(var k in (e.att||{}))a[k]=e.att[k];if(!st||a[dt]===st)delete a[dt];else a[dt]=st;e.att=a})}
 function calc(e){
   var s=num(e.salary),d=tdays(e),
-  net=Math.ceil(Math.round((s-s/30*d)*1e6)/1e6);if(net<0)net=0;
+  net=Math.round(Math.round((s-s/30*d)*1e6)/1e6/1000)*1000;if(net<0)net=0;
   var debt=num(e.debt),dd=Math.min(Math.max(0,num(e.ded)),debt);
   return{abs:s-net,net:net,dd:dd,nd:debt-dd,fin:net-dd}}
 function push(id){
