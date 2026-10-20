@@ -387,7 +387,7 @@
   
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-    import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, doc, setDoc, deleteDoc, onSnapshot, collection, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+    import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, doc, setDoc, deleteDoc, onSnapshot, collection, getDocs, getDoc, query, limit } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyC3BQg3ZCdhkNRwchrVk1EUgWcIOTUvU7A",
@@ -429,7 +429,7 @@
     // ترحيل تلقائي لمرة واحدة من المستند القديم daily_data إلى مستندات مستقلة.
     window.__fbAuthReady.then(async function(){
       try{
-        const txSnap = await getDocs(txCol);
+        const txSnap = await getDocs(query(txCol, limit(1)));
         if (txSnap.empty) {
           const oldSnap = await getDoc(dataRef);
           if (oldSnap.exists()) {
@@ -594,7 +594,7 @@
     // ترحيل تلقائي لمرة واحدة: لو المجموعة الجديدة فاضية ولسه فيه بيانات بالمستند القديم، ينسخها كمستندات مستقلة.
     window.__fbAuthReady.then(async function(){
       try{
-        const snap = await getDocs(usersCol);
+        const snap = await getDocs(query(usersCol, limit(1)));
         if (snap.empty) {
           const oldSnap = await getDoc(usersRef);
           if (oldSnap.exists()) {
