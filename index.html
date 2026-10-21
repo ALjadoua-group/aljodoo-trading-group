@@ -387,7 +387,7 @@
   
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-    import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, doc, setDoc, deleteDoc, onSnapshot, collection, getDocs, getDoc, query, limit } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+    import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, doc, setDoc, deleteDoc, onSnapshot, collection, getDocs, getDoc, query, limit, where, getCountFromServer } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyC3BQg3ZCdhkNRwchrVk1EUgWcIOTUvU7A",
@@ -424,6 +424,8 @@
 
     // نظام مستندات مستقلة لكل عملية يومية (بدل مستند daily_data واحد يُكتب فوقه بالكامل).
     const txCol = collection(db, "aljodoo_tx");
+    const delCol = collection(db, "aljodoo_deleted");
+    function nextStamp(){ var t = Date.now(), m = window.__txMaxSeen || 0; if (t <= m) t = m + 1; window.__txMaxSeen = t; return t; }
     const naqdRef = doc(db, "aljodoo_settings", "naqd");
 
     // ترحيل تلقائي لمرة واحدة من المستند القديم daily_data إلى مستندات مستقلة.
@@ -482,7 +484,7 @@
     window.__fbSetTx = function(item){
       var note = notifySave("تم حفظ العملية ✓", "تم الحفظ على الجهاز، سيُرفع عند عودة الإنترنت");
       return trackPending(window.__fbAuthReady.then(function(){
-        return setDoc(doc(txCol, String(item.id)), item).then(function(){
+        return setDoc(doc(txCol, String(item.id)), Object.assign({}, item, { updatedAt: nextStamp() })).then(function(){
           note.ok();
         }).catch(function(e){
           console.error("Firebase set tx error:", e);
@@ -493,7 +495,7 @@
 
     window.__fbDeleteTx = function(id){
       return trackPending(window.__fbAuthReady.then(function(){
-        return deleteDoc(doc(txCol, String(id))).then(function(){
+        return Promise.all([deleteDoc(doc(txCol, String(id))), setDoc(doc(delCol, String(id)), { id: String(id), updatedAt: nextStamp() }).catch(function(){})]).then(function(){
           window.__notify && window.__notify("تم حذف العملية", "del");
         }).catch(function(e){
           console.error("Firebase delete tx error:", e);
@@ -503,14 +505,86 @@
     };
 
     window.__fbSubscribeTxCollection = function(callback){
-      window.__fbAuthReady.then(function(){
-        onSnapshot(txCol, function(snap){
-          var arr = [];
-          snap.forEach(function(d){ arr.push(d.data()); });
-          callback(arr, snap.metadata.fromCache);
-        }, function(err){
-          console.error("Firebase tx sync error:", err);
-        });
+      window.__fbAuthReady.then(async function(){
+        /* ===== مزامنة تفاضلية: نسخة محلية كاملة + قراءة المتغيّر فقط عند كل فتح ===== */
+        var KEY = "taswiya_tx_sync", OVERLAP = 5 * 60 * 1000;
+        function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+        function lsSet(k, v){ try{ localStorage.setItem(k, v); }catch(e){} }
+        function flatten(){
+          var m = {};
+          try{
+            var d = JSON.parse(lsGet("taswiya_data") || "null");
+            if (!d || typeof d !== "object") return m;
+            Object.keys(d).forEach(function(cat){
+              var v = d[cat];
+              if (Array.isArray(v)){
+                if (cat === "deferred" || cat === "muhawal" || cat === "sharedEntries"){
+                  v.forEach(function(it){ if (it && it.id) m[String(it.id)] = Object.assign({}, it, { cat: cat, sub: null }); });
+                }
+              } else if (v && typeof v === "object"){
+                Object.keys(v).forEach(function(sub){
+                  if (Array.isArray(v[sub])) v[sub].forEach(function(it){ if (it && it.id) m[String(it.id)] = Object.assign({}, it, { cat: cat, sub: sub }); });
+                });
+              }
+            });
+          }catch(e){}
+          return m;
+        }
+        var st = null; try{ st = JSON.parse(lsGet(KEY) || "null"); }catch(e){}
+        var map = flatten();
+        var ready = !!(st && typeof st.last === "number" && Object.keys(map).length > 0);
+        var last = ready ? st.last : 0, tlast = ready ? (st.tlast || 0) : 0;
+        function sane(u){ u = Number(u) || 0; return (u > 0 && u <= Date.now() + 600000) ? u : 0; }
+        function trackTx(u){ u = sane(u); if (u > last) last = u; if (u > (window.__txMaxSeen || 0)) window.__txMaxSeen = u; }
+        function trackDel(u){ u = sane(u); if (u > tlast) tlast = u; if (u > (window.__txMaxSeen || 0)) window.__txMaxSeen = u; }
+        function save(){ lsSet(KEY, JSON.stringify({ last: last, tlast: tlast, at: Date.now() })); }
+        function emit(fromCache){ callback(Object.keys(map).map(function(k){ return map[k]; }), !!fromCache); }
+        async function fullLoad(){
+          var snap = await getDocs(txCol), m = {};
+          last = 0;
+          snap.forEach(function(d){ var x = d.data(); var id = String((x && x.id) || d.id); m[id] = x; trackTx(x && x.updatedAt); });
+          map = m; tlast = Math.max(tlast, Date.now() - OVERLAP); save();
+          return snap.size;
+        }
+        try{
+          if (!ready){ await fullLoad(); emit(false); }
+        }catch(e){ console.error("Firebase tx full load error:", e); }
+
+        onSnapshot(query(txCol, where("updatedAt", ">", Math.max(0, last - OVERLAP))), function(snap){
+          var changed = false;
+          snap.docChanges().forEach(function(ch){
+            var x = ch.doc.data(), id = String((x && x.id) || ch.doc.id);
+            if (ch.type === "removed"){ if (map[id]){ delete map[id]; changed = true; } }
+            else { map[id] = x; trackTx(x && x.updatedAt); changed = true; }
+          });
+          if (changed){ save(); emit(snap.metadata.fromCache); }
+        }, function(err){ console.error("Firebase tx sync error:", err); });
+
+        onSnapshot(query(delCol, where("updatedAt", ">", Math.max(0, tlast - OVERLAP))), function(snap){
+          var changed = false;
+          snap.docChanges().forEach(function(ch){
+            if (ch.type === "removed") return;
+            var x = ch.doc.data(), id = String((x && x.id) || ch.doc.id);
+            trackDel(x && x.updatedAt);
+            if (map[id] && !(Number(map[id].updatedAt) > Number(x.updatedAt))){ delete map[id]; changed = true; }
+          });
+          if (changed){ save(); emit(false); }
+        }, function(err){ console.error("Firebase tx delete-log sync error:", err); });
+
+        /* شبكة أمان: مطابقة العدد (1 قراءة لكل 1000 مستند) تكشف أي فرق نادر (نسخ قديمة، حذف قديم) فتعيد تحميلاً كاملاً مرة واحدة */
+        var lastFull = ready ? 0 : Date.now(), reconciling = false, lastRecon = 0;
+        async function reconcile(){
+          if (reconciling || !navigator.onLine || (window.__fbPendingCount || 0) > 0) return;
+          reconciling = true; lastRecon = Date.now();
+          try{
+            var cs = await getCountFromServer(txCol), c = cs.data().count, n = Object.keys(map).length;
+            if (c !== n && Date.now() - lastFull > 10 * 60 * 1000){ lastFull = Date.now(); await fullLoad(); emit(false); }
+          }catch(e){}
+          reconciling = false;
+        }
+        setTimeout(reconcile, 8000);
+        setInterval(reconcile, 20 * 60 * 1000);
+        document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "visible" && Date.now() - lastRecon > 10 * 60 * 1000) reconcile(); });
       });
     };
 
