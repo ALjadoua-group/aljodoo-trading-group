@@ -1445,34 +1445,38 @@ function norm(r){
   if(r.u)return r;
   var u={};if(r.m&&r.m.length){u[r.by||"سابق"]={m:r.m,ts:r.ts||0,d:r.d}}
   return{u:u,o:r.o||0,ots:r.ts||0}}
-function all(){var R=rts(),ch=0;Object.keys(R).forEach(function(k){if(!R[k].u){R[k]=norm(R[k]);ch=1}});if(ch)put(R);return R}
+function all(){var R=rts(),ch=0;Object.keys(R).forEach(function(k){
+  if(!R[k].u){R[k]=norm(R[k]);ch=1}
+  var r=R[k];if(r.od){var nm=r.oby||"المدير";r.u[nm]=r.u[nm]||{m:[],ts:r.ots||0};if(r.u[nm].p===undefined){r.u[nm].p=r.o||0;r.u[nm].d=1;r.u[nm].ts=Math.max(r.u[nm].ts||0,r.ots||0)}delete r.od;ch=1}});
+  if(ch)put(R);return R}
 function calc(k,ym){
   var S=SEC.filter(function(x){return x.k===k})[0],r=norm(rts()[ym+"|"+k]),ix=vis(S),names=Object.keys(r.u),me=user(),
   gv=function(nm,i){return ((r.u[nm]&&r.u[nm].m)||[])[i]||0},
   avg=ix.map(function(i){var t=0,n=0;names.forEach(function(nm){var v=gv(nm,i);if(v){t+=v;n++}});return n?t/n:0}),
   cnt=ix.map(function(i){var n=0;names.forEach(function(nm){if(gv(nm,i))n++});return n}),
   mine=ix.map(function(i){return me?gv(me,i):0}),
-  op=r.o||0,done=avg.filter(Boolean).length+(op?1:0),tot=ix.length+1,a=S.a?auto(k,ym):null,
+  pt=0,pn=0;names.forEach(function(nm){var v=r.u[nm].p;if(v){pt+=v;pn++}});
+  if(r.o){var lo=r.oby||"المدير";if(!r.u[lo]||r.u[lo].p===undefined){pt+=r.o;pn++}}
+  var op=pn?pt/pn:0,opMine=(me&&r.u[me]&&r.u[me].p)||0,
+  done=avg.filter(Boolean).length+(op?1:0),tot=ix.length+1,a=S.a?auto(k,ym):null,
   pts=avg.reduce(function(s,v){return s+v*4},0)+op*4+(a?a.g:0);
-  return{S:S,ix:ix,avg:avg,cnt:cnt,mine:mine,names:names,op:op,done:done,tot:tot,a:a,score:Math.round(pts),complete:done===tot}}
+  return{S:S,ix:ix,avg:avg,cnt:cnt,mine:mine,names:names,op:op,opCnt:pn,opMine:opMine,done:done,tot:tot,a:a,score:Math.round(pts),complete:done===tot}}
 function rank(ym){return SEC.map(function(s){return calc(s.k,ym)}).sort(function(a,b){return (b.complete-a.complete)||(b.score-a.score)||(((b.a&&b.a.gp)||0)-((a.a&&a.a.gp)||0))})}
 function col(v){return v>=80?"pos":v>=60?"warn":"neg"}
 function safe(n){return encodeURIComponent(n).replace(/\./g,"%2E")}
-function dirty(){var R=all(),n=0;Object.keys(R).forEach(function(k){Object.keys(R[k].u||{}).forEach(function(nm){if(R[k].u[nm].d)n++});if(R[k].od)n++});return n}
+function dirty(){var R=all(),n=0;Object.keys(R).forEach(function(k){Object.keys(R[k].u||{}).forEach(function(nm){if(R[k].u[nm].d)n++})});return n}
 function pushU(key,nm){
-  var R=all(),r=R[key]&&R[key].u&&R[key].u[nm],f=window.__rateFb;if(!r||!f)return;var p=key.split("|"),ts=r.ts;
-  f.save(p[0]+"_"+p[1]+"_u_"+safe(nm),{ym:p[0],sec:p[1],kind:"u",user:nm,m:r.m,ts:ts}).then(function(){var R2=all(),x=R2[key]&&R2[key].u&&R2[key].u[nm];if(x&&x.ts===ts){delete x.d;put(R2)}erF=0;draw()}).catch(function(){erF=1;draw()})}
-function pushA(key){
-  var R=all(),r=R[key],f=window.__rateFb;if(!r||!f)return;var p=key.split("|"),ts=r.ots;
-  f.save(p[0]+"_"+p[1]+"_adm",{ym:p[0],sec:p[1],kind:"adm",o:r.o||0,ts:ts,by:r.oby||""}).then(function(){var R2=all();if(R2[key]&&R2[key].ots===ts){delete R2[key].od;put(R2)}erF=0;draw()}).catch(function(){erF=1;draw()})}
-function pushAll(){var R=all();Object.keys(R).forEach(function(k){Object.keys(R[k].u||{}).forEach(function(nm){if(R[k].u[nm].d)pushU(k,nm)});if(R[k].od)pushA(k)})}
+  var R=all(),r=R[key]&&R[key].u&&R[key].u[nm],f=window.__rateFb;if(!r||!f)return;var p=key.split("|"),ts=r.ts,doc={ym:p[0],sec:p[1],kind:"u",user:nm,m:r.m||[],ts:ts};
+  if(r.p!==undefined)doc.p=r.p;
+  f.save(p[0]+"_"+p[1]+"_u_"+safe(nm),doc).then(function(){var R2=all(),x=R2[key]&&R2[key].u&&R2[key].u[nm];if(x&&x.ts===ts){delete x.d;put(R2)}erF=0;draw()}).catch(function(){erF=1;draw()})}
+function pushAll(){var R=all();Object.keys(R).forEach(function(k){Object.keys(R[k].u||{}).forEach(function(nm){if(R[k].u[nm].d)pushU(k,nm)})})}
 function sync(){
   var f=window.__rateFb;if(!f)return false;if(sub)return true;sub=1;
   f.sub(function(arr){var R=all(),ch=0;
     arr.forEach(function(o){
       var key=o.ym+"|"+o.sec,r=R[key]||(R[key]={u:{},o:0,ots:0});
-      if(o.kind==="adm"){if((o.ts||0)>(r.ots||0)){r.o=o.o||0;r.ots=o.ts||0;r.oby=o.by||"";delete r.od;ch=1}}
-      else if(o.kind==="u"){var l=r.u[o.user];if(!l||(o.ts||0)>(l.ts||0)){r.u[o.user]={m:o.m||[],ts:o.ts||0};ch=1}}
+      if(o.kind==="adm"){if((o.ts||0)>(r.ots||0)){r.o=o.o||0;r.ots=o.ts||0;r.oby=o.by||"";ch=1}}
+      else if(o.kind==="u"){var l=r.u[o.user];if(!l||(o.ts||0)>(l.ts||0)){var v={m:o.m||[],ts:o.ts||0};if(o.p!==undefined)v.p=o.p;r.u[o.user]=v;ch=1}}
       else{var nm=o.by||"سابق",l2=r.u[nm];if(!l2||(o.ts||0)>(l2.ts||0)){r.u[nm]={m:o.m||[],ts:o.ts||0};ch=1}if(o.o&&(o.ts||0)>(r.ots||0)){r.o=o.o;r.ots=o.ts||0;ch=1}}
     });
     if(ch)put(R);pushAll();erF=0;draw()},function(){erF=1;draw()});
@@ -1481,11 +1485,12 @@ var tr=0,tm=setInterval(function(){if(sync()||++tr>40)clearInterval(tm)},1500);
 function setStar(k,i,v){
   var nm=user();if(!nm)return;
   var key=YM()+"|"+k,R=all(),r=R[key]||(R[key]={u:{},o:0,ots:0}),cur=r.u[nm]||{m:[]},m=(cur.m||[]).slice();while(m.length<5)m.push(0);
-  m[i]=m[i]===v?0:v;r.u[nm]={m:m,ts:Date.now(),d:1};R[key]=r;put(R);pushU(key,nm);draw()}
+  m[i]=m[i]===v?0:v;var n={m:m,ts:Date.now(),d:1};if(cur.p!==undefined)n.p=cur.p;r.u[nm]=n;R[key]=r;put(R);pushU(key,nm);draw()}
 function setOp(k,v){
-  if(!isAdm())return;
-  var key=YM()+"|"+k,R=all(),r=R[key]||(R[key]={u:{},o:0,ots:0});
-  r.o=r.o===v?0:v;r.ots=Date.now();r.oby=user();r.od=1;R[key]=r;put(R);pushA(key);draw()}
+  var nm=user();if(!nm)return;
+  var key=YM()+"|"+k,R=all(),r=R[key]||(R[key]={u:{},o:0,ots:0}),cur=r.u[nm]||{m:[]},m=(cur.m||[]).slice();
+  var oldp=cur.p!==undefined?cur.p:((r.o&&(r.oby||"المدير")===nm)?r.o:0);
+  r.u[nm]={m:m,p:oldp===v?0:v,ts:Date.now(),d:1};R[key]=r;put(R);pushU(key,nm);draw()}
 var el=document.createElement("div");el.id="jdRate";
 function draw(){
   if(!el.classList.contains("open"))return;
@@ -1502,10 +1507,10 @@ function draw(){
         var lb=S.m[j],v=r.mine[q],av=r.avg[q],st="";for(var n=1;n<=5;n++)st+='<button type="button" data-a="st" data-k="'+S.k+'" data-i="'+j+'" data-v="'+n+'" class="'+(n<=v?"on":"")+'">★</button>';
         h+='<div class="ro" style="flex-wrap:wrap"><span>'+lb+'<em>'+(av?(Math.round(av*40)/10)+' / 20 • متوسط '+r.cnt[q]+' مقيّم':'لا تقييم بعد')+(v?' • تقييمك '+v+' ★':'')+'</em></span><span class="stars">'+st+'</span></div>'});
       if(r.names.length)h+='<div class="sy">المقيّمون: '+r.names.map(esc).join("، ")+'</div>';
-      var ov=r.op,ost="",adm=isAdm();for(var n2=1;n2<=5;n2++)ost+='<button type="button" '+(adm?'data-a="op" data-k="'+S.k+'" data-v="'+n2+'"':'disabled')+' class="'+(n2<=ov?"on":"")+'">★</button>';
-      h+='<div class="ro" style="flex-wrap:wrap"><span>رأي الإدارة<em>'+(ov?ov*4+' / 20':(adm?'لم يُدخل بعد':'بانتظار رأي الإدارة'))+'</em></span><span class="stars">'+ost+'</span></div>'}
+      var ost="";for(var n2=1;n2<=5;n2++)ost+='<button type="button" data-a="op" data-k="'+S.k+'" data-v="'+n2+'" class="'+(n2<=r.opMine?"on":"")+'">★</button>';
+      h+='<div class="ro" style="flex-wrap:wrap"><span>رأي الإدارة<em>'+(r.op?(Math.round(r.op*40)/10)+' / 20 • متوسط '+r.opCnt+' مقيّم':'لا تقييم بعد')+(r.opMine?' • رأيك '+r.opMine+' ★':'')+'</em></span><span class="stars">'+ost+'</span></div>'}
     h+='</div>'});
-  h+='<div class="sy">النقاط: كل معيار من 20 (متوسط تقييمات كل المقيّمين، والنجمة الواحدة 4 نقاط). كل مستخدم يقيّم باسمه، ورأي الإدارة يحدده المدير فقط. التقييم لا يدخل في أي حساب أو تقرير.</div></div>';
+  h+='<div class="sy">النقاط: كل معيار من 20 (متوسط تقييمات كل المقيّمين، والنجمة الواحدة 4 نقاط). كل مستخدم يقيّم باسمه، ورأي الإدارة معيار يصوّت فيه الجميع بالتساوي. التقييم لا يدخل في أي حساب أو تقرير.</div></div>';
   var y=el.scrollTop;el.innerHTML=h;el.scrollTop=y}
 el.addEventListener("click",function(e){
   var t=e.target.closest("[data-a]");if(!t)return;var a=t.getAttribute("data-a"),k=t.getAttribute("data-k");
