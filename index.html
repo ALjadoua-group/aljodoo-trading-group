@@ -2370,9 +2370,10 @@ document.body?mount():document.addEventListener("DOMContentLoaded",mount);
 
 
 <style id="jd-usertheme-css">
-/* تخصيص الألوان لكل مستخدم على جهازه فقط - يُطبَّق على السمة الفاتحة */
+/* تخصيص المظهر لكل مستخدم على جهازه فقط */
 html.jd-uc-bg:not(.jd-dark),html.jd-uc-bg:not(.jd-dark) body,html.jd-uc-bg:not(.jd-dark) #root .bg-\[\#f6f7fb\]{background-color:var(--uc-bg) !important}
 html.jd-uc-card:not(.jd-dark) #root .bg-white{background-color:var(--uc-card) !important}
+html.jd-uc-card:not(.jd-dark) #root option{background:var(--uc-card);color:var(--uc-text,inherit)}
 html.jd-uc-cat:not(.jd-dark) #root button.rounded-\[20px\].p-4.border{background:var(--uc-cat) !important}
 html.jd-uc-text:not(.jd-dark) #root .text-\[\#111827\],
 html.jd-uc-text:not(.jd-dark) #root .text-black,
@@ -2383,56 +2384,143 @@ html.jd-uc-primary:not(.jd-dark) #root .text-\[\#1e3a8a\]{color:var(--uc-primary
 html.jd-uc-primary:not(.jd-dark) #root button[style*="rgb(30, 58, 138)"]{background:var(--uc-primary) !important}
 html.jd-uc-primary:not(.jd-dark) #reportHeaderBtn{background:var(--uc-primary) !important}
 html.jd-uc-header:not(.jd-dark) #root header.sticky{background-color:var(--uc-header) !important}
+html.jd-uc-border:not(.jd-dark) #root :is(.border-gray-100,.border-gray-200,.border-gray-300){border-color:var(--uc-border) !important}
+html.jd-uc-soft:not(.jd-dark) #root :is(.bg-gray-50,.bg-gray-100,.bg-gray-200,.bg-\[\#f9fafb\],.bg-\[\#fbfcfe\],.bg-\[\#fbfdff\],.bg-\[\#fcfcfb\]){background-color:var(--uc-soft) !important}
+html.jd-uc-muted:not(.jd-dark) #root :is(.text-gray-400,.text-gray-500,.text-gray-600){color:var(--uc-muted) !important}
+html.jd-uc-muted:not(.jd-dark) #root ::placeholder{color:var(--uc-muted) !important;opacity:.8}
+html.jd-uc-isdark:not(.jd-dark) #root :is(.bg-emerald-50,.bg-emerald-100){background-color:rgba(16,185,129,.18) !important}
+html.jd-uc-isdark:not(.jd-dark) #root :is(.text-emerald-600,.text-emerald-700,.text-emerald-800,.text-emerald-900){color:#6ee7b7 !important}
+html.jd-uc-isdark:not(.jd-dark) #root :is(.border-emerald-200,.border-emerald-300){border-color:rgba(16,185,129,.45) !important}
+html.jd-uc-isdark:not(.jd-dark) #root :is(.bg-red-50,.bg-red-100){background-color:rgba(239,68,68,.18) !important}
+html.jd-uc-isdark:not(.jd-dark) #root :is(.text-red-500,.text-red-600,.text-red-700,.text-red-900){color:#fca5a5 !important}
+html.jd-uc-isdark:not(.jd-dark) #root :is(.border-red-200,.border-red-300){border-color:rgba(239,68,68,.45) !important}
+html.jd-uc-isdark:not(.jd-dark) #root :is(.bg-amber-50,.bg-amber-100,.bg-\[\#fef3c7\]){background-color:rgba(245,158,11,.16) !important}
+html.jd-uc-isdark:not(.jd-dark) #root :is(.text-amber-700,.text-amber-800,.text-\[\#92400e\]){color:#fcd34d !important}
+html.jd-uc-isdark:not(.jd-dark) #root :is(.border-amber-200){border-color:rgba(245,158,11,.45) !important}
+html.jd-uc-isdark:not(.jd-dark) #root :is(.bg-blue-50,.bg-cyan-50){background-color:rgba(56,189,248,.16) !important}
+html.jd-uc-isdark:not(.jd-dark) #root :is(.text-blue-700,.text-cyan-700){color:#7dd3fc !important}
+html.jd-uc-isdark:not(.jd-dark) #root :is(.border-blue-200,.border-cyan-200,.border-cyan-500\/20){border-color:rgba(56,189,248,.45) !important}
+html.jd-uc-isdark:not(.jd-dark) #root button.rounded-\[20px\].p-4 .font-bold[style*="color"]{filter:brightness(1.45) saturate(1.1)}
+html.jd-uc-isdark:not(.jd-dark){color-scheme:dark}
+html.jd-uc-fs #root .text-\[9px\]{font-size:calc(9px * var(--uc-fs)) !important}
+html.jd-uc-fs #root .text-\[10px\]{font-size:calc(10px * var(--uc-fs)) !important}
+html.jd-uc-fs #root .text-\[11px\]{font-size:calc(11px * var(--uc-fs)) !important}
+html.jd-uc-fs #root .text-\[12px\]{font-size:calc(12px * var(--uc-fs)) !important}
+html.jd-uc-fs #root .text-\[13px\]{font-size:calc(13px * var(--uc-fs)) !important}
+html.jd-uc-fs #root .text-\[14px\]{font-size:calc(14px * var(--uc-fs)) !important}
+html.jd-uc-fs #root .text-\[15px\]{font-size:calc(15px * var(--uc-fs)) !important}
+html.jd-uc-fs #root .text-\[16px\]{font-size:calc(16px * var(--uc-fs)) !important}
+html.jd-uc-fs #root .text-\[17px\]{font-size:calc(17px * var(--uc-fs)) !important}
+html.jd-uc-fs #root .text-\[18px\]{font-size:calc(18px * var(--uc-fs)) !important}
+html.jd-uc-fs #root .text-\[24px\]{font-size:calc(24px * var(--uc-fs)) !important}
+html.jd-uc-fs #reportHeaderBtn{font-size:calc(13px * var(--uc-fs)) !important}
 </style>
 <script id="jd-usertheme-js">
 (function(){
-  var KEYS=["bg","card","cat","text","primary","header"];
-  var DEF={bg:"#f6f7fb",card:"#ffffff",cat:"#f8fafc",text:"#111827",primary:"#1e3a8a",header:"#ffffff"};
-  var LBL={bg:"خلفية البرنامج",card:"البطاقات",cat:"بطاقات الأقسام (الرئيسية)",text:"لون الخط",primary:"الأزرار والعناصر الرئيسية",header:"الشريط العلوي"};
-  var PRE=[["كحلي","#1e3a8a",{}],["أخضر","#15803d",{bg:"#f4faf6",header:"#f0fdf4",primary:"#15803d"}],["بنفسجي","#6d28d9",{bg:"#f7f5ff",header:"#f5f3ff",primary:"#6d28d9"}],["برتقالي","#c2410c",{bg:"#fffaf5",header:"#fff7ed",primary:"#c2410c"}]];
+  var KEYS=["bg","card","cat","text","primary","header","border","soft","muted"];
+  var DEF={bg:"#f6f7fb",card:"#ffffff",cat:"#f8fafc",text:"#111827",primary:"#1e3a8a",header:"#ffffff",border:"#e5e7eb",soft:"#f9fafb",muted:"#6b7280"};
+  var LBL={bg:"خلفية البرنامج",card:"البطاقات",cat:"بطاقات الأقسام (الرئيسية)",text:"لون الخط",primary:"الأزرار والعناصر الرئيسية",header:"الشريط العلوي",border:"لون الحدود",soft:"الحقول والأسطح الداخلية",muted:"الخط الثانوي (الخافت)"};
+  var TPL=[
+   ["royal","أزرق ملكي",{bg:"#f1f5fb",card:"#ffffff",text:"#0f172a",primary:"#1d4ed8",header:"#ffffff",border:"#dbe4f3",soft:"#f3f6fc",muted:"#64748b"}],
+   ["emerald","زمردي",{bg:"#f0f7f4",card:"#ffffff",text:"#0b2e22",primary:"#047857",header:"#ffffff",border:"#d5e8df",soft:"#f1f8f5",muted:"#5b7a6d"}],
+   ["violet","بنفسجي ملكي",{bg:"#f6f3fd",card:"#ffffff",text:"#1e1033",primary:"#6d28d9",header:"#ffffff",border:"#e3daf5",soft:"#f6f2fd",muted:"#7a6b99"}],
+   ["gold","ذهبي فاخر",{bg:"#fbf7ef",card:"#fffefb",text:"#2b1d08",primary:"#b45309",header:"#fffdf7",border:"#eadfc7",soft:"#faf5e8",muted:"#8a7650"}],
+   ["rose","وردي أنيق",{bg:"#fdf2f6",card:"#ffffff",text:"#3b0a1f",primary:"#be185d",header:"#ffffff",border:"#f3d7e2",soft:"#fdf0f5",muted:"#9d5a76"}],
+   ["slate","رمادي مكتبي",{bg:"#eef0f4",card:"#ffffff",text:"#111827",primary:"#334155",header:"#ffffff",border:"#dde1e8",soft:"#f2f4f7",muted:"#6b7280"}],
+   ["ocean","محيطي",{bg:"#eef8fb",card:"#ffffff",text:"#082f3a",primary:"#0e7490",header:"#ffffff",border:"#d3e9ef",soft:"#eff8fb",muted:"#5a8794"}],
+   ["sunset","غروب دافئ",{bg:"#fff6ef",card:"#fffefd",text:"#3a1604",primary:"#ea580c",header:"#fffaf6",border:"#f6dfcf",soft:"#fff3ea",muted:"#a2704f"}],
+   ["midnight","ليلي أزرق (داكن)",{bg:"#0b1220",card:"#131c2e",cat:"#17233a",text:"#e5e9f2",primary:"#3b82f6",header:"#0f172a",border:"#26324a",soft:"#1a2539",muted:"#9aa8c2"}],
+   ["charcoal","فحمي وذهبي (داكن)",{bg:"#121212",card:"#1c1c1c",cat:"#222222",text:"#f2efe6",primary:"#b8860b",header:"#181818",border:"#2f2f2f",soft:"#242424",muted:"#a8a39a"}],
+   ["forest","غابة (داكن)",{bg:"#0c1a14",card:"#12261d",cat:"#163027",text:"#e3f1ea",primary:"#16a34a",header:"#0f2219",border:"#214034",soft:"#173025",muted:"#8fb3a1"}],
+   ["plum","عنابي (داكن)",{bg:"#160f1a",card:"#21152a",cat:"#281a33",text:"#efe6f5",primary:"#9333ea",header:"#1b1222",border:"#3a2748",soft:"#2a1c35",muted:"#b39cc4"}]
+  ];
+  var SW=["#1e3a8a","#1d4ed8","#0e7490","#047857","#15803d","#65a30d","#b45309","#ea580c","#be185d","#6d28d9","#334155","#111827"];
   var cur=null;
   function uname(){try{var u=JSON.parse(localStorage.getItem("taswiya_session_user")||"null");return(u&&u.name)||""}catch(e){return ""}}
   function who(){var n=uname();if(n){try{localStorage.setItem("jd_uc_last",n)}catch(e){}return n}try{return localStorage.getItem("jd_uc_last")||""}catch(e){return ""}}
   function load(){try{return JSON.parse(localStorage.getItem("jd_uc_"+cur)||"{}")||{}}catch(e){return {}}}
   function save(o){try{localStorage.setItem("jd_uc_"+cur,JSON.stringify(o))}catch(e){}}
   function ok(v){return typeof v==="string"&&/^#[0-9a-fA-F]{6}$/.test(v)}
+  function lum(h){var r=parseInt(h.substr(1,2),16),g=parseInt(h.substr(3,2),16),b=parseInt(h.substr(5,2),16);return(0.299*r+0.587*g+0.114*b)/255}
+  function fsOf(o){var n=parseInt(o.fs,10);return(n>=80&&n<=150)?n:100}
   function apply(){
     var o=load(),r=document.documentElement;
     KEYS.forEach(function(k){
       if(ok(o[k])){r.style.setProperty("--uc-"+k,o[k]);r.classList.add("jd-uc-"+k)}
       else{r.style.removeProperty("--uc-"+k);r.classList.remove("jd-uc-"+k)}
     });
+    r.classList.toggle("jd-uc-isdark",ok(o.bg)&&lum(o.bg)<0.4);
+    var f=fsOf(o);
+    if(f!==100){r.style.setProperty("--uc-fs",String(f/100));r.classList.add("jd-uc-fs")}
+    else{r.style.removeProperty("--uc-fs");r.classList.remove("jd-uc-fs")}
   }
   function sync(){var n=who();if(n!==cur){cur=n;apply();var pn=document.getElementById("jd-uc-panel");if(pn&&pn.parentNode)pn.parentNode.removeChild(pn);inject()}}
-  function setKey(k,v){var o=load();if(v)o[k]=v;else delete o[k];save(o);apply()}
-  function btn(t,fn,st){var b=document.createElement("button");b.type="button";b.textContent=t;b.style.cssText="font-size:11px;padding:6px 10px;border-radius:10px;border:1px solid rgba(128,128,128,.35);background:transparent;color:inherit;cursor:pointer;"+(st||"");b.onclick=fn;return b}
-  function build(){
-    var o=load(),p=document.createElement("div");p.id="jd-uc-panel";
-    p.style.cssText="margin-top:18px;padding-top:16px;border-top:1px solid rgba(128,128,128,.25)";
-    var h=document.createElement("div");h.textContent="🎨 تخصيص الألوان";h.style.cssText="font-weight:700;font-size:13px;margin-bottom:4px";p.appendChild(h);
-    var n=document.createElement("div");n.textContent="يُحفظ على هذا الجهاز ولحسابك فقط، ولا يغيّر شيئاً على بقية الأجهزة. يُطبَّق على السمة الفاتحة.";n.style.cssText="font-size:10.5px;opacity:.65;margin-bottom:12px;line-height:1.7";p.appendChild(n);
-    var pr=document.createElement("div");pr.style.cssText="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px";
-    PRE.forEach(function(x){var b=btn(x[0],function(){
-      var o2={};KEYS.forEach(function(k){if(x[2][k])o2[k]=x[2][k]});save(o2);apply();refresh()},"display:flex;align-items:center;gap:6px");
-      var d=document.createElement("span");d.style.cssText="width:12px;height:12px;border-radius:50%;background:"+x[1];b.insertBefore(d,b.firstChild);pr.appendChild(b)});
-    p.appendChild(pr);
+  function setKey(k,v){var o=load();if(v)o[k]=v;else delete o[k];delete o.tpl;save(o);apply()}
+  function el(t,css,txt){var e=document.createElement(t);if(css)e.style.cssText=css;if(txt!=null)e.textContent=txt;return e}
+  function btn(t,fn,st){var b=el("button","font-size:11px;padding:6px 10px;border-radius:10px;border:1px solid rgba(128,128,128,.35);background:transparent;color:inherit;cursor:pointer;"+(st||""),t);b.type="button";b.onclick=fn;return b}
+  function title(t){return el("div","font-weight:700;font-size:12.5px;margin:16px 0 8px",t)}
+  function preview(v){
+    var m=el("div","border-radius:9px;overflow:hidden;border:1px solid "+v.border+";background:"+v.bg+";height:56px;position:relative;width:100%");
+    m.appendChild(el("div","height:12px;background:"+v.header+";border-bottom:1px solid "+v.border));
+    var c=el("div","position:absolute;left:8px;right:8px;top:21px;height:28px;border-radius:6px;background:"+(v.cat||v.card)+";border:1px solid "+v.border);
+    c.appendChild(el("div","position:absolute;right:7px;top:7px;width:26px;height:9px;border-radius:5px;background:"+v.primary));
+    c.appendChild(el("div","position:absolute;left:7px;top:9px;width:34px;height:4px;border-radius:2px;background:"+v.muted+";opacity:.7"));
+    c.appendChild(el("div","position:absolute;left:7px;top:17px;width:22px;height:4px;border-radius:2px;background:"+v.text+";opacity:.55"));
+    m.appendChild(c);return m}
+  function build(open){
+    var o=load(),p=el("div","margin-top:18px;padding-top:16px;border-top:1px solid rgba(128,128,128,.25)");p.id="jd-uc-panel";
+    p.appendChild(el("div","font-weight:700;font-size:13px;margin-bottom:4px","🎨 تخصيص المظهر"));
+    p.appendChild(el("div","font-size:10.5px;opacity:.65;margin-bottom:6px;line-height:1.7","يُحفظ على هذا الجهاز ولحسابك فقط، ولا يغيّر شيئاً على بقية الأجهزة."));
+    // font size
+    p.appendChild(title("حجم الخط"));
+    var fr=el("div","display:flex;align-items:center;gap:8px");
+    var val=el("span","min-width:42px;text-align:center;font-size:12px;font-weight:700",fsOf(o)+"%");
+    var sl=document.createElement("input");sl.type="range";sl.min="80";sl.max="150";sl.step="5";sl.value=String(fsOf(o));sl.setAttribute("data-uc","fs");sl.style.cssText="flex:1;direction:ltr";
+    var smp=el("div","margin-top:8px;padding:8px 10px;border-radius:10px;border:1px dashed rgba(128,128,128,.4);font-size:"+(15*fsOf(o)/100)+"px","نص تجريبي: إيداع 1,250,000 د.ع");
+    function setFs(n){n=Math.max(80,Math.min(150,n));var q=load();if(n===100)delete q.fs;else q.fs=n;save(q);apply();sl.value=String(n);val.textContent=n+"%";smp.style.fontSize=(15*n/100)+"px"}
+    sl.oninput=function(){setFs(parseInt(sl.value,10))};
+    fr.appendChild(btn("A+",function(){setFs(fsOf(load())+5)},"font-size:13px;font-weight:700"));
+    fr.appendChild(sl);
+    fr.appendChild(btn("A−",function(){setFs(fsOf(load())-5)},"font-size:12px;font-weight:700"));
+    fr.appendChild(val);fr.appendChild(btn("افتراضي",function(){setFs(100)}));
+    p.appendChild(fr);p.appendChild(smp);
+    // templates
+    p.appendChild(title("القوالب الجاهزة"));
+    var g=el("div","display:grid;grid-template-columns:repeat(2,1fr);gap:10px");
+    var d0={bg:DEF.bg,card:DEF.card,text:DEF.text,primary:DEF.primary,header:DEF.header,border:DEF.border,muted:DEF.muted};
+    var all=[["default","الافتراضي",d0]].concat(TPL);
+    all.forEach(function(x){
+      var sel=(x[0]==="default"&&!o.tpl&&!KEYS.some(function(k){return ok(o[k])}))||o.tpl===x[0];
+      var b=el("button","text-align:center;padding:6px;border-radius:12px;background:transparent;color:inherit;cursor:pointer;border:2px solid "+(sel?x[2].primary:"rgba(128,128,128,.28)"));b.type="button";
+      b.appendChild(preview(x[2]));b.appendChild(el("div","font-size:11.5px;margin-top:6px;font-weight:"+(sel?"700":"500"),(sel?"✓ ":"")+x[1]));
+      b.onclick=function(){var q=load(),n={};if(q.fs)n.fs=q.fs;if(x[0]!=="default"){KEYS.forEach(function(k){if(x[2][k])n[k]=x[2][k]});n.tpl=x[0]}save(n);apply();refresh()};
+      g.appendChild(b)});
+    p.appendChild(g);
+    // quick primary colours
+    p.appendChild(title("لون الأزرار والعناصر الرئيسية (سريع)"));
+    var sw=el("div","display:flex;gap:8px;flex-wrap:wrap");
+    SW.forEach(function(c){var a=el("button","width:28px;height:28px;border-radius:50%;cursor:pointer;background:"+c+";border:3px solid "+(o.primary===c?"rgba(128,128,128,.9)":"rgba(128,128,128,.25)"));a.type="button";a.onclick=function(){setKey("primary",c);refresh()};sw.appendChild(a)});
+    p.appendChild(sw);
+    // manual
+    var dt=document.createElement("details");dt.style.cssText="margin-top:14px";if(open)dt.open=true;
+    var sm=el("summary","font-weight:700;font-size:12.5px;cursor:pointer;margin-bottom:6px","تخصيص يدوي لكل لون");dt.appendChild(sm);
     KEYS.forEach(function(k){
-      var row=document.createElement("div");row.style.cssText="display:flex;align-items:center;justify-content:space-between;gap:8px;margin:8px 0";
-      var l=document.createElement("span");l.textContent=LBL[k];l.style.cssText="font-size:12px;flex:1";
+      var row=el("div","display:flex;align-items:center;justify-content:space-between;gap:8px;margin:8px 0");
       var i=document.createElement("input");i.type="color";i.setAttribute("data-uc",k);i.value=ok(o[k])?o[k]:DEF[k];
       i.style.cssText="width:46px;height:32px;border-radius:8px;border:1px solid rgba(128,128,128,.4);padding:2px;background:transparent;cursor:pointer";
       i.oninput=function(){setKey(k,i.value)};
-      var r=btn("افتراضي",function(){setKey(k,"");i.value=DEF[k]});
-      row.appendChild(l);row.appendChild(i);row.appendChild(r);p.appendChild(row)});
-    p.appendChild(btn("إعادة ضبط كل الألوان",function(){save({});apply();refresh()},"width:100%;margin-top:10px;padding:9px"));
+      row.appendChild(el("span","font-size:12px;flex:1",LBL[k]));row.appendChild(i);
+      row.appendChild(btn("افتراضي",function(){setKey(k,"");i.value=DEF[k]}));dt.appendChild(row)});
+    p.appendChild(dt);
+    p.appendChild(btn("إعادة ضبط الألوان",function(){var q=load(),n={};if(q.fs)n.fs=q.fs;save(n);apply();refresh()},"width:100%;margin-top:12px;padding:9px"));
     return p;
   }
-  function refresh(){var pn=document.getElementById("jd-uc-panel");if(pn&&pn.parentNode){var par=pn.parentNode;par.replaceChild(build(),pn)}}
+  function refresh(){var pn=document.getElementById("jd-uc-panel");if(pn&&pn.parentNode){var dt=pn.querySelector("details"),op=dt&&dt.open;pn.parentNode.replaceChild(build(op),pn)}}
   function inject(){
     if(document.getElementById("jd-uc-panel"))return;
     var t=document.querySelectorAll("#root div.font-bold.mb-4"),card=null;
     for(var i=0;i<t.length;i++){if((t[i].textContent||"").indexOf("المظهر والخط")>-1){card=t[i].parentNode;break}}
-    if(card)card.appendChild(build());
+    if(card)card.appendChild(build(false));
   }
   var q=0;function later(){if(q)return;q=setTimeout(function(){q=0;inject()},200)}
   function start(){
