@@ -2571,6 +2571,18 @@ html.jd-dark #jdInsOv{--ib:#0a2250;--it:#ffffff;--ibd:#1e3f7a;--ip:#2563eb;--im:
 #jdInsOv .jbar .v{width:84px;flex:none;text-align:left;color:var(--im);font-size:11px}
 #jdInsOv .jsum{background:var(--is);border-radius:12px;padding:9px 11px;margin-top:8px;font-size:12px}
 #jdInsOv .jnote{color:var(--im);font-size:10.5px;margin-top:8px}
+#jdInsOv .jal.farq{border-color:#7c3aed88}
+#jdInsOv .jfq{border:1px solid var(--ibd);border-radius:14px;margin-top:10px;overflow:hidden}
+#jdInsOv .jfq .hd{width:100%;display:flex;align-items:center;justify-content:space-between;padding:11px 12px;border:none;background:var(--is);color:inherit;font-size:12.5px;font-weight:700;cursor:pointer}
+#jdInsOv .jfq .hd b.bad{color:#dc2626}
+#jdInsOv .jfq .hd b.ok{color:#16a34a}
+#jdInsOv .jfqb{padding:4px 12px 12px}
+#jdInsOv .jmean{background:var(--is);border-radius:10px;padding:8px 10px;margin-top:8px;font-size:12px}
+#jdInsOv .jhyp{display:flex;gap:8px;padding:7px 0;border-bottom:1px dashed var(--ibd);font-size:12px}
+#jdInsOv .jrow{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px dashed var(--ibd);font-size:12px}
+#jdInsOv .jrow small{display:block;color:var(--im);font-size:10.5px}
+#jdInsOv .jrow.hit{background:#fef3c722;border-radius:8px;padding:6px 6px}
+#jdInsOv .jtabs button{font-size:12px;padding:9px 3px}
 </style>
 <script id="jd-ins-js">
 (function(){
@@ -2638,6 +2650,7 @@ html.jd-dark #jdInsOv{--ib:#0a2250;--it:#ffffff;--ibd:#1e3f7a;--ip:#2563eb;--im:
       for(var i=1;i<g.length;i++){
         if(g[i].ts-g[i-1].ts<=c.dup*60000)
           al.push({k:"dup|"+g[i-1].id+"|"+g[i].id,t:"dup",ic:"🔁",title:"تكرار محتمل: "+fmt(g[i].amount)+" د.ع في "+name(g[i].cat,g[i].sub),sub:"سُجّل المبلغ نفسه مرتين خلال "+fmt((g[i].ts-g[i-1].ts)/60000,0)+" دقيقة"+(g[i].user?" • "+g[i].user:"")+(g[i].time?" • "+g[i].time:"")})}});
+    try{var fd=fqDays(3);[1,2].forEach(function(n){var k=iso(addDays(now,-n)),D=fd[k]&&fd[k].D;if(D&&Math.abs(D)>=0.5)al.push({k:"farq|"+k+"|"+D,t:"farq",ic:"⚖️",title:"فرق في تسوية "+dayTxt(k)+": "+fmt(D)+" د.ع",sub:"افتح تبويب «الفرق» لمعرفة السبب المحتمل."})})}catch(e){}
     return al.filter(function(a){return !dis[a.k]})}
   function updBadge(){
     var b=document.getElementById("jdInsBadge");if(!b)return;
@@ -2680,11 +2693,94 @@ html.jd-dark #jdInsOv{--ib:#0a2250;--it:#ffffff;--ibd:#1e3f7a;--ip:#2563eb;--im:
       html+='<div class="jnote">الساعة هي وقت تسجيل العملية في البرنامج، وقد تتأخر عن وقت حدوثها الفعلي.</div>'}
     html+='<div class="jnote">يُحسب التحليل من '+f.length+' عملية منذ '+start+(PK.sec?"":" (الواردات فقط)")+'.</div>';
     return html}
+
+  // ---- فرق التسوية: كاشف الأسباب
+  var COEF={"saderat.awaliya":1,"saderat.naqd":1,"saderat.sarfiyat":1,"salary.sarfiyat":1,"waredat.khareji":-1,"waredat.whatsapp":-1,"malab.hujuzat":-1,"malab.taira":-1,"malab.sahb":1,"hawatif.wared":-1,"hawatif.sahb":1,"albisa.wared":-1,"albisa.sahb":1,"super.sabah":-1,"super.masai":-1,"super.sahb":1,"idara.wared":-1,"idara.sahb":1,"electronic.ida":-1,"electronic.sahb":1,"gym.wared":-1,"gym.sahb":1,"muhawal.":-1};
+  var FQ={per:31,open:"",all:0};
+  function fqAll(){
+    var d={};try{d=JSON.parse(localStorage.getItem("taswiya_data")||"{}")||{}}catch(e){}
+    var out=[];
+    function add(c,s,x){var k=c+"."+s;if(!(k in COEF)||!x||typeof x!=="object")return;var a=Number(x.amount)||0,cf=COEF[k];out.push({cat:c,sub:s,a:a,c:cf,e:cf*a,iso:isoOf(x),user:x.user||"",time:x.time||"",note:x.note||"",id:x.id})}
+    Object.keys(d).forEach(function(c){var v=d[c];
+      if(c==="muhawal"){if(Array.isArray(v))v.forEach(function(x){add("muhawal","",x)});return}
+      if(Array.isArray(v)||!v||typeof v!=="object")return;
+      Object.keys(v).forEach(function(s){var a=v[s];if(Array.isArray(a))a.forEach(function(x){add(c,s,x)})})});
+    return out}
+  function fqDays(per){
+    var it=fqAll(),days={},now=new Date(),i;
+    for(i=0;i<per;i++)days[iso(addDays(now,-i))]={D:0,ops:[]};
+    it.forEach(function(x){var o=days[x.iso];if(o){o.D+=x.e;o.ops.push(x)}});
+    Object.keys(days).forEach(function(k){days[k].D=Math.round(days[k].D*1000)/1000});
+    return days}
+  function dayTxt(k){try{return new Date(k+"T00:00:00").toLocaleDateString("ar-EG",{weekday:"long",day:"numeric",month:"long"})}catch(e){return k}}
+  function opTxt(x){return fmt(x.a)+" د.ع في "+name(x.cat==="muhawal"?"muhawal":x.cat,x.sub)+(x.user?" ("+x.user+(x.time?" • "+x.time:"")+")":"")}
+  function eq(a,b){return Math.abs(a-b)<0.5}
+  function explain(k,days){
+    var o=days[k],D=o.D,H=[],mark={};
+    if(!D)return{H:H,mark:mark};
+    var partners=Object.keys(days).filter(function(q){return q!==k&&eq(days[q].D,-D)});
+    var pt=partners.map(dayTxt).join(" و");
+    var cnt=o.ops.filter(function(x){return x.a}).length;
+    o.ops.forEach(function(x,i){
+      if(!x.a)return;
+      if(cnt>1&&eq(x.e,D)){mark[i]=1;H.push({ic:"🎯",t:"العملية ("+opTxt(x)+") يساوي أثرها الفرق تماماً؛ قد تكون مكررة أو زائدة"+(partners.length?"، أو مسجّلة بتاريخ غير تاريخها: ويوجد فرق معاكس تماماً في يوم "+pt+" فيُرجَّح أن مكانها هناك.":"، أو مسجّلة بتاريخ خاطئ.")})}
+      if(eq(2*x.e,D)){mark[i]=1;H.push({ic:"🔄",t:"العملية ("+opTxt(x)+") قد تكون سُجّلت في الجهة المعاكسة (وارد بدل سحب أو العكس)، لأن الفرق يساوي ضعف أثرها."})}
+      [10,100,1000].forEach(function(f){
+        if(eq(x.e*(f-1)/f,D)){mark[i]=1;H.push({ic:"0️⃣",t:"العملية ("+opTxt(x)+") قد يكون فيها "+(f===10?"صفر":"أصفار")+" زائدة؛ المفترض أن يكون المبلغ "+fmt(x.a/f)+" د.ع."})}
+        if(eq(x.e*(1-f),D)){mark[i]=1;H.push({ic:"0️⃣",t:"العملية ("+opTxt(x)+") قد ينقصها "+(f===10?"صفر":"أصفار")+"؛ المفترض أن يكون المبلغ "+fmt(x.a*f)+" د.ع."})}})});
+    // عملية في اليوم المقابل تتبع هذا اليوم
+    partners.forEach(function(q){days[q].ops.forEach(function(x){if(x.a&&eq(x.e,-D))H.push({ic:"📅",t:"في يوم "+dayTxt(q)+" توجد عملية ("+opTxt(x)+") أثرها عكس هذا الفرق؛ قد تكون تابعة لهذا اليوم وسُجّلت بتاريخ خاطئ."})})});
+    // عمليتان مجموع أثرهما = الفرق
+    var n=0;
+    for(var i=0;i<o.ops.length&&n<3&&cnt>2;i++)for(var j=i+1;j<o.ops.length&&n<3;j++){
+      var x=o.ops[i],y=o.ops[j];
+      if(x.a&&y.a&&eq(x.e+y.e,D)){n++;mark[i]=1;mark[j]=1;H.push({ic:"➕",t:"عمليتان مجموع أثرهما يساوي الفرق: ("+opTxt(x)+") و("+opTxt(y)+")."})}}
+    if(!H.length&&partners.length)H.push({ic:"📅",t:"يوجد فرق معاكس تماماً في يوم "+pt+"؛ على الأرجح أن عملية بمبلغ "+fmt(Math.abs(D))+" د.ع سُجّلت في أحد اليومين بدل الآخر. راجع العمليات بهذا المبلغ في اليومين."});
+    if(!H.length)H.push({ic:"❓",t:"لا يوجد تفسير ظاهر من العمليات المسجّلة؛ الأرجح أن عملية لم تُدخل."});
+    return{H:H,mark:mark}}
+  function dirTxt(D){
+    return D>0?"الدخل أكبر من الخرج بمقدار "+fmt(D)+" د.ع: يلزم غالباً إدخال خرج (وارد أو إيداع أو محوّل) بهذا المبلغ، أو أن أحد عمليات الدخل (أولية / منفذ رواتب / نقد) زائد."
+             :"الخرج أكبر من الدخل بمقدار "+fmt(-D)+" د.ع: يلزم غالباً إدخال دخل (أولية أو منفذ رواتب أو نقد) بهذا المبلغ، أو أن أحد عمليات الخرج (وارد / إيداع / محوّل) زائد."}
+  function fqRow(x,i,mark,side){
+    var val=side==="A"?x.e:-x.e;
+    return '<div class="jrow'+(mark[i]?" hit":"")+'"><span>'+(mark[i]?"🎯 ":"")+esc(name(x.cat,x.sub))+'<small>'+esc((x.user||"")+(x.time?" • "+x.time:"")+(x.note?" • "+x.note:""))+'</small></span><b>'+fmt(val)+'</b></div>'}
+  function fqHtml(){
+    var days=fqDays(FQ.per),keys=Object.keys(days).sort().reverse(),nz=keys.filter(function(k){return Math.abs(days[k].D)>=0.5});
+    var net=nz.reduce(function(a,k){return a+days[k].D},0);
+    var sel='<option value="14"'+(FQ.per===14?" selected":"")+'>آخر 14 يوماً</option><option value="31"'+(FQ.per===31?" selected":"")+'>آخر 31 يوماً</option><option value="60"'+(FQ.per===60?" selected":"")+'>آخر 60 يوماً</option><option value="90"'+(FQ.per===90?" selected":"")+'>آخر 90 يوماً</option>';
+    var h='<div class="jflt"><span>الفترة</span><select data-fq-per="1">'+sel+'</select><label style="display:flex;gap:5px;align-items:center"><input type="checkbox" data-fq-all="1"'+(FQ.all?" checked":"")+'> إظهار الأيام المتطابقة</label></div>';
+    h+='<div class="jsum">الفرق = الدخل (أولية + منفذ رواتب + نقد) − الخرج (الواردات + صافي الأقسام + المحوّل)، ويُحسب لكل يوم على حدة كما في صفحة التسوية.</div>';
+    if(!nz.length)return h+'<div class="jempty">✅ كل أيام آخر '+FQ.per+' يوماً متطابقة (الفرق صفر).</div>';
+    h+='<div class="jsum" style="margin-top:8px">⚖️ '+nz.length+' يوماً فيها فرق من '+FQ.per+'، وصافي الفروق: <b>'+fmt(net)+'</b> د.ع'+(nz.length>1&&Math.abs(net)<0.5?'<br>صافي الفروق صفر تقريباً، فالأرجح أنها أخطاء في تواريخ الإدخال بين الأيام.':'')+'</div>';
+    var list=FQ.all?keys:nz;
+    list.forEach(function(k){
+      var o=days[k],D=o.D,open=FQ.open===k;
+      h+='<div class="jfq"><button type="button" class="hd" data-fq="'+k+'"><span>'+esc(dayTxt(k))+'</span><b class="'+(Math.abs(D)<0.5?"ok":"bad")+'">'+(Math.abs(D)<0.5?"متطابق":fmt(D))+'</b></button>';
+      if(open){
+        var ex=explain(k,days),A=[],B=[],sa=0,sb=0;
+        o.ops.forEach(function(x,i){var inA=(x.cat==="saderat"||x.cat==="salary");if(inA){A.push([x,i]);sa+=x.e}else{B.push([x,i]);sb+=-x.e}});
+        h+='<div class="jfqb">';
+        if(Math.abs(D)>=0.5){
+          h+='<div class="jmean">'+esc(dirTxt(D))+'</div><div class="jh" style="margin-top:10px">الأسباب المحتملة</div>';
+          ex.H.forEach(function(q){h+='<div class="jhyp"><span>'+q.ic+'</span><span>'+esc(q.t)+'</span></div>'});
+        }
+        h+='<div class="jh">جهة الدخل: '+fmt(sa)+'</div>'+(A.length?A.map(function(q){return fqRow(q[0],q[1],ex.mark,"A")}).join(""):'<div class="jnote">لا عمليات</div>');
+        h+='<div class="jh">جهة الخرج: '+fmt(sb)+'</div>'+(B.length?B.map(function(q){return fqRow(q[0],q[1],ex.mark,"B")}).join(""):'<div class="jnote">لا عمليات</div>');
+        h+='<div class="jsum">'+fmt(sa)+' دخل − '+fmt(sb)+' خرج = <b>'+fmt(D)+'</b></div>';
+        h+='<button type="button" class="jall" data-go="'+k+'">عرض هذا اليوم في التسوية</button></div>'}
+      h+='</div>'});
+    return h}
+  function goDay(k){
+    var ni=document.querySelector("#root input[type=date]");
+    if(!ni){alert("افتح الصفحة الرئيسية أولاً ثم اضغط مرة أخرى.");return}
+    var set=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,"value").set;
+    set.call(ni,k);ni.dispatchEvent(new Event("input",{bubbles:true}));ni.dispatchEvent(new Event("change",{bubbles:true}));
+    var ov=document.getElementById("jdInsOv");if(ov)ov.classList.remove("open");window.scrollTo(0,0)}
   // ---- UI
   function render(){
     var ov=document.getElementById("jdInsOv");if(!ov)return;
     var al=alerts(),body=ov.querySelector(".jbody"),tb=ov.querySelectorAll(".jtabs button");
-    tb[0].className=tab==="al"?"on":"";tb[1].className=tab==="pk"?"on":"";
+    tb[0].className=tab==="al"?"on":"";tb[1].className=tab==="pk"?"on":"";tb[2].className=tab==="fq"?"on":"";
     tb[0].innerHTML='🔔 التنبيهات'+(al.length?'<i>'+al.length+'</i>':'');
     var h="";
     if(tab==="al"){
@@ -2694,22 +2790,27 @@ html.jd-dark #jdInsOv{--ib:#0a2250;--it:#ffffff;--ibd:#1e3f7a;--ip:#2563eb;--im:
       if(!al.length)h+='<div class="jempty">✅ لا توجد تنبيهات الآن.<br><small>يُراجع البرنامج الأقسام والمبالغ والتكرار تلقائياً.</small></div>';
       al.forEach(function(a){h+='<div class="jal '+a.t+'"><span class="ic">'+a.ic+'</span><span class="tx"><b>'+esc(a.title)+'</b><small>'+esc(a.sub)+'</small></span><button data-dis="'+esc(a.k)+'">تجاهل</button></div>'});
       if(al.length>1)h+='<button class="jall" data-disall="1">تجاهل الكل</button>'}
-    else h+=peak();
+    else if(tab==="pk")h+=peak();
+    else h+=fqHtml();
     body.innerHTML=h;updBadge()}
   function build(){
     if(document.getElementById("jdInsOv"))return;
     var ov=document.createElement("div");ov.id="jdInsOv";
-    ov.innerHTML='<div class="jb"><div class="jt"><span>🧭 مركز المتابعة</span><button type="button" data-x="1">✕</button></div><div class="jtabs"><button type="button" data-tab="al">🔔 التنبيهات</button><button type="button" data-tab="pk">📈 الذروة</button></div><div class="jbody"></div></div>';
+    ov.innerHTML='<div class="jb"><div class="jt"><span>🧭 مركز المتابعة</span><button type="button" data-x="1">✕</button></div><div class="jtabs"><button type="button" data-tab="al">🔔 التنبيهات</button><button type="button" data-tab="pk">📈 الذروة</button><button type="button" data-tab="fq">⚖️ الفرق</button></div><div class="jbody"></div></div>';
     ov.addEventListener("click",function(e){
       var t=e.target;if(t===ov){ov.classList.remove("open");return}
       var b=t.closest&&t.closest("button");if(!b)return;
       if(b.getAttribute("data-x")){ov.classList.remove("open");updBadge();return}
       var tt=b.getAttribute("data-tab");if(tt){tab=tt;render();return}
+      var fq=b.getAttribute("data-fq");if(fq){FQ.open=(FQ.open===fq?"":fq);render();return}
+      var go=b.getAttribute("data-go");if(go){goDay(go);return}
       var d=b.getAttribute("data-dis");if(d){dismiss([d]);render();return}
       if(b.getAttribute("data-disall")){dismiss(alerts().map(function(a){return a.k}));render()}});
     ov.addEventListener("change",function(e){
       var t=e.target,k=t.getAttribute&&t.getAttribute("data-cfg");
       if(k){var c=cfg(),o={hour:c.hour,mult:c.mult};o[k]=Number(t.value);saveCfg(o);render();return}
+      if(t.getAttribute&&t.getAttribute("data-fq-per")){FQ.per=Number(t.value);FQ.open="";render();return}
+      if(t.getAttribute&&t.getAttribute("data-fq-all")){FQ.all=t.checked?1:0;render();return}
       var p=t.getAttribute&&t.getAttribute("data-pk");
       if(p){PK[p]=(p==="per")?Number(t.value):t.value;render()}});
     document.body.appendChild(ov)}
