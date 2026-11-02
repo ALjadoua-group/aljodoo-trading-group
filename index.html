@@ -2536,57 +2536,68 @@ html.jd-uc-fs #reportHeaderBtn{font-size:calc(13px * var(--uc-fs)) !important}
 #jdInsBtn{height:36px;min-width:36px;border-radius:12px;border:1px solid var(--uc-border,#e5e7eb);background:var(--uc-card,#fff);margin-left:6px;position:relative;font-size:16px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0 6px;color:inherit}
 #jdInsBadge{position:absolute;top:-5px;left:-5px;min-width:17px;height:17px;border-radius:9px;background:#dc2626;color:#fff;font-size:10px;font-weight:700;display:none;align-items:center;justify-content:center;padding:0 4px;line-height:1}
 html.jd-dark #jdInsBtn{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18);color:#fff}
-#jdInsOv{--ib:var(--uc-card,#ffffff);--it:var(--uc-text,#111827);--ibd:var(--uc-border,#e5e7eb);--ip:var(--uc-primary,#1e3a8a);--im:var(--uc-muted,#6b7280);--is:var(--uc-soft,#f3f4f6);position:fixed;inset:0;z-index:100000;background:rgba(15,23,42,.55);display:none;align-items:flex-end;justify-content:center;direction:rtl;font-family:inherit}
-#jdInsOv.open{display:flex}
-html.jd-dark #jdInsOv{--ib:#0a2250;--it:#ffffff;--ibd:#1e3f7a;--ip:#2563eb;--im:#b4cdf5;--is:#0b2758}
-#jdInsOv .jb{background:var(--ib);color:var(--it);width:100%;max-width:560px;height:92vh;border-radius:20px 20px 0 0;display:flex;flex-direction:column;overflow:hidden}
-@media(min-width:640px){#jdInsOv{align-items:center}#jdInsOv .jb{height:86vh;border-radius:20px}}
-#jdInsOv .jt{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--ibd);font-weight:700;font-size:14px}
-#jdInsOv .jt button{border:none;background:var(--is);color:inherit;width:32px;height:32px;border-radius:10px;font-size:15px;cursor:pointer}
-#jdInsOv .jtabs{display:flex;gap:8px;padding:10px 12px;border-bottom:1px solid var(--ibd)}
-#jdInsOv .jtabs button{flex:1;padding:9px 6px;border-radius:12px;border:1px solid var(--ibd);background:transparent;color:inherit;font-size:12.5px;font-weight:700;cursor:pointer}
-#jdInsOv .jtabs button.on{background:var(--ip);color:#fff;border-color:transparent}
-#jdInsOv .jtabs i{font-style:normal;background:#dc2626;color:#fff;border-radius:9px;padding:1px 6px;font-size:10px;margin-right:4px}
-#jdInsOv .jbody{flex:1;overflow:auto;padding:12px 14px 22px;font-size:12.5px;line-height:1.7}
-#jdInsOv .jcfg,#jdInsOv .jflt{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:11.5px;background:var(--is);border-radius:12px;padding:8px 10px;margin-bottom:12px}
-#jdInsOv select{background:var(--ib);color:var(--it);border:1px solid var(--ibd);border-radius:8px;padding:5px 6px;font-size:11.5px}
-#jdInsOv .jal{border:1px solid var(--ibd);border-radius:14px;padding:10px 12px;margin-bottom:10px;display:flex;gap:10px;align-items:flex-start}
-#jdInsOv .jal .ic{font-size:20px;line-height:1.2}
-#jdInsOv .jal .tx{flex:1}
-#jdInsOv .jal b{display:block;font-size:12.5px}
-#jdInsOv .jal small{display:block;color:var(--im);font-size:11px}
-#jdInsOv .jal.silent{border-color:#f59e0b88}
-#jdInsOv .jal.out{border-color:#dc262688}
-#jdInsOv .jal.dup{border-color:#2563eb88}
-#jdInsOv .jal button,#jdInsOv .jall{border:1px solid var(--ibd);background:transparent;color:inherit;border-radius:9px;padding:4px 9px;font-size:11px;cursor:pointer}
-#jdInsOv .jall{width:100%;margin-top:4px;padding:8px}
-#jdInsOv .jempty{text-align:center;color:var(--im);padding:34px 10px}
-#jdInsOv .jh{font-weight:700;font-size:12.5px;margin:16px 0 8px}
-#jdInsOv .jbar{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:11.5px}
-#jdInsOv .jbar .n{width:62px;flex:none}
-#jdInsOv .jbar .t{flex:1;background:var(--is);border-radius:7px;height:20px;overflow:hidden}
-#jdInsOv .jbar .t i{display:block;height:100%;background:var(--ip);border-radius:7px;opacity:.85}
-#jdInsOv .jbar.best .t i{background:#16a34a}
-#jdInsOv .jbar.worst .t i{background:#dc2626}
-#jdInsOv .jbar .v{width:84px;flex:none;text-align:left;color:var(--im);font-size:11px}
-#jdInsOv .jsum{background:var(--is);border-radius:12px;padding:9px 11px;margin-top:8px;font-size:12px}
-#jdInsOv .jnote{color:var(--im);font-size:10.5px;margin-top:8px}
-#jdInsOv .jal.farq{border-color:#7c3aed88}
-#jdInsOv .jfq{border:1px solid var(--ibd);border-radius:14px;margin-top:10px;overflow:hidden}
-#jdInsOv .jfq .hd{width:100%;display:flex;align-items:center;justify-content:space-between;padding:11px 12px;border:none;background:var(--is);color:inherit;font-size:12.5px;font-weight:700;cursor:pointer}
-#jdInsOv .jfq .hd b.bad{color:#dc2626}
-#jdInsOv .jfq .hd b.ok{color:#16a34a}
-#jdInsOv .jfqb{padding:4px 12px 12px}
-#jdInsOv .jmean{background:var(--is);border-radius:10px;padding:8px 10px;margin-top:8px;font-size:12px}
-#jdInsOv .jhyp{display:flex;gap:8px;padding:7px 0;border-bottom:1px dashed var(--ibd);font-size:12px}
-#jdInsOv .jrow{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px dashed var(--ibd);font-size:12px}
-#jdInsOv .jrow small{display:block;color:var(--im);font-size:10.5px}
-#jdInsOv .jrow.hit{background:#fef3c722;border-radius:8px;padding:6px 6px}
-#jdInsOv .jtabs button{font-size:12px;padding:9px 3px}
+.jdov{--ib:var(--uc-card,#ffffff);--it:var(--uc-text,#111827);--ibd:var(--uc-border,#e5e7eb);--ip:var(--uc-primary,#1e3a8a);--im:var(--uc-muted,#6b7280);--is:var(--uc-soft,#f3f4f6);position:fixed;inset:0;z-index:100000;background:rgba(15,23,42,.55);display:none;align-items:flex-end;justify-content:center;direction:rtl;font-family:inherit}
+.jdov.open{display:flex}
+html.jd-dark .jdov{--ib:#0a2250;--it:#ffffff;--ibd:#1e3f7a;--ip:#2563eb;--im:#b4cdf5;--is:#0b2758}
+.jdov .jb{background:var(--ib);color:var(--it);width:100%;max-width:560px;height:92vh;border-radius:20px 20px 0 0;display:flex;flex-direction:column;overflow:hidden}
+@media(min-width:640px){.jdov{align-items:center}.jdov .jb{height:86vh;border-radius:20px}}
+.jdov .jt{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--ibd);font-weight:700;font-size:14px}
+.jdov .jt button{border:none;background:var(--is);color:inherit;width:32px;height:32px;border-radius:10px;font-size:15px;cursor:pointer}
+.jdov .jtabs{display:flex;gap:8px;padding:10px 12px;border-bottom:1px solid var(--ibd)}
+.jdov .jtabs button{flex:1;padding:9px 6px;border-radius:12px;border:1px solid var(--ibd);background:transparent;color:inherit;font-size:12.5px;font-weight:700;cursor:pointer}
+.jdov .jtabs button.on{background:var(--ip);color:#fff;border-color:transparent}
+.jdov .jtabs i{font-style:normal;background:#dc2626;color:#fff;border-radius:9px;padding:1px 6px;font-size:10px;margin-right:4px}
+.jdov .jbody{flex:1;overflow:auto;padding:12px 14px 22px;font-size:12.5px;line-height:1.7}
+.jdov .jcfg,.jdov .jflt{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:11.5px;background:var(--is);border-radius:12px;padding:8px 10px;margin-bottom:12px}
+.jdov select{background:var(--ib);color:var(--it);border:1px solid var(--ibd);border-radius:8px;padding:5px 6px;font-size:11.5px}
+.jdov .jal{border:1px solid var(--ibd);border-radius:14px;padding:10px 12px;margin-bottom:10px;display:flex;gap:10px;align-items:flex-start}
+.jdov .jal .ic{font-size:20px;line-height:1.2}
+.jdov .jal .tx{flex:1}
+.jdov .jal b{display:block;font-size:12.5px}
+.jdov .jal small{display:block;color:var(--im);font-size:11px}
+.jdov .jal.silent{border-color:#f59e0b88}
+.jdov .jal.out{border-color:#dc262688}
+.jdov .jal.dup{border-color:#2563eb88}
+.jdov .jal button,.jdov .jall{border:1px solid var(--ibd);background:transparent;color:inherit;border-radius:9px;padding:4px 9px;font-size:11px;cursor:pointer}
+.jdov .jall{width:100%;margin-top:4px;padding:8px}
+.jdov .jempty{text-align:center;color:var(--im);padding:34px 10px}
+.jdov .jh{font-weight:700;font-size:12.5px;margin:16px 0 8px}
+.jdov .jbar{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:11.5px}
+.jdov .jbar .n{width:62px;flex:none}
+.jdov .jbar .t{flex:1;background:var(--is);border-radius:7px;height:20px;overflow:hidden}
+.jdov .jbar .t i{display:block;height:100%;background:var(--ip);border-radius:7px;opacity:.85}
+.jdov .jbar.best .t i{background:#16a34a}
+.jdov .jbar.worst .t i{background:#dc2626}
+.jdov .jbar .v{width:84px;flex:none;text-align:left;color:var(--im);font-size:11px}
+.jdov .jsum{background:var(--is);border-radius:12px;padding:9px 11px;margin-top:8px;font-size:12px}
+.jdov .jnote{color:var(--im);font-size:10.5px;margin-top:8px}
+.jdov .jal.farq{border-color:#7c3aed88}
+.jdov .jfq{border:1px solid var(--ibd);border-radius:14px;margin-top:10px;overflow:hidden}
+.jdov .jfq .hd{width:100%;display:flex;align-items:center;justify-content:space-between;padding:11px 12px;border:none;background:var(--is);color:inherit;font-size:12.5px;font-weight:700;cursor:pointer}
+.jdov .jfq .hd b.bad{color:#dc2626}
+.jdov .jfq .hd b.ok{color:#16a34a}
+.jdov .jfqb{padding:4px 12px 12px}
+.jdov .jmean{background:var(--is);border-radius:10px;padding:8px 10px;margin-top:8px;font-size:12px}
+.jdov .jhyp{display:flex;gap:8px;padding:7px 0;border-bottom:1px dashed var(--ibd);font-size:12px}
+.jdov .jrow{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px dashed var(--ibd);font-size:12px}
+.jdov .jrow small{display:block;color:var(--im);font-size:10.5px}
+.jdov .jrow.hit{background:#fef3c722;border-radius:8px;padding:6px 6px}
+
+
+.jdov .jchip{display:inline-block;background:var(--is);border-radius:9px;padding:3px 9px;margin:0 0 6px 6px;font-size:11.5px}
+.jdov .jq{margin:14px 0 10px;font-weight:700;font-size:13px;line-height:1.7}
+.jdov .jbtns{display:flex;flex-direction:column;gap:8px}
+.jdov .jbtns button{padding:11px;border-radius:12px;border:1px solid var(--ibd);background:transparent;color:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.jdov .jbtns button.ok{background:#16a34a;color:#fff;border-color:transparent}
+.jdov .jbtns button.no{background:#fef3c7;color:#92400e;border-color:#f59e0b}
+#jdRemOv{z-index:100002}
+.jdov .jtabs{overflow-x:auto}
+.jdov .jtabs button{white-space:nowrap;font-size:11.5px;padding:9px 4px}
+.jdov .jcfg label{display:flex;gap:6px;align-items:center}
 </style>
 <script id="jd-ins-js">
 (function(){
-  var LBL={salary:"منفذ الرواتب",saderat:"الصادرات",waredat:"الواردات",malab:"الملعب",hawatif:"الهواتف",albisa:"الألبسة",super:"السوبر ماركت",idara:"الإدارة",electronic:"الدفع الإلكتروني",wakeel:"تعبئة من وكيل",gym:"الجدوع جم"};
+  var LBL={deferred:"حوالات مؤجلة",muhawal:"محوّل",salary:"منفذ الرواتب",saderat:"الصادرات",waredat:"الواردات",malab:"الملعب",hawatif:"الهواتف",albisa:"الألبسة",super:"السوبر ماركت",idara:"الإدارة",electronic:"الدفع الإلكتروني",wakeel:"تعبئة من وكيل",gym:"الجدوع جم"};
   var SUBL={awaliya:"أولية",naqd:"نقد",sarfiyat:"منفذ الرواتب",khareji:"خارجي",whatsapp:"مشاريع",hujuzat:"حجوزات",taira:"طائرة",sahb:"سحب",wared:"وارد",sabah:"صباحي",masai:"مسائي",ida:"إيداع",mablagh:"المبلغ",tasdeed:"تسديد"};
   var SKIP={deferred:1,muhawal:1,sharedEntries:1};
   var DAYS=["السبت","الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة"],DAYIDX=[6,0,1,2,3,4,5];
@@ -2776,11 +2787,103 @@ html.jd-dark #jdInsOv{--ib:#0a2250;--it:#ffffff;--ibd:#1e3f7a;--ip:#2563eb;--im:
     var set=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,"value").set;
     set.call(ni,k);ni.dispatchEvent(new Event("input",{bubbles:true}));ni.dispatchEvent(new Event("change",{bubbles:true}));
     var ov=document.getElementById("jdInsOv");if(ov)ov.classList.remove("open");window.scrollTo(0,0)}
+
+  // ---- التذكير الساعي بتسجيل العمليات
+  var RM_DEF={on:1,every:60,from:9,to:22,snooze:10,sound:1,notif:0},remOpen=0;
+  function remCfg(){var o={};try{o=JSON.parse(localStorage.getItem("jd_rem_cfg")||"{}")||{}}catch(e){}
+    var d=RM_DEF;return{on:o.on===0?0:1,every:[30,60,90,120].indexOf(o.every)>-1?o.every:d.every,from:(o.from>=0&&o.from<=23)?o.from:d.from,to:(o.to>=1&&o.to<=24)?o.to:d.to,snooze:[5,10,15].indexOf(o.snooze)>-1?o.snooze:d.snooze,sound:o.sound===0?0:1,notif:o.notif?1:0}}
+  function remSave(o){try{localStorage.setItem("jd_rem_cfg",JSON.stringify(o))}catch(e){}}
+  function remSt(){var o={};try{o=JSON.parse(localStorage.getItem("jd_rem_state")||"{}")||{}}catch(e){}return o}
+  function remStSave(o){try{localStorage.setItem("jd_rem_state",JSON.stringify(o))}catch(e){}}
+  function remLog(){try{return JSON.parse(localStorage.getItem("jd_rem_log")||"[]")||[]}catch(e){return []}}
+  function remLogAdd(e){var l=remLog();l.push(e);l=l.slice(-150);try{localStorage.setItem("jd_rem_log",JSON.stringify(l))}catch(x){}}
+  function curUser(){try{return(JSON.parse(localStorage.getItem("taswiya_session_user")||"null")||{}).name||""}catch(e){return ""}}
+  function tm(ts){try{return new Date(ts).toLocaleTimeString("ar-EG",{hour:"2-digit",minute:"2-digit"})}catch(e){return ""}}
+  function remSince(){var c=remCfg(),st=remSt(),f=new Date();f.setHours(c.from,0,0,0);return Math.max(st.last||Date.now(),f.getTime())}
+  function remItems(since){
+    var d={};try{d=JSON.parse(localStorage.getItem("taswiya_data")||"{}")||{}}catch(e){}
+    var out=[];
+    function add(c,s,x){if(!x||typeof x!=="object")return;var ts=tsOf(x);if(ts&&ts>=since)out.push({cat:c,sub:s,amount:Number(x.amount)||0,ts:ts,user:x.user||"",note:x.note||""})}
+    Object.keys(d).forEach(function(c){var v=d[c];
+      if(Array.isArray(v)){v.forEach(function(x){add(c,"",x)});return}
+      if(v&&typeof v==="object")Object.keys(v).forEach(function(s){var a=v[s];if(Array.isArray(a))a.forEach(function(x){add(c,s,x)})})});
+    return out.sort(function(a,b){return a.ts-b.ts})}
+  function remSound(){
+    try{if(navigator.vibrate)navigator.vibrate([200,100,200])}catch(e){}
+    try{var C=window.AudioContext||window.webkitAudioContext;if(!C)return;var a=new C(),o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.type="sine";o.frequency.value=880;g.gain.value=0.08;o.start();setTimeout(function(){try{o.stop();a.close()}catch(e){}},350)}catch(e){}}
+  function remNotify(){
+    try{
+      if(!("Notification" in window)||Notification.permission!=="granted")return;
+      var title="⏰ تذكير التسجيل",opt={body:"هل أُدخلت كل العمليات؟ افتح البرنامج للمراجعة والتأكيد.",tag:"jd-rem",renotify:true,lang:"ar",dir:"rtl"};
+      if(navigator.serviceWorker&&navigator.serviceWorker.getRegistration){navigator.serviceWorker.getRegistration().then(function(r){if(r&&r.showNotification)r.showNotification(title,opt);else new Notification(title,opt)}).catch(function(){})}
+      else new Notification(title,opt)
+    }catch(e){}}
+  function showRem(test){
+    var c=remCfg(),since=remSince(),list=remItems(since),ov=document.getElementById("jdRemOv");
+    if(!ov){ov=document.createElement("div");ov.id="jdRemOv";ov.className="jdov";document.body.appendChild(ov);
+      ov.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("button");if(!b)return;var a=b.getAttribute("data-r");if(a)remAnswer(a,ov.getAttribute("data-test")==="1")})}
+    ov.setAttribute("data-test",test?"1":"0");
+    var tot={};list.forEach(function(x){var k=name(x.cat,"");var o=tot[k]||(tot[k]={n:0,s:0});o.n++;o.s+=x.amount});
+    var h='<div class="jb"><div class="jt"><span>⏰ تذكير التسجيل • '+esc(tm(Date.now()))+(test?" (تجربة)":"")+'</span></div><div class="jbody">';
+    h+='<div class="jsum">العمليات المُدخلة منذ '+esc(tm(since))+' ('+list.length+' عملية)</div>';
+    if(!list.length)h+='<div class="jempty" style="padding:14px">لم تُسجَّل أي عملية خلال هذه الفترة.</div>';
+    else{
+      h+='<div style="margin-top:10px">';Object.keys(tot).forEach(function(k){h+='<span class="jchip">'+esc(k)+': '+tot[k].n+' • '+fmt(tot[k].s)+'</span>'});h+='</div>';
+      h+='<div class="jh">التفاصيل</div>';
+      list.slice(-40).reverse().forEach(function(x){h+='<div class="jrow"><span>'+esc(name(x.cat,x.sub))+'<small>'+esc(tm(x.ts)+(x.user?" • "+x.user:"")+(x.note?" • "+x.note:""))+'</small></span><b>'+fmt(x.amount)+'</b></div>'});
+      if(list.length>40)h+='<div class="jnote">يُعرض آخر 40 عملية من '+list.length+'.</div>'}
+    h+='<div class="jq">هل أُدخلت <b>كل</b> العمليات: الصرف والوارد من الصندوق وإليه؟</div>';
+    h+='<div class="jbtns"><button type="button" data-r="ok" class="ok">✅ نعم، كل شيء مُدخل</button><button type="button" data-r="no" class="no">⚠️ لا، يوجد ما لم يُدخل بعد</button><button type="button" data-r="later">⏰ ذكّرني بعد '+c.snooze+' دقائق</button></div>';
+    var today=iso(new Date()),lg=remLog().filter(function(x){return iso(new Date(x.ts))===today&&x.a==="ok"});
+    if(lg.length)h+='<div class="jnote" style="margin-top:12px">تأكيدات اليوم: '+lg.map(function(x){return esc(tm(x.ts)+" ✓ "+(x.user||""))}).join(" • ")+'</div>';
+    h+='</div></div>';
+    ov.innerHTML=h;ov.classList.add("open");remOpen=1;
+    if(c.sound&&!test)remSound()}
+  function remAnswer(a,test){
+    var c=remCfg(),st=remSt(),now=Date.now(),n=remItems(remSince()).length;
+    if(!test){
+      if(a==="ok"){st.last=now;st.snoozeUntil=0;st.notified=0;remLogAdd({ts:now,user:curUser(),a:"ok",n:n})}
+      else if(a==="no"){st.snoozeUntil=now+c.snooze*60000;remLogAdd({ts:now,user:curUser(),a:"no",n:n})}
+      else st.snoozeUntil=now+c.snooze*60000;
+      remStSave(st)}
+    var ov=document.getElementById("jdRemOv");if(ov)ov.classList.remove("open");remOpen=0;
+    var io=document.getElementById("jdInsOv");if(io&&io.classList.contains("open"))render()}
+  function remTick(){
+    var c=remCfg();if(!c.on||remOpen)return;
+    var now=new Date(),h=now.getHours(),t=now.getTime(),st=remSt();
+    if(!document.querySelector("#root header"))return;
+    if(!st.last){st.last=t;remStSave(st);return}
+    if(h<c.from||h>=c.to)return;
+    var due=st.snoozeUntil?t>=st.snoozeUntil:(t-st.last>=c.every*60000);
+    if(!due)return;
+    if(document.hidden){if(c.notif&&!st.notified){st.notified=1;remStSave(st);remNotify()}return}
+    var ae=document.activeElement;if(ae&&/^(INPUT|TEXTAREA)$/.test(ae.tagName)&&ae.value&&ae.type!=="color"&&ae.type!=="range"&&ae.type!=="checkbox")return;
+    showRem(false)}
+  function remHtml(){
+    var c=remCfg(),h="",i,opt=function(v,cur,lbl){return '<option value="'+v+'"'+(v===cur?" selected":"")+'>'+lbl+'</option>'};
+    var ev="";[30,60,90,120].forEach(function(v){ev+=opt(v,c.every,v+" دقيقة")});
+    var fr="",to="";for(i=0;i<=23;i++)fr+=opt(i,c.from,((i%12)||12)+(i>=12?" م":" ص"));
+    for(i=1;i<=24;i++)to+=opt(i,c.to,i===24?"12 ص (نهاية اليوم)":((i%12)||12)+(i>=12?" م":" ص"));
+    var sn="";[5,10,15].forEach(function(v){sn+=opt(v,c.snooze,v+" دقائق")});
+    h+='<div class="jcfg" style="flex-direction:column;align-items:stretch;gap:10px">';
+    h+='<label><input type="checkbox" data-rm="on"'+(c.on?" checked":"")+'> <b>تفعيل التذكير الدوري على هذا الجهاز</b></label>';
+    h+='<div>يظهر كل <select data-rm="every">'+ev+'</select></div>';
+    h+='<div>خلال الدوام من <select data-rm="from">'+fr+'</select> إلى <select data-rm="to">'+to+'</select></div>';
+    h+='<div>مدة التأجيل <select data-rm="snooze">'+sn+'</select></div>';
+    h+='<label><input type="checkbox" data-rm="sound"'+(c.sound?" checked":"")+'> صوت واهتزاز عند الظهور</label>';
+    h+='<label><input type="checkbox" data-rm="notif"'+(c.notif?" checked":"")+'> إشعار للنظام عندما تكون الصفحة مخفية (يطلب إذناً)</label>';
+    h+='<button type="button" class="jall" data-rm-test="1">اختبار التذكير الآن</button></div>';
+    var today=iso(new Date()),lg=remLog().filter(function(x){return iso(new Date(x.ts))===today}).reverse();
+    h+='<div class="jh">سجل اليوم</div>';
+    if(!lg.length)h+='<div class="jnote">لا توجد إجابات اليوم بعد.</div>';
+    lg.slice(0,30).forEach(function(x){h+='<div class="jrow"><span>'+esc(tm(x.ts))+' • '+esc(x.user||"")+'<small>'+(x.n||0)+' عملية في الفترة</small></span><b>'+(x.a==="ok"?"✅ أُدخل كل شيء":"⚠️ ينقص شيء")+'</b></div>'});
+    h+='<div class="jnote">يعمل التذكير والبرنامج مفتوح على الجهاز. كل جهاز له جدوله وسجله الخاص، ولا يصل إشعار إلى هاتف مغلق. النتيجة ترتبط بما أُدخل منذ آخر تأكيد.</div>';
+    return h}
   // ---- UI
   function render(){
     var ov=document.getElementById("jdInsOv");if(!ov)return;
     var al=alerts(),body=ov.querySelector(".jbody"),tb=ov.querySelectorAll(".jtabs button");
-    tb[0].className=tab==="al"?"on":"";tb[1].className=tab==="pk"?"on":"";tb[2].className=tab==="fq"?"on":"";
+    tb[0].className=tab==="al"?"on":"";tb[1].className=tab==="pk"?"on":"";tb[2].className=tab==="fq"?"on":"";tb[3].className=tab==="rm"?"on":"";
     tb[0].innerHTML='🔔 التنبيهات'+(al.length?'<i>'+al.length+'</i>':'');
     var h="";
     if(tab==="al"){
@@ -2791,17 +2894,19 @@ html.jd-dark #jdInsOv{--ib:#0a2250;--it:#ffffff;--ibd:#1e3f7a;--ip:#2563eb;--im:
       al.forEach(function(a){h+='<div class="jal '+a.t+'"><span class="ic">'+a.ic+'</span><span class="tx"><b>'+esc(a.title)+'</b><small>'+esc(a.sub)+'</small></span><button data-dis="'+esc(a.k)+'">تجاهل</button></div>'});
       if(al.length>1)h+='<button class="jall" data-disall="1">تجاهل الكل</button>'}
     else if(tab==="pk")h+=peak();
+    else if(tab==="rm")h+=remHtml();
     else h+=fqHtml();
     body.innerHTML=h;updBadge()}
   function build(){
     if(document.getElementById("jdInsOv"))return;
-    var ov=document.createElement("div");ov.id="jdInsOv";
-    ov.innerHTML='<div class="jb"><div class="jt"><span>🧭 مركز المتابعة</span><button type="button" data-x="1">✕</button></div><div class="jtabs"><button type="button" data-tab="al">🔔 التنبيهات</button><button type="button" data-tab="pk">📈 الذروة</button><button type="button" data-tab="fq">⚖️ الفرق</button></div><div class="jbody"></div></div>';
+    var ov=document.createElement("div");ov.id="jdInsOv";ov.className="jdov";
+    ov.innerHTML='<div class="jb"><div class="jt"><span>🧭 مركز المتابعة</span><button type="button" data-x="1">✕</button></div><div class="jtabs"><button type="button" data-tab="al">🔔 التنبيهات</button><button type="button" data-tab="pk">📈 الذروة</button><button type="button" data-tab="fq">⚖️ الفرق</button><button type="button" data-tab="rm">⏰ التذكير</button></div><div class="jbody"></div></div>';
     ov.addEventListener("click",function(e){
       var t=e.target;if(t===ov){ov.classList.remove("open");return}
       var b=t.closest&&t.closest("button");if(!b)return;
       if(b.getAttribute("data-x")){ov.classList.remove("open");updBadge();return}
       var tt=b.getAttribute("data-tab");if(tt){tab=tt;render();return}
+      if(b.getAttribute("data-rm-test")){showRem(true);return}
       var fq=b.getAttribute("data-fq");if(fq){FQ.open=(FQ.open===fq?"":fq);render();return}
       var go=b.getAttribute("data-go");if(go){goDay(go);return}
       var d=b.getAttribute("data-dis");if(d){dismiss([d]);render();return}
@@ -2809,6 +2914,11 @@ html.jd-dark #jdInsOv{--ib:#0a2250;--it:#ffffff;--ibd:#1e3f7a;--ip:#2563eb;--im:
     ov.addEventListener("change",function(e){
       var t=e.target,k=t.getAttribute&&t.getAttribute("data-cfg");
       if(k){var c=cfg(),o={hour:c.hour,mult:c.mult};o[k]=Number(t.value);saveCfg(o);render();return}
+      var rk=t.getAttribute&&t.getAttribute("data-rm");
+      if(rk){var c0=remCfg(),o0={on:c0.on,every:c0.every,from:c0.from,to:c0.to,snooze:c0.snooze,sound:c0.sound,notif:c0.notif};
+        if(t.type==="checkbox")o0[rk]=t.checked?1:0;else o0[rk]=Number(t.value);
+        if(rk==="notif"&&t.checked){try{Notification.requestPermission().then(function(pm){if(pm!=="granted"){var o1=remCfg();o1.notif=0;remSave(o1);render()}})}catch(e){o0.notif=0}}
+        remSave(o0);render();return}
       if(t.getAttribute&&t.getAttribute("data-fq-per")){FQ.per=Number(t.value);FQ.open="";render();return}
       if(t.getAttribute&&t.getAttribute("data-fq-all")){FQ.all=t.checked?1:0;render();return}
       var p=t.getAttribute&&t.getAttribute("data-pk");
@@ -2821,9 +2931,9 @@ html.jd-dark #jdInsOv{--ib:#0a2250;--it:#ffffff;--ibd:#1e3f7a;--ip:#2563eb;--im:
     var b=document.createElement("button");b.id="jdInsBtn";b.type="button";b.title="مركز المتابعة";
     b.innerHTML='🧭<span id="jdInsBadge"></span>';b.addEventListener("click",open);
     rb.parentElement.insertBefore(b,rb.nextSibling);updBadge()}
-  setInterval(ensureBtn,1000);setInterval(updBadge,30000);
+  setInterval(ensureBtn,1000);setInterval(updBadge,30000);setInterval(remTick,15000);document.addEventListener("visibilitychange",function(){if(!document.hidden)setTimeout(remTick,300)});
   window.addEventListener("storage",updBadge);
-  window.__jdIns={alerts:alerts,peak:peak,open:open,items:items};
+  window.__jdIns={alerts:alerts,peak:peak,open:open,items:items,remTick:remTick,showRem:showRem,remNotify:remNotify,remCfg:remCfg};
 })();
 </script>
 </body>
