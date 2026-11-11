@@ -1185,7 +1185,7 @@ if('serviceWorker' in navigator){
   function renderDetail(d){
     return (coOnOf(d)?coNote()+'<div style="margin:0 0 8px;font-size:12px;font-weight:700;color:#92400e">إجمالي عمولة الشركة لهذه الفترة: '+fmtC((d.totals.ida||0)*0.001)+' د.ع</div>':'')+'<div class="jr-search"><input type="search" data-q="1" placeholder="🔍 ابحث عن اسم أو بيان أو مبلغ في العمليات" value="'+esc(st.q)+'"></div><div class="jr-dwrap">'+detailTable(d)+'</div>';
   }
-  function refreshDetail(){var dd=host&&host.querySelector(".jr-dwrap");if(dd)dd.innerHTML=detailTable(compute())}
+  function refreshDetail(){var dd=host&&host.querySelector(".jr-dwrap");if(!dd)return;var sc=host.closest(".box"),top=sc?sc.scrollTop:0,wy=window.pageYOffset;dd.innerHTML=detailTable(compute());if(sc)sc.scrollTop=top;if(window.pageYOffset!==wy)window.scrollTo(0,wy)}
 
   /* ===== الانتقال إلى العملية نفسها في اليوم نفسه ===== */
   function wait(fn,ms,cb){var t0=Date.now();(function p(){var v=fn();if(v){cb(v);return}if(Date.now()-t0>ms){cb(null);return}setTimeout(p,90)})()}
@@ -1274,7 +1274,9 @@ if('serviceWorker' in navigator){
     if(act==="go"){e.preventDefault();var gid=el.getAttribute("data-id"),gx=compute().items.filter(function(z){return String(z.id)===gid})[0];if(gx)goTo(gx);return}
     if(act==="like"){var lid=el.getAttribute("data-id"),lx=compute().items.filter(function(z){return String(z.id)===lid})[0];
       if(!lx)return;if(typeof window.__jdLikeOp!=="function"){notify("تعذّر تسجيل الإعجاب الآن");return}
-      window.__jdLikeOp(st.cat,lx._k,lx.id);setTimeout(refreshDetail,450);setTimeout(refreshDetail,1200);return}
+      var sc0=host.closest(".box"),top0=sc0?sc0.scrollTop:0,wy0=window.pageYOffset,stopK=0,cancelK=function(){stopK=1};["wheel","touchstart","mousedown"].forEach(function(nm){window.addEventListener(nm,cancelK,{once:true,passive:true,capture:true})});
+      var keepK=function(){if(stopK)return;if(sc0&&Math.abs(sc0.scrollTop-top0)>2)sc0.scrollTop=top0;if(Math.abs(window.pageYOffset-wy0)>2)window.scrollTo(0,wy0)};
+      window.__jdLikeOp(st.cat,lx._k,lx.id);[0,60,200,450,520,900,1200,1300,1800].forEach(function(t){setTimeout(function(){if(t===450||t===1200)refreshDetail();keepK()},t)});return}
     if(act==="cat"){st.cat=v;st.sub=columns(v)[0].k;st.q=""}
     else if(act==="period"){st.period=v;st.off=0}
     else if(act==="sub"){st.sub=v;st.q=""}
