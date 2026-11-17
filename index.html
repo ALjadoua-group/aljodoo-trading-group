@@ -58,108 +58,86 @@
 #root{font-variant-numeric:tabular-nums}
 </style>
 
-<!-- ===== PRO CARDS V7 - بيضوية + خط أسود غامق + حواف ===== -->
-<style id="jd-pro-cards-v7">
-#root{ background:#F2F2F7 !important; }
-
-/* === البطاقة البيضوية === */
+<!-- ===== PRO CARDS V8 - بيضوية مضغوطة ومتوازنة ===== -->
+<style id="jd-pro-cards-v8">
+#root{ background:#F4F2ED !important; }
 #root button.rounded-\[20px\].p-4{
   position:relative !important;
-  /* بيضوي: استدارة كبيرة جدا من كل الجهات */
-  border-radius:50px !important;
-  background:var(--card-bg,#ffffff) !important;
-  /* حواف واضحة - لونها يتبع لون القسم */
-  border:2px solid var(--accent,#D1D5DB) !important;
-  padding:18px 14px 16px !important;
+  border-radius:28px !important; /* بيضوية هادئة - مو حبة دواء */
+  background:var(--card-bg,#fff) !important;
+  border:1.5px solid var(--border-c,#E7E5E4) !important;
+  padding:12px 12px 12px !important;
   overflow:hidden !important;
-  box-shadow:0 4px 16px rgba(0,0,0,.06) !important;
-  transition:transform .2s ease, box-shadow .2s ease, border-color .3s ease, background .4s ease !important;
+  box-shadow:0 2px 10px rgba(0,0,0,.04) !important;
+  transition:all .2s ease !important;
   text-align:center !important;
   display:flex !important; flex-direction:column !important; align-items:center !important;
 }
-#root button.rounded-\[20px\].p-4::before{ display:none !important; }
-#root button.rounded-\[20px\].p-4:hover{
-  transform:translateY(-3px) scale(1.01) !important;
-  box-shadow:0 10px 26px rgba(0,0,0,.09) !important;
-  border-width:2.5px !important;
-}
-#root button.rounded-\[20px\].p-4:active{ transform:scale(.98) !important; }
-/* شريط علوي صغير بيضوي - اختياري، يبقى داخل الشكل البيضوي */
-#root button.rounded-\[20px\].p-4::after{
-  content:"" !important; position:absolute !important; top:0; left:18%; right:18%; height:5px !important;
-  background:var(--accent,#1e3a8a) !important; border-radius:0 0 10px 10px !important; display:block !important;
-}
+#root button.rounded-\[20px\].p-4::before, #root button.rounded-\[20px\].p-4::after{ display:none !important; }
+#root button.rounded-\[20px\].p-4:hover{ transform:translateY(-2px) !important; box-shadow:0 6px 18px rgba(0,0,0,.07) !important; }
 #root button.rounded-\[20px\].p-4 > div{
-  display:flex !important; flex-direction:column !important; align-items:center !important;
-  gap:0 !important; padding:0 !important; width:100% !important;
+  display:flex !important; flex-direction:column !important; align-items:center !important; gap:0 !important; padding:0 !important; width:100% !important;
 }
 #root button.rounded-\[20px\].p-4 > div:first-child{
   display:flex !important; flex-direction:column !important; align-items:center !important; gap:0 !important;
 }
-/* الأيقونة: بيضوية أيضا */
+/* الأيقونة: أصغر وأقرب للعنوان - مو منفصلة */
 #root button.rounded-\[20px\].p-4 > div:first-child > div:first-child{
-  width:52px !important; height:52px !important; min-width:52px !important;
-  border-radius:50% !important; /* دائرة كاملة = بيضوية */
+  width:56px !important; height:56px !important; min-width:56px !important;
+  border-radius:18px !important; /* مربع بيضوي مو دائرة كاملة - أهدى */
   display:flex !important; align-items:center !important; justify-content:center !important;
-  font-size:22px !important; margin-bottom:10px !important;
-  box-shadow:none !important; overflow:hidden !important;
-  background:var(--icon-bg,#F2F2F7) !important;
-  border:1.5px solid var(--accent,#E5E7EB) !important;
+  font-size:24px !important; margin:2px 0 8px !important; box-shadow:none !important; overflow:hidden !important;
+  background:var(--icon-bg,#F5F5F4) !important; border:none !important;
 }
-#root button.rounded-\[20px\].p-4 > div:first-child > div:first-child img{ width:32px !important; height:32px !important; object-fit:contain !important; }
-
-/* الشارة: بيضوية أيضا */
+#root button.rounded-\[20px\].p-4 > div:first-child > div:first-child img{ width:36px !important; height:36px !important; object-fit:contain !important; }
+/* الشارة: ملتصقة بالأيقونة - مو بالنص */
 #root button.rounded-\[20px\].p-4 .rounded-full{
-  background:#fff !important; color:#000 !important; border:1.5px solid #E5E7EB !important;
-  font-size:11px !important; font-weight:700 !important; padding:4px 12px !important; border-radius:999px !important; margin:0 0 8px !important;
+  background:#FAF7F2 !important; color:#78716C !important; border:none !important;
+  font-size:11px !important; font-weight:600 !important; padding:3px 10px !important; border-radius:999px !important; margin:0 0 6px !important; line-height:1.4 !important;
 }
-
-/* === الخط: أسود غامق في كل البطاقة === */
-#root button.rounded-\[20px\].p-4,
-#root button.rounded-\[20px\].p-4 *{ color:#000 !important; }
+/* الكل أسود - بدون استثناء */
+#root button.rounded-\[20px\].p-4, #root button.rounded-\[20px\].p-4 *{ color:#111111 !important; }
 #root button.rounded-\[20px\].p-4 > div:first-child > div:nth-child(2){
-  display:flex !important; flex-direction:column !important; align-items:center !important; gap:2px !important;
+  display:flex !important; flex-direction:column !important; align-items:center !important; gap:1px !important;
 }
 #root button.rounded-\[20px\].p-4 > div:first-child > div:nth-child(2) > div:first-child{
-  font-size:16px !important; font-weight:900 !important; color:#000 !important; line-height:1.3 !important; letter-spacing:-.2px !important;
+  font-size:15px !important; font-weight:800 !important; color:#111 !important; line-height:1.35 !important;
 }
-/* المبلغ: أسود غامق جدا */
 #root button.rounded-\[20px\].p-4 .text-2xl,
 #root button.rounded-\[20px\].p-4 [class*="text-\[20px\]"],
 #root button.rounded-\[20px\].p-4 > div:first-child > div:nth-child(2) > div:nth-child(2){
-  font-size:24px !important; font-weight:900 !important; color:#000 !important;
-  letter-spacing:-.4px !important; font-variant-numeric:tabular-nums !important; line-height:1.2 !important;
+  font-size:21px !important; font-weight:900 !important; color:#000 !important; line-height:1.25 !important; margin-top:1px !important; letter-spacing:-.3px !important;
 }
-/* التفاصيل: أسود غامق لكن أخف وزنا - بدون خطوط فاصلة */
+/* التفاصيل: نفس الأسود - بس أصغر، ونلغي الرمادي الباهت */
 #root button.rounded-\[20px\].p-4 > div > div:last-child,
 #root button.rounded-\[20px\].p-4 > div:nth-child(2),
 #root button.rounded-\[20px\].p-4 > div:nth-child(3){
-  display:flex !important; flex-direction:row !important; flex-wrap:wrap !important;
-  justify-content:center !important; gap:6px 10px !important;
-  margin-top:8px !important; padding-top:0 !important; border-top:none !important; width:100% !important;
-  font-size:12px !important; color:#000 !important; font-weight:600 !important;
+  display:flex !important; flex-direction:row !important; flex-wrap:wrap !important; justify-content:center !important;
+  gap:3px 10px !important; margin-top:7px !important; padding-top:7px !important;
+  border-top:1px solid #F0EDE8 !important; width:100% !important;
+  font-size:12px !important; color:#111 !important; font-weight:600 !important; line-height:1.5 !important;
 }
-/* إلغاء أي لون ملون قديم داخل النص */
-#root button.rounded-\[20px\].p-4 .text-red-500,
-#root button.rounded-\[20px\].p-4 .text-red-600,
-#root button.rounded-\[20px\].p-4 .text-emerald-600,
-#root button.rounded-\[20px\].p-4 .text-emerald-700,
-#root button.rounded-\[20px\].p-4 .text-purple-600,
-#root button.rounded-\[20px\].p-4 .text-blue-600{
-  color:#000 !important;
+#root button.rounded-\[20px\].p-4 > div > div:last-child *,
+#root button.rounded-\[20px\].p-4 > div:nth-child(2) *,
+#root button.rounded-\[20px\].p-4 > div:nth-child(3) *{ color:#111 !important; font-weight:600 !important; }
+/* إلغاء الألوان الملونة داخل النص */
+#root button.rounded-\[20px\].p-4 .text-red-500, #root button.rounded-\[20px\].p-4 .text-red-600,
+#root button.rounded-\[20px\].p-4 .text-emerald-600, #root button.rounded-\[20px\].p-4 .text-emerald-700,
+#root button.rounded-\[20px\].p-4 .text-purple-600, #root button.rounded-\[20px\].p-4 .text-blue-600{ color:#111 !important; }
+/* نقطة لون صغيرة بدل الشريط الكبير - تدل على القسم بدون ما تثقل البطاقة */
+#root button.rounded-\[20px\].p-4 > div:first-child > div:first-child::after{
+  content:"" !important; position:absolute !important; top:10px !important; left:10px !important; width:8px !important; height:8px !important; border-radius:50% !important; background:var(--accent,#D6D3D1) !important; display:block !important;
 }
-/* بطاقات الداخل: بيضوية أيضا */
 #root .rounded-\[14px\].p-3.flex, #root div.rounded-\[16px\].border.p-4{
-  border-radius:28px !important; border:1.5px solid #E5E7EB !important; background:#fff !important; box-shadow:0 3px 12px rgba(0,0,0,.04) !important;
+  border-radius:20px !important; border:1px solid #E7E5E4 !important; background:#fff !important; box-shadow:0 2px 8px rgba(0,0,0,.03) !important;
 }
 html.jd-dark #root{ background:#0e1626 !important; }
-html.jd-dark #root button.rounded-\[20px\].p-4{ background:var(--card-bg,#16223a) !important; border-color:var(--accent,#3b4a63) !important; box-shadow:0 4px 18px rgba(0,0,0,.3) !important; }
-html.jd-dark #root button.rounded-\[20px\].p-4,
-html.jd-dark #root button.rounded-\[20px\].p-4 *{ color:#fff !important; }
-html.jd-dark #root button.rounded-\[20px\].p-4 .rounded-full{ background:rgba(255,255,255,.1) !important; color:#fff !important; border-color:rgba(255,255,255,.2) !important; }
+html.jd-dark #root button.rounded-\[20px\].p-4{ background:var(--card-bg,#16223a) !important; border-color:var(--border-c,#2a354d) !important; }
+html.jd-dark #root button.rounded-\[20px\].p-4, html.jd-dark #root button.rounded-\[20px\].p-4 *{ color:#fff !important; }
+html.jd-dark #root button.rounded-\[20px\].p-4 .rounded-full{ background:rgba(255,255,255,.08) !important; color:#D1D5DB !important; }
 @media (max-width:480px){
-  #root button.rounded-\[20px\].p-4{ padding:16px 10px 14px !important; border-radius:42px !important; }
-  #root button.rounded-\[20px\].p-4 > div:first-child > div:first-child{ width:46px !important; height:46px !important; min-width:46px !important; }
+  #root button.rounded-\[20px\].p-4{ padding:10px 8px 10px !important; border-radius:24px !important; }
+  #root button.rounded-\[20px\].p-4 > div:first-child > div:first-child{ width:50px !important; height:50px !important; min-width:50px !important; }
 }
 </style>
 <script id="jd-pro-dynamic">
@@ -180,8 +158,8 @@ html.jd-dark #root button.rounded-\[20px\].p-4 .rounded-full{ background:rgba(25
     else if(/إلكتروني|دفع/.test(t)){ base="#2563EB"; }
     else if(/إدارة|ادارة/.test(t)){ base="#475569"; }
     else { base="#1E3A8A"; }
-    if(a===0){ return { accent:"#D1D5DB", cardBg:"#FFFFFF", iconBg:"#F2F2F7" }; }
-    return { accent: base, cardBg: hexToRgba(base, 0.07 * intensity + 0.02), iconBg: hexToRgba(base, 0.16 * intensity + 0.06) };
+    if(a===0){ return { accent:"#D6D3D1", cardBg:"#FFFFFF", iconBg:"#F5F5F4", border:"#E7E5E4" }; }
+    return { accent: base, cardBg: hexToRgba(base, 0.05 * intensity + 0.01), iconBg: hexToRgba(base, 0.12 * intensity + 0.05), border: hexToRgba(base, 0.25 * intensity + 0.15) };
   }
   function apply(){
     var cards = document.querySelectorAll('#root button.rounded-\\[20px\\].p-4');
@@ -198,7 +176,7 @@ html.jd-dark #root button.rounded-\[20px\].p-4 .rounded-full{ background:rgba(25
       card.style.setProperty('--accent', c.accent);
       card.style.setProperty('--card-bg', c.cardBg);
       card.style.setProperty('--icon-bg', c.iconBg);
-      card.setAttribute('data-jd-amount', String(amount));
+      card.style.setProperty('--border-c', c.border);
     });
   }
   var mo = new MutationObserver(function(){ apply(); });
