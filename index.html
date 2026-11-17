@@ -58,61 +58,48 @@
 #root{font-variant-numeric:tabular-nums}
 </style>
 
-<!-- ===== PRO CARDS V11 FINAL - نفس V9 + موشن لطيف بطيء يكسر الروتين ===== -->
+<!-- ===== PRO CARDS V9 FINAL - تعديل خفيف فقط، بدون JS، بدون صراع مع ألوان البرنامج ===== -->
 <style id="jd-pro-cards-v9">
-#root button.rounded-\[20px\].p-4{ border-radius:28px !important; border-width:2px !important; padding:14px 14px 13px !important; overflow:hidden !important; box-shadow:0 2px 10px rgba(0,0,0,.04) !important; }
-#root button.rounded-\[20px\].p-4::before, #root button.rounded-\[20px\].p-4::after{ display:none !important; }
-#root button.rounded-\[20px\].p-4 > div:first-child > div:first-child{ border-radius:20px !important; width:64px !important; height:64px !important; min-width:64px !important; }
-#root button.rounded-\[20px\].p-4 > div:first-child > div:last-child{ color:#111 !important; font-weight:700 !important; }
-#root button.rounded-\[20px\].p-4 > div.font-bold{ color:#000 !important; font-size:15px !important; font-weight:800 !important; }
-#root button.rounded-\[20px\].p-4 > div.text-\[12px\]{ color:#000 !important; font-size:19px !important; font-weight:900 !important; margin-top:3px !important; letter-spacing:-.3px !important; }
-#root button.rounded-\[20px\].p-4 > div.mt-3{ margin-top:10px !important; padding-top:8px !important; border-top:1px solid rgba(0,0,0,.06) !important; }
-#root button.rounded-\[20px\].p-4 > div.mt-3 > div{ opacity:1 !important; color:#111 !important; font-size:11.5px !important; font-weight:600 !important; }
-#root button.rounded-\[20px\].p-4 > div.mt-3 > div span{ color:#111 !important; }
-html.jd-dark #root button.rounded-\[20px\].p-4 > div.font-bold, html.jd-dark #root button.rounded-\[20px\].p-4 > div.text-\[12px\], html.jd-dark #root button.rounded-\[20px\].p-4 > div.mt-3 > div, html.jd-dark #root button.rounded-\[20px\].p-4 > div.mt-3 > div span{ color:#fff !important; }
-@media (max-width:480px){ #root button.rounded-\[20px\].p-4{ border-radius:24px !important; padding:12px 12px 11px !important; } #root button.rounded-\[20px\].p-4 > div:first-child > div:first-child{ width:56px !important; height:56px !important; min-width:56px !important; } }
-</style>
-<style id="jd-pro-motion">
-/* ===== موشن لطيف بطيء - يكسر الروتين بدون ما يزعج ===== */
-@keyframes jdCardIn{ 0%{ opacity:0; transform:translateY(28px) scale(.94); } 60%{ opacity:1; transform:translateY(-4px) scale(1.01); } 100%{ opacity:1; transform:translateY(0) scale(1); } }
-@keyframes jdFloat{ 0%,100%{ transform:translateY(0) rotate(0deg); } 50%{ transform:translateY(-3px) rotate(1deg); } }
-@keyframes jdPageIn{ 0%{ opacity:0; transform:translateY(22px) scale(.98); filter:blur(3px); } 100%{ opacity:1; transform:translateY(0) scale(1); filter:blur(0); } }
-@keyframes jdAmountIn{ 0%{ opacity:0; transform:translateY(6px); } 100%{ opacity:1; transform:translateY(0); } }
-@keyframes jdPress{ 0%{ transform:scale(1); } 40%{ transform:scale(.94); } 100%{ transform:scale(1); } }
-/* 1- دخول البطاقات: بطيء وناعم مع قفزة صغيرة لطيفة - 0.9 ثانية */
+/* البطاقة: بيضوية هادئة - نحافظ على لون الحافة والخلفية الأصلي من البرنامج */
 #root button.rounded-\[20px\].p-4{
-  animation: jdCardIn .9s cubic-bezier(.22,1.4,.36,1) both !important;
-  will-change: transform, opacity !important;
-  transition: transform .45s cubic-bezier(.22,1,.36,1), box-shadow .45s ease !important;
+  border-radius:28px !important;
+  border-width:2px !important; /* نحافظ على لون الحافة الأصلي d.color */
+  padding:14px 14px 13px !important;
+  overflow:hidden !important;
+  box-shadow:0 2px 10px rgba(0,0,0,.04) !important;
 }
-#root button.rounded-\[20px\].p-4:nth-child(1){ animation-delay:.05s !important; }
-#root button.rounded-\[20px\].p-4:nth-child(2){ animation-delay:.16s !important; }
-#root button.rounded-\[20px\].p-4:nth-child(3){ animation-delay:.27s !important; }
-#root button.rounded-\[20px\].p-4:nth-child(4){ animation-delay:.38s !important; }
-#root button.rounded-\[20px\].p-4:nth-child(5){ animation-delay:.49s !important; }
-#root button.rounded-\[20px\].p-4:nth-child(6){ animation-delay:.60s !important; }
-#root button.rounded-\[20px\].p-4:nth-child(7){ animation-delay:.71s !important; }
-#root button.rounded-\[20px\].p-4:nth-child(8){ animation-delay:.82s !important; }
-/* 2- الأيقونة تطفو بهدوء - حركة مستمرة لطيفة تكسر الجمود */
+#root button.rounded-\[20px\].p-4::before, #root button.rounded-\[20px\].p-4::after{ display:none !important; }
+/* الأيقونة: بيضوية هادئة، بدون حافة إضافية تقصها */
 #root button.rounded-\[20px\].p-4 > div:first-child > div:first-child{
-  animation: jdFloat 3.2s ease-in-out infinite !important;
+  border-radius:20px !important;
+  width:64px !important; height:64px !important; min-width:64px !important;
 }
-/* 3- عند التمرير / اللمس: البطاقة تطفو للأعلى بهدوء */
-#root button.rounded-\[20px\].p-4:hover{
-  transform:translateY(-5px) scale(1.015) !important;
-  box-shadow:0 14px 28px rgba(0,0,0,.10) !important;
+/* الشارة: نص أسود */
+#root button.rounded-\[20px\].p-4 > div:first-child > div:last-child{
+  color:#111 !important; font-weight:700 !important;
 }
-/* 4- عند الضغط للدخول: انضغاطة ناعمة بطيئة ثم ارتداد */
-#root button.rounded-\[20px\].p-4:active{
-  animation: jdPress .55s cubic-bezier(.22,1.4,.36,1) !important;
-  box-shadow:0 4px 10px rgba(0,0,0,.06) !important;
+/* === الأسود الغامق: نلغي لون d.color فقط على النص، ونبقيه على الحافة === */
+#root button.rounded-\[20px\].p-4 > div.font-bold{
+  color:#000 !important; font-size:15px !important; font-weight:800 !important;
 }
-/* 5- صفحة القسم: تنزلق بهدوء مع فك بلور خفيف - 0.65 ثانية */
-#root main > div{ animation: jdPageIn .65s cubic-bezier(.22,1,.36,1) both !important; }
-/* 6- المبلغ يطلع من الأسفل بهدوء */
-#root button.rounded-\[20px\].p-4 > div.text-\[12px\]{ animation: jdAmountIn .7s ease both !important; animation-delay:.35s !important; }
-@media (prefers-reduced-motion: reduce){
-  #root button.rounded-\[20px\].p-4, #root button.rounded-\[20px\].p-4 > div:first-child > div:first-child, #root main > div{ animation:none !important; transition:none !important; }
+#root button.rounded-\[20px\].p-4 > div.text-\[12px\]{
+  color:#000 !important; font-size:19px !important; font-weight:900 !important; margin-top:3px !important; letter-spacing:-.3px !important;
+}
+/* التفاصيل: نلغي opacity-70 اللي يخليها رمادية - تصير أسود كامل */
+#root button.rounded-\[20px\].p-4 > div.mt-3{
+  margin-top:10px !important; padding-top:8px !important; border-top:1px solid rgba(0,0,0,.06) !important;
+}
+#root button.rounded-\[20px\].p-4 > div.mt-3 > div{
+  opacity:1 !important; color:#111 !important; font-size:11.5px !important; font-weight:600 !important;
+}
+#root button.rounded-\[20px\].p-4 > div.mt-3 > div span{ color:#111 !important; }
+html.jd-dark #root button.rounded-\[20px\].p-4 > div.font-bold,
+html.jd-dark #root button.rounded-\[20px\].p-4 > div.text-\[12px\],
+html.jd-dark #root button.rounded-\[20px\].p-4 > div.mt-3 > div,
+html.jd-dark #root button.rounded-\[20px\].p-4 > div.mt-3 > div span{ color:#fff !important; }
+@media (max-width:480px){
+  #root button.rounded-\[20px\].p-4{ border-radius:24px !important; padding:12px 12px 11px !important; }
+  #root button.rounded-\[20px\].p-4 > div:first-child > div:first-child{ width:56px !important; height:56px !important; min-width:56px !important; }
 }
 </style>
 
