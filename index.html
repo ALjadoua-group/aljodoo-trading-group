@@ -57,6 +57,125 @@
 #root .rounded-\[14px\].border:active{transform:scale(.995)}
 #root{font-variant-numeric:tabular-nums}
 </style>
+
+<!-- ===== PRO CARDS v2 - بطاقات احترافية - يلغي الشكل القديم بدون لمس المنطق ===== -->
+<style id="jd-pro-cards-v2">
+/* --- 1. البطاقة الأساسية --- */
+#root button.rounded-\[20px\].p-4{
+  position:relative !important;
+  border-radius:16px !important;
+  background:#ffffff !important;
+  border:1px solid #e5e7eb !important;
+  padding:0 !important;
+  overflow:hidden !important;
+  box-shadow:0 1px 2px rgba(0,0,0,.05), 0 4px 12px rgba(0,0,0,.05) !important;
+  transition:transform .25s cubic-bezier(.16,1,.3,1), box-shadow .25s ease, border-color .25s ease !important;
+  text-align:right !important;
+}
+/* شريط اللون العلوي 3px */
+#root button.rounded-\[20px\].p-4::before{
+  content:"" !important;
+  position:absolute !important; top:0; left:0; right:0;
+  height:3px !important;
+  background:var(--accent,#1e3a8a) !important;
+  display:block !important;
+  z-index:2;
+}
+#root button.rounded-\[20px\].p-4:hover{
+  transform:translateY(-3px) !important;
+  box-shadow:0 8px 24px rgba(0,0,0,.08), 0 2px 8px rgba(0,0,0,.06) !important;
+  border-color:#d1d5db !important;
+}
+#root button.rounded-\[20px\].p-4:active{ transform:scale(.98) !important; }
+
+/* ألوان الأقسام - دورة ألوان احترافية */
+#root button.rounded-\[20px\].p-4:nth-child(6n+1){ --accent:#1e3a8a; }
+#root button.rounded-\[20px\].p-4:nth-child(6n+2){ --accent:#059669; }
+#root button.rounded-\[20px\].p-4:nth-child(6n+3){ --accent:#d97706; }
+#root button.rounded-\[20px\].p-4:nth-child(6n+4){ --accent:#7c3aed; }
+#root button.rounded-\[20px\].p-4:nth-child(6n+5){ --accent:#db2777; }
+#root button.rounded-\[20px\].p-4:nth-child(6n+6){ --accent:#0891b2; }
+
+/* --- 2. إعادة توزيع المحتوى الداخلي بدون تغيير HTML --- */
+/* الحاوية الداخلية تصبح عمودية مع padding احترافي */
+#root button.rounded-\[20px\].p-4 > div{
+  padding:16px 16px 14px !important;
+  gap:10px !important;
+}
+/* صف الأيقونة + العنوان */
+#root button.rounded-\[20px\].p-4 > div:first-child{
+  display:flex !important;
+  align-items:center !important;
+  gap:12px !important;
+}
+/* الأيقونة تصبح دائرة 44px مع خلفية ناعمة بلون القسم */
+#root button.rounded-\[20px\].p-4 > div:first-child > div:first-child{
+  width:44px !important; height:44px !important; min-width:44px !important;
+  border-radius:12px !important;
+  background:color-mix(in srgb, var(--accent,#1e3a8a) 12%, #fff) !important;
+  border:1px solid color-mix(in srgb, var(--accent,#1e3a8a) 18%, transparent) !important;
+  display:flex !important; align-items:center !important; justify-content:center !important;
+  font-size:20px !important;
+  box-shadow:none !important;
+}
+/* العنوان */
+#root button.rounded-\[20px\].p-4 > div:first-child > div:nth-child(2) > div:first-child{
+  font-size:15px !important; font-weight:800 !important; letter-spacing:-.2px !important; color:#111827 !important; line-height:1.3 !important;
+}
+/* المبلغ / الرقم الكبير */
+#root button.rounded-\[20px\].p-4 .text-2xl,
+#root button.rounded-\[20px\].p-4 [class*="text-\[20px\]"]{
+  font-variant-numeric:tabular-nums !important; letter-spacing:-.3px !important; font-weight:800 !important;
+}
+/* الشارة السفلية N أقسام / N عملية - شكل pill احترافي */
+#root button.rounded-\[20px\].p-4 .rounded-full{
+  border-radius:999px !important;
+  padding:4px 10px !important;
+  font-size:11px !important; font-weight:700 !important;
+  background:#f3f4f6 !important; color:#374151 !important; border:1px solid #e5e7eb !important;
+  box-shadow:none !important;
+}
+
+/* --- 3. بطاقات الداخل (العمليات / التفاصيل) rounded-[14px] و rounded-[16px] --- */
+#root .rounded-\[14px\].p-3.flex,
+#root div.rounded-\[16px\].border.p-4{
+  border-radius:14px !important;
+  border:1px solid #e5e7eb !important;
+  background:#fff !important;
+  box-shadow:0 1px 2px rgba(0,0,0,.04) !important;
+  transition:box-shadow .2s ease, transform .2s ease !important;
+}
+#root .rounded-\[14px\].p-3.flex:hover{ box-shadow:0 4px 12px rgba(0,0,0,.06) !important; }
+
+/* --- 4. الوضع الداكن: نفس الروح لكن ألوان داكنة --- */
+html.jd-dark #root button.rounded-\[20px\].p-4{
+  background:#16223a !important;
+  border-color:rgba(227,196,88,.28) !important;
+  box-shadow:0 1px 2px rgba(0,0,0,.3), 0 4px 14px rgba(0,0,0,.25) !important;
+}
+html.jd-dark #root button.rounded-\[20px\].p-4:hover{
+  box-shadow:0 10px 28px rgba(0,0,0,.35) !important;
+  border-color:rgba(227,196,88,.45) !important;
+}
+html.jd-dark #root button.rounded-\[20px\].p-4 > div:first-child > div:first-child{
+  background:rgba(227,196,88,.14) !important; border-color:rgba(227,196,88,.35) !important;
+}
+html.jd-dark #root button.rounded-\[20px\].p-4 > div:first-child > div:nth-child(2) > div:first-child{ color:#eaf0fa !important; }
+html.jd-dark #root button.rounded-\[20px\].p-4 .rounded-full{
+  background:rgba(255,255,255,.08) !important; color:#eaf0fa !important; border-color:rgba(255,255,255,.12) !important;
+}
+html.jd-dark #root .rounded-\[14px\].p-3.flex,
+html.jd-dark #root div.rounded-\[16px\].border.p-4{
+  background:#16223a !important; border-color:rgba(227,196,88,.25) !important;
+}
+
+/* --- 5. موبايل: padding أصغر قليلا --- */
+@media (max-width:480px){
+  #root button.rounded-\[20px\].p-4 > div{ padding:14px 14px 12px !important; }
+  #root button.rounded-\[20px\].p-4 > div:first-child > div:first-child{ width:40px !important; height:40px !important; min-width:40px !important; font-size:18px !important; }
+}
+</style>
+
 </head>
 <body>
   <div id="root"></div>
