@@ -58,29 +58,34 @@
 #root{font-variant-numeric:tabular-nums}
 </style>
 
-<!-- ===== PRO CARDS V4 - ستايل iOS مثل الصورة المرجعية - تغيير شكل فقط، الترتيب ثابت ===== -->
-<style id="jd-pro-cards-v4">
+<!-- ===== PRO CARDS V5 - احترافي هادئ: لون واحد للعناوين، المبلغ هو البطل ===== -->
+<style id="jd-pro-cards-v5">
+/* الخلفية: رمادي هادئ نظيف */
 #root{ background:#F2F2F7 !important; }
+
+/* === البطاقة: أقصر، أنظف، بدون ألوان صارخة === */
 #root button.rounded-\[20px\].p-4{
   position:relative !important;
   border-radius:20px !important;
   background:#ffffff !important;
   border:none !important;
-  padding:18px 12px 16px !important;
+  padding:16px 12px 14px !important;
   overflow:hidden !important;
-  box-shadow:0 4px 20px rgba(0,0,0,.06), 0 1px 3px rgba(0,0,0,.04) !important;
-  transition:transform .25s ease, box-shadow .25s ease !important;
+  box-shadow:0 4px 16px rgba(0,0,0,.05), 0 1px 2px rgba(0,0,0,.03) !important;
+  transition:transform .2s ease, box-shadow .2s ease !important;
   text-align:center !important;
   display:flex !important; flex-direction:column !important; align-items:center !important;
+  min-height:0 !important;
 }
 #root button.rounded-\[20px\].p-4::before{ display:none !important; }
 #root button.rounded-\[20px\].p-4:hover{
-  transform:translateY(-4px) !important;
-  box-shadow:0 10px 28px rgba(0,0,0,.09), 0 2px 6px rgba(0,0,0,.05) !important;
+  transform:translateY(-3px) !important;
+  box-shadow:0 8px 22px rgba(0,0,0,.07) !important;
 }
-#root button.rounded-\[20px\].p-4:active{ transform:scale(.97) !important; }
+#root button.rounded-\[20px\].p-4:active{ transform:scale(.98) !important; }
 #root button.rounded-\[20px\].p-4:nth-child(odd),
 #root button.rounded-\[20px\].p-4:nth-child(even){ background:#fff !important; }
+
 #root button.rounded-\[20px\].p-4 > div{
   display:flex !important; flex-direction:column !important; align-items:center !important;
   gap:0 !important; padding:0 !important; width:100% !important;
@@ -88,51 +93,97 @@
 #root button.rounded-\[20px\].p-4 > div:first-child{
   display:flex !important; flex-direction:column !important; align-items:center !important; gap:0 !important;
 }
+
+/* الأيقونة: باستيل فقط، بدون ألوان صارخة - 48px */
 #root button.rounded-\[20px\].p-4 > div:first-child > div:first-child{
-  width:52px !important; height:52px !important; min-width:52px !important;
-  border-radius:16px !important;
+  width:48px !important; height:48px !important; min-width:48px !important;
+  border-radius:14px !important;
   display:flex !important; align-items:center !important; justify-content:center !important;
-  font-size:24px !important; margin-bottom:12px !important;
-  box-shadow:none !important; border:none !important;
+  font-size:22px !important; margin-bottom:10px !important;
+  box-shadow:none !important; border:none !important; overflow:hidden !important;
 }
-#root button.rounded-\[20px\].p-4:nth-child(6n+1) > div:first-child > div:first-child{ background:#FFF0E6 !important; }
-#root button.rounded-\[20px\].p-4:nth-child(6n+2) > div:first-child > div:first-child{ background:#F3E8FF !important; }
-#root button.rounded-\[20px\].p-4:nth-child(6n+3) > div:first-child > div:first-child{ background:#E0F2FE !important; }
+/* ألوان باستيل هادئة جدا */
+#root button.rounded-\[20px\].p-4:nth-child(6n+1) > div:first-child > div:first-child{ background:#FEF3C7 !important; }
+#root button.rounded-\[20px\].p-4:nth-child(6n+2) > div:first-child > div:first-child{ background:#E0F2FE !important; }
+#root button.rounded-\[20px\].p-4:nth-child(6n+3) > div:first-child > div:first-child{ background:#FCE7F3 !important; }
 #root button.rounded-\[20px\].p-4:nth-child(6n+4) > div:first-child > div:first-child{ background:#DCFCE7 !important; }
-#root button.rounded-\[20px\].p-4:nth-child(6n+5) > div:first-child > div:first-child{ background:#FCE7F3 !important; }
-#root button.rounded-\[20px\].p-4:nth-child(6n+6) > div:first-child > div:first-child{ background:#FEF3C7 !important; }
-#root button.rounded-\[20px\].p-4 > div:first-child > div:nth-child(2){
-  display:flex !important; flex-direction:column !important; align-items:center !important; gap:4px !important;
+#root button.rounded-\[20px\].p-4:nth-child(6n+5) > div:first-child > div:first-child{ background:#F3E8FF !important; }
+#root button.rounded-\[20px\].p-4:nth-child(6n+6) > div:first-child > div:first-child{ background:#FFF0E6 !important; }
+/* توحيد صور الأيقونات: قصها داخل المربع حتى لا تبرز */
+#root button.rounded-\[20px\].p-4 > div:first-child > div:first-child img{
+  width:32px !important; height:32px !important; object-fit:contain !important; border-radius:0 !important;
 }
-#root button.rounded-\[20px\].p-4 > div:first-child > div:nth-child(2) > div:first-child{
-  font-size:18px !important; font-weight:800 !important; color:#000 !important; line-height:1.2 !important; letter-spacing:-.3px !important;
-}
-#root button.rounded-\[20px\].p-4 > div:first-child > div:nth-child(2) > div:nth-child(2){
-  font-size:12px !important; color:#8A8A8E !important; font-weight:500 !important;
-}
-#root button.rounded-\[20px\].p-4 .text-2xl,
-#root button.rounded-\[20px\].p-4 [class*="text-\[20px\]"]{
-  font-size:22px !important; font-weight:800 !important; color:#000 !important; letter-spacing:-.4px !important;
-}
+
+/* الشارة: رمادي محايد واحد لكل البطاقات */
 #root button.rounded-\[20px\].p-4 .rounded-full{
   background:#F2F2F7 !important; color:#6B7280 !important; border:none !important;
-  font-size:11px !important; font-weight:600 !important; padding:5px 10px !important; border-radius:999px !important; margin-top:10px !important;
+  font-size:11px !important; font-weight:600 !important; padding:4px 10px !important; border-radius:999px !important;
+  margin:0 0 8px !important; order:-1 !important;
 }
+
+/* === الإصلاح الأهم: توحيد الألوان === */
+/* العنوان: لون واحد غامق لكل البطاقات - إلغاء البنفسجي / الأحمر / الأخضر */
+#root button.rounded-\[20px\].p-4 > div:first-child > div:nth-child(2){
+  display:flex !important; flex-direction:column !important; align-items:center !important; gap:2px !important;
+}
+#root button.rounded-\[20px\].p-4 > div:first-child > div:nth-child(2) > div:first-child,
+#root button.rounded-\[20px\].p-4 > div:first-child > div:nth-child(2) > div{
+  color:#111827 !important;
+}
+#root button.rounded-\[20px\].p-4 > div:first-child > div:nth-child(2) > div:first-child{
+  font-size:15px !important; font-weight:700 !important; line-height:1.3 !important; letter-spacing:-.2px !important;
+}
+/* المبلغ هو البطل: أكبر، أسود، tabular */
+#root button.rounded-\[20px\].p-4 .text-2xl,
+#root button.rounded-\[20px\].p-4 [class*="text-\[20px\]"],
+#root button.rounded-\[20px\].p-4 > div:first-child > div:nth-child(2) > div:nth-child(2){
+  font-size:22px !important; font-weight:800 !important; color:#0F172A !important;
+  letter-spacing:-.4px !important; font-variant-numeric:tabular-nums !important; line-height:1.2 !important;
+}
+/* إلغاء أي لون ملون قديم داخل البطاقة (أحمر / أخضر / بنفسجي) */
+#root button.rounded-\[20px\].p-4 .text-red-500,
+#root button.rounded-\[20px\].p-4 .text-red-600,
+#root button.rounded-\[20px\].p-4 .text-emerald-600,
+#root button.rounded-\[20px\].p-4 .text-emerald-700,
+#root button.rounded-\[20px\].p-4 .text-purple-600,
+#root button.rounded-\[20px\].p-4 .text-blue-600,
+#root button.rounded-\[20px\].p-4 .text-teal-600{
+  color:#111827 !important;
+}
+
+/* === التفاصيل الصغيرة: سطر واحد مفصول بخط، بدل 3 أسطر متراكمة === */
+#root button.rounded-\[20px\].p-4 > div > div:last-child,
+#root button.rounded-\[20px\].p-4 > div:nth-child(2),
+#root button.rounded-\[20px\].p-4 > div:nth-child(3){
+  display:flex !important; flex-direction:row !important; flex-wrap:wrap !important;
+  justify-content:center !important; gap:6px 10px !important;
+  margin-top:8px !important; padding-top:8px !important;
+  border-top:1px solid #F1F5F9 !important; width:100% !important;
+  font-size:11.5px !important; color:#6B7280 !important; line-height:1.4 !important;
+}
+#root button.rounded-\[20px\].p-4 > div > div:last-child > div,
+#root button.rounded-\[20px\].p-4 > div:nth-child(2) > div,
+#root button.rounded-\[20px\].p-4 > div:nth-child(3) > div{
+  font-size:11.5px !important; color:#6B7280 !important; font-weight:500 !important;
+}
+
+/* بطاقات الداخل نفس الروح */
 #root .rounded-\[14px\].p-3.flex,
 #root div.rounded-\[16px\].border.p-4{
-  border-radius:18px !important; border:none !important; background:#fff !important;
-  box-shadow:0 4px 16px rgba(0,0,0,.05) !important;
+  border-radius:16px !important; border:none !important; background:#fff !important;
+  box-shadow:0 3px 12px rgba(0,0,0,.04) !important;
 }
+/* الوضع الداكن */
 html.jd-dark #root{ background:#0e1626 !important; }
-html.jd-dark #root button.rounded-\[20px\].p-4{
-  background:#16223a !important; box-shadow:0 4px 20px rgba(0,0,0,.35) !important;
-}
+html.jd-dark #root button.rounded-\[20px\].p-4{ background:#16223a !important; box-shadow:0 4px 18px rgba(0,0,0,.3) !important; }
 html.jd-dark #root button.rounded-\[20px\].p-4 > div:first-child > div:nth-child(2) > div:first-child{ color:#fff !important; }
-html.jd-dark #root button.rounded-\[20px\].p-4 > div:first-child > div:nth-child(2) > div:nth-child(2){ color:#a9b6cf !important; }
+html.jd-dark #root button.rounded-\[20px\].p-4 .text-2xl,
+html.jd-dark #root button.rounded-\[20px\].p-4 [class*="text-\[20px\]"]{ color:#fff !important; }
 html.jd-dark #root button.rounded-\[20px\].p-4 .rounded-full{ background:rgba(255,255,255,.08) !important; color:#c9d3e6 !important; }
+html.jd-dark #root button.rounded-\[20px\].p-4 > div > div:last-child{ border-top-color:rgba(255,255,255,.08) !important; }
 @media (max-width:480px){
-  #root button.rounded-\[20px\].p-4{ padding:16px 10px 14px !important; }
-  #root button.rounded-\[20px\].p-4 > div:first-child > div:first-child{ width:48px !important; height:48px !important; min-width:48px !important; font-size:22px !important; }
+  #root button.rounded-\[20px\].p-4{ padding:14px 10px 12px !important; }
+  #root button.rounded-\[20px\].p-4 > div:first-child > div:first-child{ width:44px !important; height:44px !important; min-width:44px !important; }
 }
 </style>
 
