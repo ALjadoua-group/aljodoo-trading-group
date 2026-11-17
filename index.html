@@ -58,40 +58,20 @@
 #root{font-variant-numeric:tabular-nums}
 </style>
 
-<!-- ===== PRO CARDS V9 FINAL - تعديل خفيف فقط، بدون JS، بدون صراع مع ألوان البرنامج ===== -->
+<!-- ===== PRO CARDS V10 FINAL - نفس V9 بالضبط + موشن عند الدخول ===== -->
 <style id="jd-pro-cards-v9">
-/* البطاقة: بيضوية هادئة - نحافظ على لون الحافة والخلفية الأصلي من البرنامج */
 #root button.rounded-\[20px\].p-4{
-  border-radius:28px !important;
-  border-width:2px !important; /* نحافظ على لون الحافة الأصلي d.color */
-  padding:14px 14px 13px !important;
-  overflow:hidden !important;
+  border-radius:28px !important; border-width:2px !important;
+  padding:14px 14px 13px !important; overflow:hidden !important;
   box-shadow:0 2px 10px rgba(0,0,0,.04) !important;
 }
 #root button.rounded-\[20px\].p-4::before, #root button.rounded-\[20px\].p-4::after{ display:none !important; }
-/* الأيقونة: بيضوية هادئة، بدون حافة إضافية تقصها */
-#root button.rounded-\[20px\].p-4 > div:first-child > div:first-child{
-  border-radius:20px !important;
-  width:64px !important; height:64px !important; min-width:64px !important;
-}
-/* الشارة: نص أسود */
-#root button.rounded-\[20px\].p-4 > div:first-child > div:last-child{
-  color:#111 !important; font-weight:700 !important;
-}
-/* === الأسود الغامق: نلغي لون d.color فقط على النص، ونبقيه على الحافة === */
-#root button.rounded-\[20px\].p-4 > div.font-bold{
-  color:#000 !important; font-size:15px !important; font-weight:800 !important;
-}
-#root button.rounded-\[20px\].p-4 > div.text-\[12px\]{
-  color:#000 !important; font-size:19px !important; font-weight:900 !important; margin-top:3px !important; letter-spacing:-.3px !important;
-}
-/* التفاصيل: نلغي opacity-70 اللي يخليها رمادية - تصير أسود كامل */
-#root button.rounded-\[20px\].p-4 > div.mt-3{
-  margin-top:10px !important; padding-top:8px !important; border-top:1px solid rgba(0,0,0,.06) !important;
-}
-#root button.rounded-\[20px\].p-4 > div.mt-3 > div{
-  opacity:1 !important; color:#111 !important; font-size:11.5px !important; font-weight:600 !important;
-}
+#root button.rounded-\[20px\].p-4 > div:first-child > div:first-child{ border-radius:20px !important; width:64px !important; height:64px !important; min-width:64px !important; }
+#root button.rounded-\[20px\].p-4 > div:first-child > div:last-child{ color:#111 !important; font-weight:700 !important; }
+#root button.rounded-\[20px\].p-4 > div.font-bold{ color:#000 !important; font-size:15px !important; font-weight:800 !important; }
+#root button.rounded-\[20px\].p-4 > div.text-\[12px\]{ color:#000 !important; font-size:19px !important; font-weight:900 !important; margin-top:3px !important; letter-spacing:-.3px !important; }
+#root button.rounded-\[20px\].p-4 > div.mt-3{ margin-top:10px !important; padding-top:8px !important; border-top:1px solid rgba(0,0,0,.06) !important; }
+#root button.rounded-\[20px\].p-4 > div.mt-3 > div{ opacity:1 !important; color:#111 !important; font-size:11.5px !important; font-weight:600 !important; }
 #root button.rounded-\[20px\].p-4 > div.mt-3 > div span{ color:#111 !important; }
 html.jd-dark #root button.rounded-\[20px\].p-4 > div.font-bold,
 html.jd-dark #root button.rounded-\[20px\].p-4 > div.text-\[12px\],
@@ -102,6 +82,51 @@ html.jd-dark #root button.rounded-\[20px\].p-4 > div.mt-3 > div span{ color:#fff
   #root button.rounded-\[20px\].p-4 > div:first-child > div:first-child{ width:56px !important; height:56px !important; min-width:56px !important; }
 }
 </style>
+<style id="jd-pro-motion">
+/* ===== موشن فقط - لا يغير الشكل ولا المنطق ===== */
+@keyframes jdCardIn{ from{ opacity:0; transform:translateY(14px) scale(.97); } to{ opacity:1; transform:translateY(0) scale(1); } }
+@keyframes jdPageIn{ from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:translateY(0); } }
+@keyframes jdIconPop{ 0%{ transform:scale(.85); } 60%{ transform:scale(1.08); } 100%{ transform:scale(1); } }
+@keyframes jdAmountPop{ 0%{ transform:scale(.92); opacity:.4; } 100%{ transform:scale(1); opacity:1; } }
+/* 1- البطاقات تطلع بالتتابع عند فتح الرئيسية */
+#root button.rounded-\[20px\].p-4{
+  animation: jdCardIn .45s cubic-bezier(.22,1,.36,1) both !important;
+  will-change: transform, opacity !important;
+  transition: transform .18s ease, box-shadow .18s ease !important;
+}
+#root button.rounded-\[20px\].p-4:nth-child(1){ animation-delay:.02s !important; }
+#root button.rounded-\[20px\].p-4:nth-child(2){ animation-delay:.07s !important; }
+#root button.rounded-\[20px\].p-4:nth-child(3){ animation-delay:.12s !important; }
+#root button.rounded-\[20px\].p-4:nth-child(4){ animation-delay:.17s !important; }
+#root button.rounded-\[20px\].p-4:nth-child(5){ animation-delay:.22s !important; }
+#root button.rounded-\[20px\].p-4:nth-child(6){ animation-delay:.27s !important; }
+#root button.rounded-\[20px\].p-4:nth-child(7){ animation-delay:.32s !important; }
+#root button.rounded-\[20px\].p-4:nth-child(8){ animation-delay:.37s !important; }
+/* 2- عند الضغط على بطاقة: تنضغط وتكبر الأيقونة - تحس أنك دخلت */
+#root button.rounded-\[20px\].p-4:active{
+  transform:scale(.96) !important; box-shadow:0 2px 6px rgba(0,0,0,.06) !important;
+}
+#root button.rounded-\[20px\].p-4:active > div:first-child > div:first-child{ animation: jdIconPop .3s ease !important; }
+/* 3- عند الدخول لصفحة القسم: الصفحة تنزلق من الأسفل بهدوء */
+#root main > div{ animation: jdPageIn .35s ease both !important; }
+/* 4- المبلغ يطلع بحركة خفيفة عند تغيره */
+#root button.rounded-\[20px\].p-4 > div.text-\[12px\]{ animation: jdAmountPop .3s ease !important; }
+/* احترام من لديه تقليل الحركة */
+@media (prefers-reduced-motion: reduce){
+  #root button.rounded-\[20px\].p-4, #root main > div{ animation:none !important; transition:none !important; }
+}
+</style>
+<script id="jd-pro-motion">
+(function(){
+  // حركة عند الدخول للقسم: نضيف كلاس لحظي للبطاقة المضغوطة حتى تبقى الحركة واضحة
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest && e.target.closest('#root button.rounded-\\[20px\\].p-4');
+    if(!btn) return;
+    btn.style.transform = 'scale(.96)';
+    setTimeout(function(){ btn.style.transform = ''; }, 180);
+  }, true);
+})();
+</script>
 
 </head>
 <body>
