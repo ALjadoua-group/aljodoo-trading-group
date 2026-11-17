@@ -3057,5 +3057,97 @@ html.jd-dark .jdov{--ib:#0a2250;--it:#ffffff;--ibd:#1e3f7a;--ip:#2563eb;--im:#b4
   window.__jdIns={alerts:alerts,peak:peak,open:open,items:items,remTick:remTick,showRem:showRem,remNotify:remNotify,remCfg:remCfg};
 })();
 </script>
+<!-- ===== jd-repsec: قسم التقارير (بطاقة في الرئيسية) يجمع التقارير + مركز المتابعة + التقارير المضمونة بدل أزرار الشريط العلوي ===== -->
+<style id="jd-repsec-css">
+/* إخفاء زرّي الشريط العلوي (يبقيان في الصفحة ليستدعيهما القسم الجديد) */
+html #reportHeaderBtn,html #jdInsBtn{display:none!important}
+#jdRepSec{z-index:99990}
+#jdRepSec .jrs-it{display:flex;align-items:center;gap:12px;width:100%;text-align:right;padding:13px 14px;margin-bottom:10px;border:1px solid var(--ibd);border-radius:16px;background:var(--is);color:inherit;cursor:pointer;text-decoration:none;font-family:inherit;position:relative}
+#jdRepSec .jrs-it:active{transform:scale(.99)}
+#jdRepSec .jrs-ic{width:46px;height:46px;flex:none;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:23px;background:var(--ib);border:1px solid var(--ibd)}
+#jdRepSec .jrs-tx{flex:1;min-width:0}
+#jdRepSec .jrs-tx b{display:block;font-size:14px;font-weight:800}
+#jdRepSec .jrs-tx small{display:block;font-size:11.5px;color:var(--im);margin-top:2px;line-height:1.55}
+#jdRepSec .jrs-bd{background:#dc2626;color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;font-weight:700;margin-right:6px;vertical-align:middle}
+#jdRepSec .jrs-ar{opacity:.45;font-size:20px;flex:none}
+#jdRepSec .jrs-gh{font-weight:700;font-size:12px;color:var(--im);margin:14px 2px 8px}
+</style>
+<script id="jd-repsec-js">
+(function(){
+  var SEC="jdRepSec",CARD="jdRepCard";
+  var svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="#fff"/><rect x="11" y="34" width="10" height="18" rx="2" fill="#4f46e5"/><rect x="27" y="22" width="10" height="30" rx="2" fill="#6366f1"/><rect x="43" y="11" width="10" height="41" rx="2" fill="#818cf8"/><path d="M9 56h46" stroke="#1e1b4b" stroke-width="3" stroke-linecap="round"/></svg>';
+  var ICON="data:image/svg+xml;utf8,"+encodeURIComponent(svg);
+  function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+  function nAlerts(){try{return window.__jdIns&&window.__jdIns.alerts?window.__jdIns.alerts().length:0}catch(e){return 0}}
+  function isOpen(){var o=document.getElementById(SEC);return !!(o&&o.classList.contains("open"))}
+  function close(){var o=document.getElementById(SEC);if(o)o.classList.remove("open")}
+  function clickId(id){var b=document.getElementById(id);if(b){b.click();return true}return false}
+  function openReports(tab){
+    if(!clickId("reportHeaderBtn"))return;
+    var n=0,t=setInterval(function(){
+      var b=document.querySelector('#jd-tabs button[data-tab="'+tab+'"]');
+      if(b){b.click();clearInterval(t)}else if(++n>25)clearInterval(t)},80)}
+  function body(){
+    var n=nAlerts();
+    var h='<div class="jrs-gh">التقارير</div>';
+    h+='<button type="button" class="jrs-it" data-a="sum"><span class="jrs-ic">📊</span><span class="jrs-tx"><b>ملخص التقارير</b><small>يومي / شهري / سنوي مع الطباعة وحفظ PDF</small></span><span class="jrs-ar">‹</span></button>';
+    h+='<button type="button" class="jrs-it" data-a="secs"><span class="jrs-ic">📑</span><span class="jrs-tx"><b>تقارير الأقسام</b><small>تقرير مستقل لكل قسم وقسم فرعي</small></span><span class="jrs-ar">‹</span></button>';
+    h+='<div class="jrs-gh">المتابعة</div>';
+    h+='<button type="button" class="jrs-it" data-a="ins"><span class="jrs-ic">🧭</span><span class="jrs-tx"><b>مركز المتابعة'+(n?'<span class="jrs-bd">'+n+'</span>':'')+'</b><small>التنبيهات • الذروة • الفرق • التذكير</small></span><span class="jrs-ar">‹</span></button>';
+    h+='<div class="jrs-gh">مضمونة</div>';
+    h+='<a class="jrs-it" href="./reports.html"><span class="jrs-ic">✅</span><span class="jrs-tx"><b>التقارير المضمونة</b><small>الصفحة المنفصلة (reports.html)</small></span><span class="jrs-ar">‹</span></a>';
+    return h}
+  function build(){
+    if(document.getElementById(SEC))return;
+    var ov=document.createElement("div");ov.id=SEC;ov.className="jdov";
+    ov.innerHTML='<div class="jb"><div class="jt"><span>📊 قسم التقارير</span><button type="button" data-x="1" aria-label="إغلاق">✕</button></div><div class="jbody"></div></div>';
+    ov.addEventListener("click",function(e){
+      var t=e.target;if(t===ov){close();return}
+      var b=t.closest&&t.closest("button,a");if(!b)return;
+      if(b.getAttribute("data-x")){close();return}
+      var a=b.getAttribute("data-a");if(!a)return;
+      close();
+      if(a==="sum")openReports("summary");
+      else if(a==="secs")openReports("sections");
+      else if(a==="ins"&&window.__jdIns&&window.__jdIns.open)window.__jdIns.open()});
+    document.body.appendChild(ov)}
+  function open(){
+    build();var ov=document.getElementById(SEC);
+    ov.querySelector(".jbody").innerHTML=body();ov.classList.add("open")}
+  document.addEventListener("keydown",function(e){
+    if(e.key!=="Escape"||!isOpen())return;
+    var m=document.getElementById("reportModal"),i=document.getElementById("jdInsOv");
+    if((m&&m.classList.contains("open"))||(i&&i.classList.contains("open")))return;
+    close()});
+  function inject(){
+    var r=document.getElementById("root");if(!r)return;
+    var src=Array.prototype.filter.call(r.querySelectorAll("button"),function(b){return b.children.length===4&&b.children[0].querySelector("img")&&/^الصادرات/.test(b.children[1].textContent)})[0];
+    var par=src?src.parentNode:null;if(!par)return;
+    var c=par.querySelector("#"+CARD);
+    if(!c){
+      c=src.cloneNode(true);c.id=CARD;c.addEventListener("click",open);
+      var rc=par.querySelector("#jdRateCard");
+      if(rc)par.insertBefore(c,rc);else par.appendChild(c)}
+    var dk=document.documentElement.classList.contains("jd-dark"),col=dk?"#FFD800":"#4f46e5",n=nAlerts();
+    var sig=dk+"|"+n+"|"+(c.matches(":nth-child(even)"));
+    if(c.getAttribute("data-h")===sig)return;c.setAttribute("data-h",sig);
+    c.style.borderColor=col;c.style.background=dk?"":"#eef2ff";
+    window.__jdIcon&&window.__jdIcon(c.children[0].children[0],ICON,c);
+    c.children[0].children[1].textContent="4 أقسام";
+    c.children[1].textContent="التقارير";c.children[1].style.color=col;
+    c.children[2].textContent=n?(n+" تنبيه"):"لا تنبيهات";c.children[2].style.color=col;
+    c.children[3].innerHTML=
+      '<div class="flex justify-between text-[10px] opacity-70"><span>ملخص التقارير</span><span>📊</span></div>'+
+      '<div class="flex justify-between text-[10px] opacity-70"><span>تقارير الأقسام</span><span>📑</span></div>'+
+      '<div class="flex justify-between text-[10px] opacity-70"><span>مركز المتابعة</span><span>🧭</span></div>'+
+      '<div class="flex justify-between text-[10px] opacity-70"><span>التقارير المضمونة</span><span>✅</span></div>'}
+  var q=0;function tk(){clearTimeout(q);q=setTimeout(inject,200)}
+  function mount(){
+    new MutationObserver(tk).observe(document.body,{childList:true,subtree:true});
+    new MutationObserver(tk).observe(document.documentElement,{attributes:true,attributeFilter:["class"]});
+    setInterval(inject,4000);inject()}
+  document.body?mount():document.addEventListener("DOMContentLoaded",mount);
+})();
+</script>
 </body>
 </html>
