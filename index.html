@@ -3454,7 +3454,11 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
 
 <!-- ===== JD-VOICE-ENTRY: إدخال عمليات بالصوت - تقول "صادرات 500 ألف" ===== -->
 <style>
-#jdVoiceBar{position:fixed;bottom:84px;left:12px;right:12px;z-index:999999;display:flex;gap:8px;align-items:center;background:#111827;color:#fff;border-radius:18px;padding:10px 12px;box-shadow:0 10px 30px rgba(0,0,0,.35);direction:rtl;font-family:inherit}
+#jdVoiceBar{position:fixed;bottom:16px;left:12px;z-index:999999;display:flex;gap:8px;align-items:center;direction:rtl;font-family:inherit}
+#jdVoicePanel{display:none;align-items:center;gap:8px;background:#111827;color:#fff;border-radius:18px;padding:10px 12px;box-shadow:0 10px 30px rgba(0,0,0,.35);max-width:calc(100vw - 140px)}
+#jdVoiceBar.open #jdVoicePanel{display:flex}
+#jdVoiceClose{position:absolute;top:-8px;left:-4px;width:22px;height:22px;border-radius:50%;background:#fff;color:#111;font-size:11px;border:0;box-shadow:0 2px 8px rgba(0,0,0,.3);cursor:pointer;display:none}
+#jdVoiceBar.open #jdVoiceClose{display:block}
 #jdVoiceBar button{border:0;cursor:pointer}
 #jdVoiceMic{width:52px;height:52px;border-radius:50%;background:#f59e0b;font-size:24px;flex:none}
 #jdVoiceMic.rec{background:#dc2626;animation:pulse 1s infinite}
@@ -3463,10 +3467,15 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
 #jdVoiceConfirm{display:none;background:#16a34a;color:#fff;border-radius:12px;padding:10px 14px;font-weight:800;font-size:13px}
 </style>
 <div id="jdVoiceBar">
-  <button id="jdVoiceMic" type="button" title="اضغط وتكلم">🎤</button>
-  <div id="jdVoiceTxt">اضغط 🎤 وقول: <b>صادرات 500 ألف</b> أو <b>هواتف 200 ألف</b> أو <b>منفذ الرواتب 432 ألف</b></div>
-  <button id="jdVoiceConfirm" type="button">✅ تأكيد وإدخال</button>
-  <button id="jdSettleBtn" type="button" style="background:#061a3b;color:#FFD800;border-radius:12px;padding:10px 12px;font-weight:800;font-size:12px;flex:none">🔍 فحص التسوية</button>
+  <div style="position:relative">
+    <button id="jdVoiceMic" type="button" title="إدخال بالصوت">🎤</button>
+    <button id="jdVoiceClose" type="button" title="تصغير">✕</button>
+  </div>
+  <button id="jdSettleBtn" type="button" title="فحص التسوية (ب + ج)" style="width:52px;height:52px;border-radius:50%;background:#061a3b;color:#FFD800;font-size:22px;flex:none;box-shadow:0 6px 18px rgba(0,0,0,.3);border:2px solid #FFD800">🔍</button>
+  <div id="jdVoicePanel">
+    <div id="jdVoiceTxt" style="flex:1;font-size:13px;line-height:1.6;min-height:20px">اضغط 🎤 وقول: <b>صادرات 500 ألف</b> أو <b>هواتف 200 ألف</b> أو <b>منفذ الرواتب 432 ألف</b></div>
+    <button id="jdVoiceConfirm" type="button">✅ تأكيد وإدخال</button>
+  </div>
 </div>
 <script>
 (function(){
@@ -3525,6 +3534,10 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
   }
   var pending=null;
   var mic=document.getElementById("jdVoiceMic"), txt=document.getElementById("jdVoiceTxt"), conf=document.getElementById("jdVoiceConfirm");
+  var bar=document.getElementById("jdVoiceBar");
+  document.getElementById("jdVoiceClose").onclick=function(e){ e.stopPropagation(); bar.classList.remove("open"); };
+  try{ document.getElementById("root").style.paddingBottom="84px"; }catch(e){} 
+  // الضغطة الأولى تفتح اللوحة فقط، الثانية تبدأ التسجيل - حتى ما يغطي البطاقات بدون قصد
   function speak(){
     var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
     if(!SR){ txt.innerHTML="هذا المتصفح ما يدعم الصوت، افتح التطبيق بـ <b>Chrome</b> على الأندرويد"; return; }
@@ -3546,7 +3559,7 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
     rec.onend=function(){ mic.classList.remove("rec"); };
     try{ rec.start(); }catch(e){}
   }
-  mic.onclick=speak;
+  mic.onclick=function(){ if(!bar.classList.contains("open")){ bar.classList.add("open"); return; } speak(); };
   conf.onclick=function(){
     if(!pending) return;
     // 1) نضغط على بطاقة القسم في الرئيسية حتى يفتح نموذج الإدخال الخاص به
