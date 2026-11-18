@@ -3566,30 +3566,9 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
   ];
   var WORD_NUM={"واحد":1,"اثنين":2,"ثلاثة":3,"اربعة":4,"خمسة":5,"ستة":6,"سبعة":7,"ثمانية":8,"تسعة":9,"عشرة":10,"عشرين":20,"ثلاثين":30,"اربعين":40,"خمسين":50,"ستين":60,"سبعين":70,"ثمانين":80,"تسعين":90,"مئة":100,"مائة":100,"ميتين":200,"خمسميه":500,"خمسمئة":500,"خمسمائة":500,"ميه":100,"مليون":1000000,"مليونين":2000000};
   function norm(s){ return String(s||"").replace(/[٠-٩]/g,function(c){return String(c.charCodeAt(0)-1632)}).replace(/[أإآ]/g,"ا").replace(/ة/g,"ه").replace(/ى/g,"ي").toLowerCase(); }
-  function parseAmount(raw){
-    var s=norm(raw);
-    // 1) رقم صريح: 500000 أو 500,000 أو 500
-    var m=s.match(/(\d[\d,\.]*)/);
-    var num = m ? parseFloat(m[1].replace(/,/g,"")) : 0;
-    if(!num){
-      // كلمات: "خمسمئة" / "خمس مئة"
-      for(var k in WORD_NUM){ if(s.indexOf(k)>=0){ num=WORD_NUM[k]; break; } }
-    }
-    var mult=1;
-    if(/مليار/.test(s)) mult=1000000000;
-    else if(/مليون/.test(s)) mult=1000000;
-    else if(/الف|ألف/.test(s)) mult=1000;
-    // إذا قال "500 ألف" -> 500*1000
-    // إذا قال "خمسمئة ألف" -> num=500 -> 500*1000
-    // إذا قال "500" بدون ألف -> 500 فقط (ما نضرب)
-    // إذا قال "نص مليون" -> 500000
-    if(/نص مليون|نصف مليون/.test(s)) return 500000;
-    if(/ربع مليون/.test(s)) return 250000;
-    if(m && /الف|ألف|مليون|مليار/.test(s)) return Math.round(num*mult);
-    if(!m && /الف|ألف|مليون/.test(s) && num>0) return Math.round(num*mult);
-    return Math.round(num);
-  }
-  function parseCat(raw){
+  function stripCommissionText(s){ var x=String(s||""); x=x.replace(/عموله?\s*\d[\d,\.]*\s*(مليار|مليون|الف|ألف)?/g," "); x=x.replace(/عموله?\s*(واحد|اثنين|ثلاثه|اربعه|خمسه|سته|سبعه|ثمانيه|تسعه|عشره|عشرين|ثلاثين|اربعين|خمسين|ستين|سبعين|ثمانين|تسعين|مئه|مائه|ميتين)\s*(مليار|مليون|الف|ألف)?/g," "); x=x.replace(/عموله?/g," "); return x; }
+   function parseAmount(raw){     var s=norm(raw);     var sNoComm=stripCommissionText(s);     if(/نص مليون|نصف مليون/.test(sNoComm)) return 500000;     if(/ربع مليون/.test(sNoComm)) return 250000;     if(/مليونين/.test(sNoComm)) return 2000000;     if(/الفين|ألفين/.test(sNoComm)) return 2000;     var bare=/مليار|مليون|الف|ألف/.test(sNoComm);     var m=sNoComm.match(/(\d[\d,\.]*)/);     var num = m ? parseFloat(m[1].replace(/,/g,"")) : 0;     if(!num){       if(/مليار/.test(sNoComm)) return 1000000000;       if(/مليون/.test(sNoComm)) return 1000000;       if(/الف|ألف/.test(sNoComm)) return 1000;       for(var k in WORD_NUM){ if(sNoComm.indexOf(k)>=0){ num=WORD_NUM[k]; break; } }     }     var mult=1;     if(/مليار/.test(sNoComm)) mult=1000000000;     else if(/مليون/.test(sNoComm)) mult=1000000;     else if(/الف|ألف/.test(sNoComm)) mult=1000;     if(m && bare) return Math.round(num*mult);     return Math.round(num); }
+   function parseCat(raw){
     var s=norm(raw);
     for(var i=0;i<CATS.length;i++){
       for(var j=0;j<CATS[i].names.length;j++){
@@ -3636,37 +3615,8 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
     else if(m[2]==="الف") mult=1000;
     return Math.round(n*mult);
   }
-  function parseNote(raw, cat, amt, sub){
-    var s=String(raw||"").trim();
-    // صيغة صريحة: "بيان ..." أو "ملاحظة ..." أو "اسم ..."
-    var m=s.match(/(?:بيان|ملاحظه|ملاحظة|اسم)\s*[:\-]?\s*(.+)/);
-    if(m){
-      var nb=m[1].trim();
-      // حتى بعد "بيان" ممكن يجي "عمولة ..." - احذفها من البيان
-      nb=nb.replace(/عموله?\s*.*/,"").trim();
-      return nb;
-    }
-    // غير ذلك: خذ أي كلام بعد المبلغ (مثلاً: "صادرات 500 ألف محمد القائم" -> البيان = "محمد القائم")
-    // نحذف القسم والمبلغ والعمولة من النص، والباقي هو البيان
-    var t=s;
-    // احذف كلمة القسم
-    if(cat){ cat.names.forEach(function(n){ t=t.replace(n,""); }); }
-    // احذف كلمة الفرع (سحب/إيداع/وارد...) - حتى لا تنحسب بيان
-    if(cat && sub){
-      (SUBS[cat.k]||[]).forEach(function(sb){ if(sb.k===sub){ sb.names.forEach(function(n){ t=t.replace(n,""); }); } });
-    }
-    // احذف كل أسماء الأفرع عموماً حتى لو الفرع ما انكشف - مثلاً "سحب" لوحدها
-    ["سحب","ايداع","إيداع","وارد","اوليه","أولية","نقد","صرفيات","حجوزات","طائره","طائرة","صباحي","مسائي","خارجي","واتساب"].forEach(function(w){ t=t.replace(w,""); });
-    // احذف العمولة كاملة
-    t=t.replace(/عمولة[^،,]*$/,"").replace(/عمولة.*?(ألف|مليون|مليار|\d+)/,"");
-    // احذف المبلغ: رقم + (ألف/مليون) أو كلمات الأرقام
-    t=t.replace(/\d[\d,\.]*\s*(ألف|مليون|مليار)?/,"");
-    t=t.replace(/\s+/g," ").trim();
-    // إذا بقي كلام معناه هو البيان / الاسم
-    if(t.length>=2 && t!=="ألف" && t!=="مليون") return t;
-    return "";
-  }
-  function setReactInput(input, value){
+  function parseNote(raw, cat, amt, sub){     var s=String(raw||"").trim();     var m=s.match(/(?:بيان|ملاحظه|ملاحظة|اسم)\s*[:\-]?\s*(.+)/);     if(m){       var nb=m[1].trim();       nb=nb.replace(/عموله?\s*.*$/,"").trim();       return nb;     }     var t=s;     if(cat){ cat.names.forEach(function(n){ t=t.replace(n,""); }); }     if(cat && sub){       (SUBS[cat.k]||[]).forEach(function(sb){ if(sb.k===sub){ sb.names.forEach(function(n){ t=t.replace(n,""); }); } });     }     ["سحب","ايداع","إيداع","وارد","اوليه","أولية","نقد","صرفيات","حجوزات","طائره","طائرة","صباحي","مسائي","خارجي","واتساب"].forEach(function(w){ t=t.replace(w,""); });     t=t.replace(/و?عموله?\s*\d[\d,\.]*\s*(ألف|مليون|مليار)?/g," ");     t=t.replace(/و?عموله?\s*[^،,]+/g," ");     t=t.replace(/عموله?/g," ");     t=t.replace(/\d[\d,\.]*\s*(ألف|مليون|مليار)?/g," ");     t=t.replace(/مليون|مليار|ألف|الف/g," ");     t=t.replace(/\s+/g," ").trim();     if(t.length>=2) return t;     return ""; }
+   function setReactInput(input, value){
     var proto = window.HTMLInputElement.prototype;
     var setter = Object.getOwnPropertyDescriptor(proto, "value").set;
     setter.call(input, String(value));
