@@ -3461,7 +3461,7 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
 #jdVoiceClose{position:absolute;top:-8px;left:-4px;width:22px;height:22px;border-radius:50%;background:#fff;color:#111;font-size:11px;border:0;box-shadow:0 2px 8px rgba(0,0,0,.3);cursor:pointer;display:none}
 #jdVoiceBar.open #jdVoiceClose{display:block}
 #jdVoiceBar button{border:0;cursor:pointer}
-#jdVoiceMic{width:52px;height:52px;border-radius:50%;background:#f59e0b;font-size:24px;flex:none}
+#jdVoiceMic{width:56px;height:56px;border-radius:50%;background:#f59e0b;font-size:26px;flex:none;pointer-events:auto !important;touch-action:manipulation;-webkit-tap-highlight-color:transparent;position:relative;z-index:10000000} #jdVoiceBar{pointer-events:auto !important} #jdVoiceBar *{pointer-events:auto !important}
 #jdVoiceMic.rec{background:#dc2626;animation:pulse 1s infinite}
 @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.12)}100%{transform:scale(1)}}
 #jdVoiceTxt{flex:1;font-size:13px;line-height:1.6;min-height:20px}
@@ -3675,17 +3675,40 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
       else { txt.textContent="ما سمعت صوت، حاول مرة ثانية"; }
     };
     rec.onend=function(){ mic.classList.remove("rec"); };
-    try{ rec.start(); }catch(e){}
+    try{ rec.start(); }catch(e){ mic.classList.remove("rec"); txt.innerHTML='❌ ما كدرت أفتح المايك: '+e.message+'<br>جرب <b>⌨️ إملاء</b> بالأسفل.'; var fb3=document.getElementById("jdDictFallback"); if(fb3) fb3.style.display="block"; }
   }
   var dictBtn2=document.getElementById("jdDictFallback");
   if(dictBtn2){ dictBtn2.onclick=function(e){ e.stopPropagation(); var box=document.getElementById("jdDictBox"); box.style.display = box.style.display==="none" ? "block" : "none"; if(box.style.display==="block") document.getElementById("jdDictInput").focus(); }; }
   var dictGo=document.getElementById("jdDictGo");
   if(dictGo){ dictGo.onclick=function(){ var raw=document.getElementById("jdDictInput").value.trim(); if(!raw) return; if(window.__jdOnVoiceResult) window.__jdOnVoiceResult({results:[[{transcript:raw}]]}); document.getElementById("jdDictBox").style.display="none"; document.getElementById("jdDictInput").value=""; }; }
-  // ضغطة واحدة = يستمع فوراً ويدخل العملية - بدون ضغطة ثانية وبدون زر تأكيد
-  mic.onclick=function(){
-    bar.classList.add("open");
-    speak();
-  };
+  // ضغطة واحدة - delegated حتى لو React أعاد رسم الزر، مع رد فعل فوري حتى لو التعرف على الصوت فشل
+  function jdMicClick(e){
+    try{
+      if(e){ e.preventDefault(); e.stopPropagation(); }
+      var b=document.getElementById("jdVoiceBar");
+      if(b) b.classList.add("open");
+      var t=document.getElementById("jdVoiceTxt");
+      if(t) t.textContent="✅ ضغطت الزر... جاري فتح المايك";
+      var m=document.getElementById("jdVoiceMic");
+      if(m) m.classList.add("rec");
+      // أعطي المتصفح لحظة ليرسم "ضغطت" قبل ما يطلب إذن المايك (طلب الإذن يوقف الرسم)
+      setTimeout(function(){ try{ speak(); }catch(err){ var tt=document.getElementById("jdVoiceTxt"); if(tt) tt.textContent="❌ خطأ: "+err.message; } }, 80);
+    }catch(err){
+      var tt2=document.getElementById("jdVoiceTxt");
+      if(tt2) tt2.textContent="❌ خطأ بالضغط: "+err.message;
+    }
+  }
+  mic.onclick=jdMicClick;
+  // delegated: أي ضغطة على المايك حتى لو تغيّر العنصر
+  document.addEventListener("click", function(e){
+    var el=e.target && e.target.closest ? e.target.closest("#jdVoiceMic") : null;
+    if(el && !el.__jdBound){ el.__jdBound=true; }
+    if(el){ jdMicClick(e); }
+  }, true);
+  document.addEventListener("touchstart", function(e){
+    var el=e.target && e.target.closest ? e.target.closest("#jdVoiceMic") : null;
+    if(el){ jdMicClick(e); }
+  }, {passive:false, capture:true});
   function doDirectEntry(){
     if(!pending) return;
     // إدخال مباشر: بدون فتح القسم، بدون نموذج - نرسل العملية لـ Firebase مثل ما يسوي زر الحفظ الأصلي
