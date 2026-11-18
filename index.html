@@ -3174,6 +3174,8 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
 #jdAsst .jas-bar button{height:42px;min-width:62px;border:none;border-radius:12px;background:var(--ip);color:#fff;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit}
 #jdAsst .jas-set input{width:100%;height:38px;border-radius:10px;border:1px solid var(--ibd);background:var(--ib);color:var(--it);padding:0 10px;font-size:12px;margin:4px 0 8px;direction:ltr;text-align:left;font-family:inherit}
 #jdAsst .jas-dim{color:var(--im);font-size:11px}
+#jasToast{position:fixed;left:50%;bottom:140px;transform:translateX(-50%);background:#111827;color:#fff;padding:7px 16px;border-radius:20px;font-size:12px;font-weight:700;z-index:100001;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
+#jasToast.on{opacity:.95}
 </style>
 <script id="jd-asst-js">
 (function(){
@@ -3342,6 +3344,7 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
   // ---------- الواجهة
   function msgs(){return document.querySelector("#jdAsst .jbody")}
   function scroll(){var b=msgs();if(b)b.scrollTop=b.scrollHeight}
+  var tt=0;function toast(t){var e=document.getElementById("jasToast");if(!e){e=document.createElement("div");e.id="jasToast";document.body.appendChild(e)}e.textContent=t;e.classList.add("on");clearTimeout(tt);tt=setTimeout(function(){e.classList.remove("on")},1800)}
   function addU(t){var d=document.createElement("div");d.className="jas-m jas-u";d.textContent=t;msgs().appendChild(d);scroll()}
   function addA(html,cls){var d=document.createElement("div");d.className="jas-m jas-a"+(cls?" "+cls:"");d.innerHTML=html;msgs().appendChild(d);scroll();return d}
   function addSum(text){
@@ -3359,8 +3362,10 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
       .catch(function(){w.className="jas-m jas-a";w.innerHTML="تعذّر الاتصال بالمساعد الذكي. تأكد من الإنترنت ومن إعدادات ⚙️."})
       .then(function(){busy=0})}
   function settings(){
+    var ex=document.getElementById("jasSetCard");
+    if(ex){ex.scrollIntoView({block:"center"});return}
     var c=getCfg();
-    addA('<b>إعدادات الذكاء الاصطناعي (اختياري)</b><div class="jas-dim">بدونها يعمل المساعد على بياناتك محلياً. للتفعيل ضع رابط الوسيط (Worker) والرمز السري. عند الإرسال تُرسل أرقام مجمّعة لآخر 120 يوماً، بدون ملاحظات أو أسماء موظفين.</div><div class="jas-set"><input id="jasUrl" placeholder="https://xxxx.workers.dev" value="'+esc(c.url||"")+'"><input id="jasTok" type="password" placeholder="الرمز السري" value="'+esc(c.token||"")+'"></div><div class="jas-act"><button data-a="save">حفظ</button><button data-a="clr">مسح</button></div>')}
+    var sd=addA('<b>إعدادات الذكاء الاصطناعي (اختياري)</b><div class="jas-dim">بدونها يعمل المساعد على بياناتك محلياً. للتفعيل ضع رابط الوسيط (Worker) والرمز السري. عند الإرسال تُرسل أرقام مجمّعة لآخر 120 يوماً، بدون ملاحظات أو أسماء موظفين.</div><div class="jas-set"><input id="jasUrl" placeholder="https://xxxx.workers.dev" value="'+esc(c.url||"")+'"><input id="jasTok" type="password" placeholder="الرمز السري" value="'+esc(c.token||"")+'"></div><div class="jas-act"><button data-a="save">حفظ</button><button data-a="clr">مسح الإعدادات</button></div>');sd.id="jasSetCard"}
   function polish(text,btn){
     if(!getCfg().url){addA("الصياغة الودّية تحتاج تفعيل الذكاء الاصطناعي من ⚙️.");return}
     btn.disabled=true;
@@ -3368,8 +3373,8 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
       .then(function(a){lastSum=a;var d=addA('<div class="jas-tx">'+esc(a)+'</div><div class="jas-act"><button data-a="copy">📋 نسخ</button><button data-a="wa">📤 واتساب</button></div>');d.setAttribute("data-s",a)})
       .catch(function(){addA("تعذّرت الصياغة الآن.")}).then(function(){btn.disabled=false})}
   function copy(t){
-    try{navigator.clipboard.writeText(t).then(function(){addA("تم النسخ ✓")},function(){fb()})}catch(e){fb()}
-    function fb(){var a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();try{document.execCommand("copy");addA("تم النسخ ✓")}catch(e){}a.remove()}}
+    try{navigator.clipboard.writeText(t).then(function(){toast("تم النسخ ✓")},function(){fb()})}catch(e){fb()}
+    function fb(){var a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();try{document.execCommand("copy");toast("تم النسخ ✓")}catch(e){}a.remove()}}
   function build(){
     if(document.getElementById("jdAsst"))return;
     var ov=document.createElement("div");ov.id="jdAsst";ov.className="jdov";
@@ -3384,8 +3389,8 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
       var a=b.getAttribute("data-a"),box=b.closest(".jas-m"),s=box&&box.getAttribute("data-s");
       if(a==="go"){var i=document.getElementById("jasIn");send(i.value);i.value="";return}
       if(a==="cfg"){settings();return}
-      if(a==="save"){setCfg({url:(document.getElementById("jasUrl").value||"").trim(),token:(document.getElementById("jasTok").value||"").trim()});addA("تم حفظ الإعدادات ✓");return}
-      if(a==="clr"){setCfg({});addA("تم مسح الإعدادات.");return}
+      if(a==="save"){setCfg({url:(document.getElementById("jasUrl").value||"").trim(),token:(document.getElementById("jasTok").value||"").trim()});toast("تم حفظ الإعدادات ✓");var sc=document.getElementById("jasSetCard");if(sc)sc.remove();return}
+      if(a==="clr"){setCfg({});var u1=document.getElementById("jasUrl"),u2=document.getElementById("jasTok");if(u1)u1.value="";if(u2)u2.value="";toast("تم مسح الإعدادات");return}
       if(a==="copy"&&s){copy(s);return}
       if(a==="wa"&&s){window.open("https://wa.me/?text="+encodeURIComponent(s),"_blank");return}
       if(a==="pol"&&s){polish(s,b);return}});
