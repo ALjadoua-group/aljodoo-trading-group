@@ -3455,10 +3455,7 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
 <!-- ===== JD-VOICE-ENTRY: إدخال عمليات بالصوت - تقول "صادرات 500 ألف" ===== -->
 <style>
 #jdVoiceBar{position:fixed;bottom:16px;left:12px;z-index:999999;display:flex;gap:8px;align-items:center;direction:rtl;font-family:inherit}
-#jdVoiceBar.jd-near-wa{position:static;bottom:auto;left:auto}
-#jdWaWrap{display:flex;gap:8px;align-items:stretch;position:sticky;top:8px;z-index:99998;background:transparent}
-#jdWaWrap > button{flex:1}
-#jdWaWrap #jdVoiceBar{flex:none}
+#jdVoiceBar.jd-near-wa{position:fixed !important}
 #jdVoicePanel{display:none;align-items:center;gap:8px;background:#111827;color:#fff;border-radius:18px;padding:10px 12px;box-shadow:0 10px 30px rgba(0,0,0,.35);max-width:calc(100vw - 140px)}
 #jdVoiceBar.open #jdVoicePanel{display:flex}
 #jdVoiceClose{position:absolute;top:-8px;left:-4px;width:22px;height:22px;border-radius:50%;background:#fff;color:#111;font-size:11px;border:0;box-shadow:0 2px 8px rgba(0,0,0,.3);cursor:pointer;display:none}
@@ -3529,6 +3526,38 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
     }
     return null;
   }
+  function parseCommission(raw){
+    var s=norm(raw);
+    var m=s.match(/عموله?\s*(\d[\d,\.]*|واحد|اثنين|ثلاثه|اربعه|خمسه|سته|سبعه|ثمانيه|تسعه|عشره|عشرين|ثلاثين|اربعين|خمسين|ستين|سبعين|ثمانين|تسعين|مئه|مائه|ميتين)\s*(مليار|مليون|الف)?/);
+    if(!m) return 0;
+    var n=0;
+    if(/^\d/.test(m[1])) n=parseFloat(m[1].replace(/,/g,""));
+    else n=WORD_NUM[m[1]]||0;
+    var mult=1;
+    if(m[2]==="مليار") mult=1000000000;
+    else if(m[2]==="مليون") mult=1000000;
+    else if(m[2]==="الف") mult=1000;
+    return Math.round(n*mult);
+  }
+  function parseNote(raw, cat, amt){
+    var s=String(raw||"").trim();
+    // صيغة صريحة: "بيان ..." أو "ملاحظة ..." أو "اسم ..."
+    var m=s.match(/(?:بيان|ملاحظه|ملاحظة|اسم)\s*[:\-]?\s*(.+)/);
+    if(m) return m[1].trim();
+    // غير ذلك: خذ أي كلام بعد المبلغ (مثلاً: "صادرات 500 ألف محمد القائم" -> البيان = "محمد القائم")
+    // نحذف القسم والمبلغ والعمولة من النص، والباقي هو البيان
+    var t=s;
+    // احذف كلمة القسم
+    if(cat){ cat.names.forEach(function(n){ t=t.replace(n,""); }); }
+    // احذف العمولة كاملة
+    t=t.replace(/عمولة[^،,]*$/,"").replace(/عمولة.*?(ألف|مليون|مليار|\d+)/,"");
+    // احذف المبلغ: رقم + (ألف/مليون) أو كلمات الأرقام
+    t=t.replace(/\d[\d,\.]*\s*(ألف|مليون|مليار)?/,"");
+    t=t.replace(/\s+/g," ").trim();
+    // إذا بقي كلام معناه هو البيان / الاسم
+    if(t.length>=2 && t!=="ألف" && t!=="مليون") return t;
+    return "";
+  }
   function setReactInput(input, value){
     var proto = window.HTMLInputElement.prototype;
     var setter = Object.getOwnPropertyDescriptor(proto, "value").set;
@@ -3550,13 +3579,16 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
     rec.onresult=function(e){
       var raw=e.results[0][0].transcript;
       mic.classList.remove("rec");
-      var cat=parseCat(raw), amt=parseAmount(raw);
+      var cat=parseCat(raw), amt=parseAmount(raw), comm=parseCommission(raw), note=parseNote(raw, cat, amt);
       if(!cat || !amt){
         txt.innerHTML='ما فهمت: "<b>'+raw+'</b>"<br>جرب: <b>صادرات 500 ألف</b> - لازم تقول القسم + المبلغ';
         conf.style.display="none"; pending=null; return;
       }
-      pending={cat:cat, amt:amt, raw:raw};
-      txt.innerHTML='فهمت: <b>'+raw+'</b><br>القسم: <b>'+cat.names[0]+'</b> - المبلغ: <b>'+amt.toLocaleString("en-US")+'</b><br>اضغط ✅ إدخال مباشر - راح تدخل العملية فوراً بدون فتح القسم';
+      pending={cat:cat, amt:amt, raw:raw, comm:comm, note:note};
+      txt.innerHTML='فهمت: <b>'+raw+'</b><br>القسم: <b>'+cat.names[0]+'</b> - المبلغ: <b>'+amt.toLocaleString("en-US")+'</b>'
+        + (comm? '<br>العمولة: <b>'+comm.toLocaleString("en-US")+'</b>' : '')
+        + (note? '<br>البيان: <b>'+note+'</b>' : '')
+        + '<br>اضغط ✅ إدخال مباشر - راح تدخل العملية فوراً بدون فتح القسم';
       conf.style.display="block";
     };
     rec.onerror=function(){ mic.classList.remove("rec"); txt.textContent="ما سمعت صوت، حاول مرة ثانية"; };
@@ -3571,11 +3603,16 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
     var d=new Date();
     var iso=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
     var userName=""; try{ var u=JSON.parse(localStorage.getItem("taswiya_session_user")||"null"); if(u&&u.name) userName=u.name; }catch(e){}
-    var H={id:String(Date.now()),amount:pending.amt,note:"صوتي: "+pending.raw,date:d.toLocaleDateString("ar-EG"),dateISO:iso,user:userName,cat:pending.cat.k,sub:SUB[pending.cat.k]||"wared",time:d.toLocaleTimeString("ar-EG",{hour:"2-digit",minute:"2-digit"})};
+    var noteText = pending.note ? pending.note : ("صوتي: "+pending.raw);
+    var H={id:String(Date.now()),amount:pending.amt,note:noteText,date:d.toLocaleDateString("ar-EG"),dateISO:iso,user:userName,cat:pending.cat.k,sub:SUB[pending.cat.k]||"wared",time:d.toLocaleTimeString("ar-EG",{hour:"2-digit",minute:"2-digit"})};
+    if(pending.comm) H.commission=pending.comm;
     txt.innerHTML='⏳ جاري إدخال: <b>'+pending.cat.names[0]+' - '+pending.amt.toLocaleString("en-US")+'</b>...';
     conf.style.display="none";
     var done=function(){
-      txt.innerHTML='✅ تم إدخال العملية مباشرة:<br><b>'+pending.cat.names[0]+' - '+pending.amt.toLocaleString("en-US")+' د.ع</b><br>ظهرت الآن في البطاقة والقسم، بدون فتح نموذج.';
+      txt.innerHTML='✅ تم إدخال العملية مباشرة:<br><b>'+pending.cat.names[0]+' - '+pending.amt.toLocaleString("en-US")+' د.ع</b>'
+        + (pending.comm? '<br>العمولة: '+pending.comm.toLocaleString("en-US") : '')
+        + (pending.note? '<br>البيان: '+pending.note : '')
+        + '<br>ظهرت الآن في البطاقة والقسم، بدون فتح نموذج.';
       pending=null;
       // تحديث فوري للبطاقات بدون انتظار Firebase
       setTimeout(function(){ txt.innerHTML='اضغط 🎤 وقول: <b>صادرات 500 ألف</b>'; bar.classList.remove("open"); }, 3500);
@@ -3589,30 +3626,46 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
 </script>
 
 
+
+
 <script>
 (function(){
-  // ألصق زر المايك جنب زر "مشاركة ملخص اليوم على واتساب" على اليسار، وثبّته (sticky) حتى يبقى ظاهر مع التمرير
-  function attach(){
-    var bar=document.getElementById("jdVoiceBar");
-    if(!bar || bar.dataset.attached) return;
-    var btns=[].slice.call(document.querySelectorAll("#root button"));
+  // لماذا كان يختفي؟ كنا ننقل الزر داخل شجرة React، فأي تحديث من التطبيق كان يحذفه.
+  // الحل: الزر يبقى خارج React (في body)، ونحركه فقط بإحداثيات fixed جنب زر واتساب، بدون ما ندخله داخل React.
+  var bar=document.getElementById("jdVoiceBar");
+  if(!bar) return;
+  // تأكد أن الزر خارج #root حتى React ما يحذفه
+  if(bar.parentElement && bar.parentElement.id!=="jdWaWrap" && document.body.contains(bar) && bar.closest("#root")){ document.body.appendChild(bar); }
+  function position(){
     var wa=null;
-    btns.forEach(function(b){ if(b.textContent && b.textContent.indexOf("مشاركة ملخص اليوم على واتساب")>=0) wa=b; });
-    if(!wa) return;
-    if(wa.parentElement && wa.parentElement.id==="jdWaWrap") return;
-    var wrap=document.createElement("div"); wrap.id="jdWaWrap";
-    wa.parentNode.insertBefore(wrap, wa);
-    wrap.appendChild(wa);
-    // في RTL، العنصر الثاني يظهر على اليسار - لذلك نضيف المايك بعد زر واتساب في DOM فيظهر على يساره
-    wrap.appendChild(bar);
-    bar.classList.add("jd-near-wa");
-    bar.dataset.attached="1";
+    var btns=document.querySelectorAll("#root button");
+    for(var i=0;i<btns.length;i++){ if(btns[i].textContent && btns[i].textContent.indexOf("مشاركة ملخص اليوم على واتساب")>=0){ wa=btns[i]; break; } }
+    if(wa){
+      var r=wa.getBoundingClientRect();
+      // إذا زر واتساب ظاهر على الشاشة: صغّر زر واتساب شوي وخلّي المايك على يساره
+      if(r.top>=0 && r.top<window.innerHeight){
+        wa.style.marginLeft="64px";
+        wa.style.width="calc(100% - 64px)";
+        bar.style.position="fixed";
+        bar.style.left="12px";
+        bar.style.top=Math.max(8, r.top)+"px";
+        bar.style.bottom="auto";
+        return;
+      }
+    }
+    // إذا واتساب مو ظاهر (بالرئيسية): المايك ثابت أسفل اليسار
+    bar.style.position="fixed";
+    bar.style.left="12px";
+    bar.style.bottom="16px";
+    bar.style.top="auto";
   }
-  // راقب تغير الصفحات داخل التطبيق (التنقل بين الرئيسية والتسوية)
-  var obs=new MutationObserver(function(){ attach(); });
-  obs.observe(document.body, {childList:true, subtree:true});
-  setInterval(attach, 1000);
-  attach();
+  setInterval(position, 500);
+  window.addEventListener("scroll", position, true);
+  window.addEventListener("resize", position);
+  position();
+  // حارس: إذا React حذف الزر لأي سبب، أعد إنشاءه - لا يحتاج تحديث الصفحة
+  var guard=new MutationObserver(function(){ if(!document.getElementById("jdVoiceBar")){ location.reload(); } });
+  // لا نعيد التحميل تلقائياً، فقط نراقب - الزر الآن خارج React فما راح ينحذف
 })();
 </script>
 </body>
