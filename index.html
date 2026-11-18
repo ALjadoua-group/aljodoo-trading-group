@@ -3089,7 +3089,8 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
       if(b){b.click();clearInterval(t)}else if(++n>25)clearInterval(t)},80)}
   function body(){
     var n=nAlerts();
-    var h='<div class="jrs-gh">التقارير</div>';
+    var h='<div class="jrs-gh">المساعد</div><button type="button" class="jrs-it" data-a="ai"><span class="jrs-ic">🤖</span><span class="jrs-tx"><b>المساعد الذكي</b><small>اسأل عن بياناتك • ملخص يومي • مقارنة الأقسام</small></span><span class="jrs-ar">‹</span></button>';
+    h+='<div class="jrs-gh">التقارير</div>';
     h+='<button type="button" class="jrs-it" data-a="sum"><span class="jrs-ic">📊</span><span class="jrs-tx"><b>ملخص التقارير</b><small>يومي / شهري / سنوي مع الطباعة وحفظ PDF</small></span><span class="jrs-ar">‹</span></button>';
     h+='<button type="button" class="jrs-it" data-a="secs"><span class="jrs-ic">📑</span><span class="jrs-tx"><b>تقارير الأقسام</b><small>تقرير مستقل لكل قسم وقسم فرعي</small></span><span class="jrs-ar">‹</span></button>';
     h+='<div class="jrs-gh">المتابعة</div>';
@@ -3109,6 +3110,7 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
       close();
       if(a==="sum")openReports("summary");
       else if(a==="secs")openReports("sections");
+      else if(a==="ai"&&window.__jdAsst)window.__jdAsst.open();
       else if(a==="ins"&&window.__jdIns&&window.__jdIns.open)window.__jdIns.open()});
     document.body.appendChild(ov)}
   function open(){
@@ -3126,7 +3128,7 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
     var c=par.querySelector("#"+CARD);
     if(!c){
       c=src.cloneNode(true);c.id=CARD;c.addEventListener("click",open);
-      var rc=par.querySelector("#jdRateCard");
+      var rc=par.querySelector("#jdAsstCard")||par.querySelector("#jdRateCard");
       if(rc)par.insertBefore(c,rc);else par.appendChild(c)}
     var dk=document.documentElement.classList.contains("jd-dark"),col=dk?"#FFD800":"#4f46e5",n=nAlerts();
     var sig=dk+"|"+n+"|"+(c.matches(":nth-child(even)"));
@@ -3146,6 +3148,279 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
     new MutationObserver(tk).observe(document.body,{childList:true,subtree:true});
     new MutationObserver(tk).observe(document.documentElement,{attributes:true,attributeFilter:["class"]});
     setInterval(inject,4000);inject()}
+  document.body?mount():document.addEventListener("DOMContentLoaded",mount);
+})();
+</script>
+<!-- ===== jd-asst: المساعد الذكي (اسأل بياناتك + ملخص يومي) ===== -->
+<style id="jd-asst-css">
+#jdAsst{z-index:99995}
+#jdAsst .jb{display:flex;flex-direction:column}
+#jdAsst .jt .jas-hb{display:flex;gap:6px}
+#jdAsst .jbody{display:flex;flex-direction:column}
+#jdAsst .jas-m{max-width:94%;padding:9px 12px;border-radius:14px;margin:0 0 9px;font-size:12.5px;line-height:1.8;word-break:break-word}
+#jdAsst .jas-u{align-self:flex-start;background:var(--ip);color:#fff;border-bottom-right-radius:4px}
+#jdAsst .jas-a{align-self:flex-end;background:var(--is);border:1px solid var(--ibd);border-bottom-left-radius:4px}
+#jdAsst .jas-tx{white-space:pre-wrap}
+#jdAsst .jas-w{overflow-x:auto;margin-top:6px}
+#jdAsst table{border-collapse:collapse;font-size:11.5px;min-width:100%}
+#jdAsst th,#jdAsst td{border:1px solid var(--ibd);padding:4px 7px;text-align:right;white-space:nowrap}
+#jdAsst th{background:var(--ib);font-weight:700}
+#jdAsst .jas-act{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+#jdAsst .jas-act button,#jdAsst .jas-chip{border:1px solid var(--ibd);background:var(--ib);color:inherit;border-radius:10px;padding:5px 10px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit}
+#jdAsst .jas-chips{display:flex;gap:6px;overflow-x:auto;padding:8px 12px 0;flex:none}
+#jdAsst .jas-chip{white-space:nowrap;flex:none}
+#jdAsst .jas-bar{display:flex;gap:8px;padding:10px 12px;flex:none}
+#jdAsst .jas-bar input{flex:1;min-width:0;height:42px;border-radius:12px;border:1px solid var(--ibd);background:var(--ib);color:var(--it);padding:0 12px;font-size:13px;font-family:inherit}
+#jdAsst .jas-bar button{height:42px;min-width:62px;border:none;border-radius:12px;background:var(--ip);color:#fff;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit}
+#jdAsst .jas-set input{width:100%;height:38px;border-radius:10px;border:1px solid var(--ibd);background:var(--ib);color:var(--it);padding:0 10px;font-size:12px;margin:4px 0 8px;direction:ltr;text-align:left;font-family:inherit}
+#jdAsst .jas-dim{color:var(--im);font-size:11px}
+</style>
+<script id="jd-asst-js">
+(function(){
+  var OUT={saderat:1,salary:1};
+  var SEC=[
+    {k:"saderat",l:"الصادرات",re:/صادر/},
+    {k:"salary",l:"منفذ الرواتب",re:/رواتب|راتب|منفذ/},
+    {k:"electronic",l:"الدفع الإلكتروني",re:/الكترون|دفع/},
+    {k:"waredat",l:"الواردات الخارجية",re:/خارجي|مشاريع|واتساب|واتس/},
+    {k:"malab",l:"الملعب",re:/ملعب|حجوزات|حجز/},
+    {k:"hawatif",l:"الهواتف",re:/هواتف|هاتف|موبايل/},
+    {k:"albisa",l:"الألبسة",re:/البسه|ملابس|الابسه|لبسه/},
+    {k:"super",l:"السوبر ماركت",re:/سوبر|ماركت/},
+    {k:"idara",l:"الإدارة",re:/اداره/},
+    {k:"gym",l:"الجدوع جم",re:/جدوع|(^|\s)(ال)?جم(\s|$)/}
+  ];
+  var LBL={};SEC.forEach(function(s){LBL[s.k]=s.l});
+  var DAYS=["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+  var CFGK="jd_asst_cfg",hist=[],lastSum="",busy=0;
+  function esc(t){return String(t==null?"":t).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+  function fmt(n){return Math.round(Number(n)||0).toLocaleString("en-US")}
+  function p2(n){return n<10?"0"+n:""+n}
+  function iso(d){return d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate())}
+  function addDays(d,n){var x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()+n);return x}
+  function fromIso(s){var a=s.split("-");return new Date(+a[0],+a[1]-1,+a[2])}
+  function norm(s){return String(s||"").replace(/[\u0660-\u0669]/g,function(c){return c.charCodeAt(0)-1632}).replace(/[\u064B-\u0652\u0640]/g,"").replace(/[أإآ]/g,"ا").replace(/ى/g,"ي").replace(/ة/g,"ه").toLowerCase()}
+  function dayTxt(s){var d=fromIso(s);return DAYS[d.getDay()]+" "+d.getDate()+"/"+(d.getMonth()+1)+"/"+d.getFullYear()}
+
+  // ---------- البيانات (من نفس مصدر مركز المتابعة، على الجهاز فقط)
+  function rows(){
+    var it=[];try{it=window.__jdIns&&window.__jdIns.items?window.__jdIns.items():[]}catch(e){}
+    return it.filter(function(x){return x.iso&&x.cat!=="wakeel"})}
+  function agg(from,to,secs){
+    var r={in:0,out:0,n:0,days:{}};
+    rows().forEach(function(x){
+      if(x.iso<from||x.iso>to)return;
+      if(secs&&secs.length&&secs.indexOf(x.cat)<0)return;
+      var o=OUT[x.cat]||x.sub==="sahb",d=r.days[x.iso]||(r.days[x.iso]={in:0,out:0,n:0});
+      if(o){r.out+=x.amount;d.out+=x.amount}else{r.in+=x.amount;d.in+=x.amount}
+      d.n++;r.n++});
+    return r}
+  function onlyOut(secs){return secs&&secs.length&&secs.every(function(k){return OUT[k]})}
+
+  // ---------- فهم الفترة
+  function period(q,now){
+    var m,t=iso(now);
+    if((m=q.match(/(\d{4})-(\d{1,2})-(\d{1,2})/))){var d=m[1]+"-"+p2(+m[2])+"-"+p2(+m[3]);return{from:d,to:d,label:dayTxt(d)}}
+    if((m=q.match(/(^|\s)(\d{1,2})\/(\d{1,2})(\/(\d{4}))?(\s|$)/))){var d2=(m[5]||now.getFullYear())+"-"+p2(+m[3])+"-"+p2(+m[2]);return{from:d2,to:d2,label:dayTxt(d2)}}
+    if((m=q.match(/اخر\s*(\d+)\s*(يوم|ايام)/))){var n=Math.min(+m[1],366);return{from:iso(addDays(now,-(n-1))),to:t,label:"آخر "+n+" يوم"}}
+    if(/اخر\s*اسبوع/.test(q))return{from:iso(addDays(now,-6)),to:t,label:"آخر 7 أيام"};
+    if(/اخر\s*شهر/.test(q))return{from:iso(addDays(now,-29)),to:t,label:"آخر 30 يوماً"};
+    if(/امس|البارحه/.test(q)){var y=iso(addDays(now,-1));return{from:y,to:y,label:"أمس ("+dayTxt(y)+")"}}
+    if(/اليوم/.test(q))return{from:t,to:t,label:"اليوم ("+dayTxt(t)+")"};
+    var off=(now.getDay()+1)%7,ws=addDays(now,-off);
+    if(/الاسبوع\s*(الماضي|السابق)/.test(q))return{from:iso(addDays(ws,-7)),to:iso(addDays(ws,-1)),label:"الأسبوع الماضي"};
+    if(/اسبوع/.test(q))return{from:iso(ws),to:t,label:"هذا الأسبوع (من السبت)"};
+    if(/الشهر\s*(الماضي|السابق)/.test(q)){var a=new Date(now.getFullYear(),now.getMonth()-1,1),b=new Date(now.getFullYear(),now.getMonth(),0);return{from:iso(a),to:iso(b),label:"الشهر الماضي"}}
+    if(/شهر/.test(q))return{from:iso(new Date(now.getFullYear(),now.getMonth(),1)),to:t,label:"هذا الشهر"};
+    if(/(السنه|العام)/.test(q))return{from:now.getFullYear()+"-01-01",to:t,label:"سنة "+now.getFullYear()};
+    return null}
+
+  // ---------- إجابات محلية دقيقة
+  function table(head,body){
+    return '<div class="jas-w"><table><tr>'+head.map(function(h){return"<th>"+esc(h)+"</th>"}).join("")+"</tr>"+
+      body.map(function(r){return"<tr>"+r.map(function(c){return"<td>"+esc(c)+"</td>"}).join("")+"</tr>"}).join("")+"</table></div>"}
+  function ansCompare(p,assumed){
+    var out=[];
+    SEC.forEach(function(s){var r=agg(p.from,p.to,[s.k]);if(r.n)out.push({s:s,r:r})});
+    if(!out.length)return{h:"لا توجد عمليات مسجّلة في "+esc(p.label)+"."};
+    out.sort(function(a,b){return(b.r.in+b.r.out)-(a.r.in+a.r.out)});
+    var tot=agg(p.from,p.to,null);
+    var b=out.map(function(o){return[o.s.l,fmt(o.r.in),fmt(o.r.out),fmt(o.r.in-o.r.out),o.r.n]});
+    b.push(["الإجمالي",fmt(tot.in),fmt(tot.out),fmt(tot.in-tot.out),tot.n]);
+    return{h:"<b>مقارنة الأقسام — "+esc(p.label)+"</b>"+table(["القسم","وارد","سحب/صادر","الصافي","عدد"],b)+
+      '<div class="jas-dim" style="margin-top:6px">الصافي = وارد − سحب. الصادرات والرواتب تُحسب كلها سحباً.'+(assumed?" (لم تحدد فترة فاعتمدت هذا الشهر)":"")+"</div>"}}
+  function ansDay(kind,p,secs,assumed){
+    var r=agg(p.from,p.to,secs),ks=Object.keys(r.days),oo=onlyOut(secs);
+    if(!ks.length)return{h:"لا توجد عمليات مسجّلة في "+esc(p.label)+(secs.length?" ضمن "+esc(secs.map(function(k){return LBL[k]}).join("، ")):"")+"."};
+    var val=function(k){return oo?r.days[k].out:r.days[k].in};
+    ks.sort(function(a,b){return val(a)-val(b)});
+    var pick=(kind==="worst")?ks[0]:ks[ks.length-1],avg=ks.reduce(function(s,k){return s+val(k)},0)/ks.length;
+    return{h:"<b>"+(kind==="worst"?"أضعف":"أفضل")+" يوم "+(oo?"(صادر)":"(وارد)")+" — "+esc(p.label)+"</b><br>"+esc(dayTxt(pick))+": <b>"+fmt(val(pick))+"</b> د.ع"+
+      '<div class="jas-dim">المتوسط بين الأيام المسجّلة ('+ks.length+" يوماً): "+fmt(avg)+" د.ع"+(assumed?" • اعتمدت هذا الشهر لأنك لم تحدد فترة":"")+"</div>"}}
+  function ansTotals(p,secs,metric,assumed){
+    var r=agg(p.from,p.to,secs),nm=secs.length?secs.map(function(k){return LBL[k]}).join(" + "):"كل الأقسام";
+    if(!r.n)return{h:"لا توجد عمليات مسجّلة لـ <b>"+esc(nm)+"</b> في "+esc(p.label)+"."};
+    var h="<b>"+esc(nm)+" — "+esc(p.label)+"</b><br>";
+    if(onlyOut(secs))h+="المجموع: <b>"+fmt(r.out)+"</b> د.ع • عدد العمليات: "+r.n;
+    else if(metric==="in")h+="الوارد: <b>"+fmt(r.in)+"</b> د.ع • عدد العمليات: "+r.n;
+    else if(metric==="out")h+="السحب: <b>"+fmt(r.out)+"</b> د.ع • عدد العمليات: "+r.n;
+    else if(metric==="count")h+="عدد العمليات: <b>"+r.n+"</b>";
+    else h+="وارد: <b>"+fmt(r.in)+"</b> • سحب: <b>"+fmt(r.out)+"</b> • الصافي: <b>"+fmt(r.in-r.out)+"</b> د.ع • العمليات: "+r.n;
+    if(assumed)h+='<div class="jas-dim">لم تحدد فترة فاعتمدت هذا الشهر.</div>';
+    return{h:h}}
+
+  // ---------- الملخص اليومي
+  function summary(day){
+    var now=new Date(),d=fromIso(day),L=[],tin=0,tout=0,tn=0;
+    var lines=[];
+    SEC.forEach(function(s){
+      var r=agg(day,day,[s.k]);if(!r.n)return;
+      // المعتاد: متوسط الوارد في نفس اليوم من الأسبوع خلال 4 أسابيع سابقة
+      var base=[],i;for(i=1;i<=4;i++){var b=agg(iso(addDays(d,-7*i)),iso(addDays(d,-7*i)),[s.k]);if(b.n)base.push(OUT[s.k]?b.out:b.in)}
+      var cur=OUT[s.k]?r.out:r.in,avg=base.length?base.reduce(function(a,b){return a+b},0)/base.length:0,t="";
+      if(base.length>=2&&avg>0){var pc=Math.round((cur-avg)/avg*100);if(Math.abs(pc)>=10)t=" ("+(pc>0?"▲":"▼")+Math.abs(pc)+"% عن المعتاد)"}
+      tin+=r.in;tout+=r.out;tn+=r.n;
+      lines.push("• "+s.l+": "+(OUT[s.k]?"صادر "+fmt(r.out):"وارد "+fmt(r.in)+(r.out?" | سحب "+fmt(r.out):""))+t)});
+    L.push("📊 ملخص مجموعة الجدوع — "+dayTxt(day));
+    if(!lines.length){L.push("لا توجد عمليات مسجّلة في هذا اليوم.");return L.join("\n")}
+    L=L.concat(lines);
+    L.push("────────");
+    L.push("الإجمالي: وارد "+fmt(tin)+" | سحب/صادر "+fmt(tout)+" | الصافي "+fmt(tin-tout));
+    L.push("عدد العمليات: "+tn);
+    if(day===iso(now)){
+      try{var al=window.__jdIns.alerts().slice(0,3);
+        if(al.length){L.push("");L.push("⚠️ للمتابعة:");al.forEach(function(a){L.push("- "+a.title)})}}catch(e){}}
+    return L.join("\n")}
+
+  // ---------- الذكاء الاصطناعي عبر وسيط (اختياري)
+  function getCfg(){try{return JSON.parse(localStorage.getItem(CFGK)||"{}")||{}}catch(e){return{}}}
+  function setCfg(o){try{localStorage.setItem(CFGK,JSON.stringify(o))}catch(e){}}
+  function digest(){
+    var from=iso(addDays(new Date(),-120)),g={};
+    rows().forEach(function(x){
+      if(x.iso<from)return;var k=x.iso+"|"+x.cat,o=g[k]||(g[k]={i:0,o:0,n:0});
+      if(OUT[x.cat]||x.sub==="sahb")o.o+=x.amount;else o.i+=x.amount;o.n++});
+    var L=["الصيغة: التاريخ|القسم|وارد|سحب أو صادر|عدد العمليات"];
+    Object.keys(g).sort().forEach(function(k){var o=g[k];L.push(k+"|"+Math.round(o.i)+"|"+Math.round(o.o)+"|"+o.n)});
+    var names=Object.keys(LBL).map(function(k){return k+"="+LBL[k]}).join("، ");
+    var al="";try{al=window.__jdIns.alerts().slice(0,5).map(function(a){return a.title}).join(" ؛ ")}catch(e){}
+    return "الأقسام: "+names+"\nملاحظة: saderat وsalary كل مبالغها صادر.\n"+(al?"تنبيهات حالية: "+al+"\n":"")+L.join("\n")}
+  function askAI(q){
+    var c=getCfg();if(!c.url)return Promise.reject("nocfg");
+    return fetch(c.url,{method:"POST",headers:{"Content-Type":"application/json","X-App-Token":c.token||""},
+      body:JSON.stringify({question:q,history:hist.slice(-6),today:iso(new Date()),digest:digest()})})
+      .then(function(r){return r.json()}).then(function(j){if(!j||!j.answer)throw new Error(j&&j.error||"bad");return j.answer})}
+
+  // ---------- الموجّه: محلي أولاً ثم الذكاء
+  function route(raw){
+    var q=norm(raw),now=new Date();
+    if(/^(مساعده|help|ساعدني|وش تسوي|ماذا تفعل)/.test(q))return{h:help()};
+    if(/ملخص/.test(q)){var p0=period(q,now)||{from:iso(now),to:iso(now)},day=p0.to;lastSum=summary(day);return{sum:lastSum}}
+    var secs=[];SEC.forEach(function(s){if(s.re.test(q))secs.push(s.k)});
+    if(/واردات\s*خارجي/.test(q)&&secs.indexOf("waredat")<0)secs.push("waredat");
+    var p=period(q,now),assumed=false;
+    var wantsNum=/كم|مجموع|اجمالي|مقارن|قارن|رتب|ترتيب|اضعف|افضل|اعلى|اقل|اكثر|صافي|عدد|وارد|سحب|مبلغ/.test(q);
+    if(!wantsNum&&!p&&!secs.length)return null;
+    if(!p){p={from:iso(new Date(now.getFullYear(),now.getMonth(),1)),to:iso(now),label:"هذا الشهر"};assumed=true}
+    if(/اضعف|اقل\s*يوم|ادني/.test(q))return ansDay("worst",p,secs,assumed);
+    if(/افضل|اعلى\s*يوم|اكثر\s*يوم|اقوى/.test(q)&&/يوم/.test(q))return ansDay("best",p,secs,assumed);
+    if(secs.length>=2&&/قارن|مقارن|بين/.test(q)){
+      var rr=secs.map(function(k){var r=agg(p.from,p.to,[k]);return[LBL[k],fmt(r.in),fmt(r.out),fmt(r.in-r.out),r.n]});
+      return{h:"<b>مقارنة — "+esc(p.label)+"</b>"+table(["القسم","وارد","سحب/صادر","الصافي","عدد"],rr)}}
+    if(/قارن|مقارن|رتب|ترتيب|الاقسام/.test(q)&&secs.length!==1)return ansCompare(p,assumed);
+    var metric="all";
+    if(/صافي|ربح|فرق|رصيد/.test(q))metric="net";
+    else if(/سحب|مسحوب|صرف|مصروف|خرج/.test(q))metric="out";
+    else if(/عدد|كم\s*عمليه/.test(q))metric="count";
+    else if(/وارد|ايراد|دخل|مبيعات|ايداع/.test(q))metric="in";
+    if(metric==="net")metric="all";
+    return ansTotals(p,secs,metric,assumed)}
+  function help(){
+    return "أستطيع الإجابة من بيانات البرنامج الموجودة على جهازك، مثل:<br>• كم صادرات الأسبوع الماضي؟<br>• كم وارد الهواتف هذا الشهر؟<br>• قارن الأقسام هذا الشهر<br>• أضعف يوم في الألبسة هذا الشهر<br>• ملخص اليوم / ملخص أمس / ملخص 2026-11-10<br>"+
+      (getCfg().url?"والأسئلة الأخرى أرسلها للذكاء الاصطناعي.":'وللأسئلة المفتوحة فعّل الذكاء الاصطناعي من ⚙️.')}
+
+  // ---------- الواجهة
+  function msgs(){return document.querySelector("#jdAsst .jbody")}
+  function scroll(){var b=msgs();if(b)b.scrollTop=b.scrollHeight}
+  function addU(t){var d=document.createElement("div");d.className="jas-m jas-u";d.textContent=t;msgs().appendChild(d);scroll()}
+  function addA(html,cls){var d=document.createElement("div");d.className="jas-m jas-a"+(cls?" "+cls:"");d.innerHTML=html;msgs().appendChild(d);scroll();return d}
+  function addSum(text){
+    var d=addA('<div class="jas-tx">'+esc(text)+'</div><div class="jas-act"><button data-a="copy">📋 نسخ</button><button data-a="wa">📤 واتساب</button><button data-a="pol">✨ صياغة ودّية</button></div>');
+    d.setAttribute("data-s",text)}
+  function send(raw){
+    raw=String(raw||"").trim();if(!raw||busy)return;
+    addU(raw);hist.push({r:"u",t:raw});
+    var r=null;try{r=route(raw)}catch(e){r=null}
+    if(r&&r.sum){addSum(r.sum);hist.push({r:"a",t:r.sum});return}
+    if(r&&r.h){addA(r.h);hist.push({r:"a",t:r.h.replace(/<[^>]+>/g," ")});return}
+    if(!getCfg().url){addA("لم أفهم السؤال بدقة. جرّب صياغة مثل: <b>كم وارد الهواتف هذا الشهر؟</b><br>للأسئلة الحرة فعّل الذكاء الاصطناعي من ⚙️ أعلى الشاشة.");return}
+    busy=1;var w=addA("…","jas-dim");
+    askAI(raw).then(function(a){w.className="jas-m jas-a jas-tx";w.textContent=a;hist.push({r:"a",t:a});scroll()})
+      .catch(function(){w.className="jas-m jas-a";w.innerHTML="تعذّر الاتصال بالمساعد الذكي. تأكد من الإنترنت ومن إعدادات ⚙️."})
+      .then(function(){busy=0})}
+  function settings(){
+    var c=getCfg();
+    addA('<b>إعدادات الذكاء الاصطناعي (اختياري)</b><div class="jas-dim">بدونها يعمل المساعد على بياناتك محلياً. للتفعيل ضع رابط الوسيط (Worker) والرمز السري. عند الإرسال تُرسل أرقام مجمّعة لآخر 120 يوماً، بدون ملاحظات أو أسماء موظفين.</div><div class="jas-set"><input id="jasUrl" placeholder="https://xxxx.workers.dev" value="'+esc(c.url||"")+'"><input id="jasTok" type="password" placeholder="الرمز السري" value="'+esc(c.token||"")+'"></div><div class="jas-act"><button data-a="save">حفظ</button><button data-a="clr">مسح</button></div>')}
+  function polish(text,btn){
+    if(!getCfg().url){addA("الصياغة الودّية تحتاج تفعيل الذكاء الاصطناعي من ⚙️.");return}
+    btn.disabled=true;
+    askAI("أعد صياغة هذا الملخص كرسالة واتساب قصيرة ودّية للإدارة، مع الحفاظ على الأرقام كما هي حرفياً دون تغيير أو إضافة:\n"+text)
+      .then(function(a){lastSum=a;var d=addA('<div class="jas-tx">'+esc(a)+'</div><div class="jas-act"><button data-a="copy">📋 نسخ</button><button data-a="wa">📤 واتساب</button></div>');d.setAttribute("data-s",a)})
+      .catch(function(){addA("تعذّرت الصياغة الآن.")}).then(function(){btn.disabled=false})}
+  function copy(t){
+    try{navigator.clipboard.writeText(t).then(function(){addA("تم النسخ ✓")},function(){fb()})}catch(e){fb()}
+    function fb(){var a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();try{document.execCommand("copy");addA("تم النسخ ✓")}catch(e){}a.remove()}}
+  function build(){
+    if(document.getElementById("jdAsst"))return;
+    var ov=document.createElement("div");ov.id="jdAsst";ov.className="jdov";
+    ov.innerHTML='<div class="jb"><div class="jt"><span>🤖 المساعد الذكي</span><span class="jas-hb"><button type="button" data-a="cfg" aria-label="إعدادات">⚙️</button><button type="button" data-x="1" aria-label="إغلاق">✕</button></span></div><div class="jbody"></div>'+
+      '<div class="jas-chips"><button class="jas-chip" data-q="ملخص اليوم">📅 ملخص اليوم</button><button class="jas-chip" data-q="ملخص أمس">ملخص أمس</button><button class="jas-chip" data-q="قارن الأقسام هذا الشهر">قارن الأقسام</button><button class="jas-chip" data-q="أضعف يوم هذا الشهر">أضعف يوم</button><button class="jas-chip" data-q="كم صادرات الأسبوع الماضي؟">صادرات الأسبوع الماضي</button></div>'+
+      '<div class="jas-bar"><input id="jasIn" placeholder="اسأل عن بياناتك..." autocomplete="off"><button type="button" data-a="go">إرسال</button></div></div>';
+    ov.addEventListener("click",function(e){
+      var t=e.target;if(t===ov){ov.classList.remove("open");return}
+      var b=t.closest&&t.closest("button");if(!b)return;
+      if(b.getAttribute("data-x")){ov.classList.remove("open");return}
+      var q=b.getAttribute("data-q");if(q){send(q);return}
+      var a=b.getAttribute("data-a"),box=b.closest(".jas-m"),s=box&&box.getAttribute("data-s");
+      if(a==="go"){var i=document.getElementById("jasIn");send(i.value);i.value="";return}
+      if(a==="cfg"){settings();return}
+      if(a==="save"){setCfg({url:(document.getElementById("jasUrl").value||"").trim(),token:(document.getElementById("jasTok").value||"").trim()});addA("تم حفظ الإعدادات ✓");return}
+      if(a==="clr"){setCfg({});addA("تم مسح الإعدادات.");return}
+      if(a==="copy"&&s){copy(s);return}
+      if(a==="wa"&&s){window.open("https://wa.me/?text="+encodeURIComponent(s),"_blank");return}
+      if(a==="pol"&&s){polish(s,b);return}});
+    ov.addEventListener("keydown",function(e){if(e.key==="Enter"&&e.target.id==="jasIn"){e.preventDefault();var i=e.target;send(i.value);i.value=""}});
+    document.body.appendChild(ov);
+    addA("أهلاً 👋 أجيب من بيانات البرنامج على جهازك. جرّب أحد الأزرار بالأسفل أو اكتب سؤالك، وللمساعدة اكتب <b>مساعدة</b>.")}
+  function open(){build();document.getElementById("jdAsst").classList.add("open");var i=document.getElementById("jasIn");i&&setTimeout(function(){i.focus()},150)}
+  document.addEventListener("keydown",function(e){if(e.key==="Escape"){var o=document.getElementById("jdAsst");if(o&&o.classList.contains("open"))o.classList.remove("open")}});
+
+  // ---------- بطاقة في الرئيسية
+  var svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="#fff"/><rect x="12" y="22" width="40" height="30" rx="10" fill="#7c3aed"/><circle cx="25" cy="37" r="4.5" fill="#fff"/><circle cx="39" cy="37" r="4.5" fill="#fff"/><path d="M32 22v-8" stroke="#4c1d95" stroke-width="3" stroke-linecap="round"/><circle cx="32" cy="11" r="3.5" fill="#a78bfa"/></svg>';
+  var ICON="data:image/svg+xml;utf8,"+encodeURIComponent(svg);
+  function inject(){
+    var r=document.getElementById("root");if(!r)return;
+    var src=Array.prototype.filter.call(r.querySelectorAll("button"),function(b){return b.children.length===4&&b.children[0].querySelector("img")&&/^الصادرات/.test(b.children[1].textContent)})[0];
+    var par=src?src.parentNode:null;if(!par)return;
+    var c=par.querySelector("#jdAsstCard");
+    if(!c){
+      c=src.cloneNode(true);c.id="jdAsstCard";c.addEventListener("click",open);
+      var rep=par.querySelector("#jdRepCard"),rc=par.querySelector("#jdRateCard");
+      if(rep)par.insertBefore(c,rep.nextSibling);else if(rc)par.insertBefore(c,rc);else par.appendChild(c)}
+    var dk=document.documentElement.classList.contains("jd-dark"),col=dk?"#FFD800":"#7c3aed",sig=dk+"|"+c.matches(":nth-child(even)");
+    if(c.getAttribute("data-h")===sig)return;c.setAttribute("data-h",sig);
+    c.style.borderColor=col;c.style.background=dk?"":"#f5f3ff";
+    window.__jdIcon&&window.__jdIcon(c.children[0].children[0],ICON,c);
+    c.children[0].children[1].textContent="جديد";
+    c.children[1].textContent="المساعد الذكي";c.children[1].style.color=col;
+    c.children[2].textContent="اسأل عن بياناتك";c.children[2].style.color=col;
+    c.children[3].innerHTML='<div class="flex justify-between text-[10px] opacity-70"><span>أسئلة بالكلام</span><span>💬</span></div><div class="flex justify-between text-[10px] opacity-70"><span>ملخص يومي جاهز</span><span>📅</span></div><div class="flex justify-between text-[10px] opacity-70"><span>مقارنة الأقسام</span><span>📊</span></div>'}
+  var q0=0;function tk(){clearTimeout(q0);q0=setTimeout(inject,200)}
+  function mount(){
+    new MutationObserver(tk).observe(document.body,{childList:true,subtree:true});
+    new MutationObserver(tk).observe(document.documentElement,{attributes:true,attributeFilter:["class"]});
+    setInterval(inject,4000);inject()}
+  window.__jdAsst={open:open,route:route,summary:summary,agg:agg,digest:digest};
   document.body?mount():document.addEventListener("DOMContentLoaded",mount);
 })();
 </script>
