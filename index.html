@@ -3359,7 +3359,7 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
     if(!getCfg().url){addA("لم أفهم السؤال بدقة. جرّب صياغة مثل: <b>كم وارد الهواتف هذا الشهر؟</b><br>للأسئلة الحرة فعّل الذكاء الاصطناعي من ⚙️ أعلى الشاشة.");return}
     busy=1;var w=addA("…","jas-dim");
     askAI(raw).then(function(a){w.className="jas-m jas-a jas-tx";w.textContent=a;hist.push({r:"a",t:a});scroll()})
-      .catch(function(){w.className="jas-m jas-a";w.innerHTML="تعذّر الاتصال بالمساعد الذكي. تأكد من الإنترنت ومن إعدادات ⚙️."})
+      .catch(function(e){w.className="jas-m jas-a";w.innerHTML="تعذّر الاتصال بالمساعد الذكي. تأكد من الإنترنت ومن إعدادات ⚙️."+(e&&e.message?'<div class="jas-dim">السبب: '+esc(e.message)+"</div>":"")})
       .then(function(){busy=0})}
   function settings(){
     var ex=document.getElementById("jasSetCard");
