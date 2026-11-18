@@ -3317,23 +3317,15 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
   function getCfg(){try{return JSON.parse(localStorage.getItem(CFGK)||"{}")||{}}catch(e){return{}}}
   function setCfg(o){try{localStorage.setItem(CFGK,JSON.stringify(o))}catch(e){}}
   function digest(){
-    var from=iso(addDays(new Date(),-120)),g={},gm={};
+    var from=iso(addDays(new Date(),-120)),g={};
     rows().forEach(function(x){
-      if(x.iso<from)return;
-      var k=x.iso+"|"+x.cat,o=g[k]||(g[k]={i:0,o:0,n:0});
-      if(OUT[x.cat]||x.sub==="sahb")o.o+=x.amount;else o.i+=x.amount;o.n++;
-      // === إصلاح: مجموع شهري جاهز حتى لا يضطر الذكاء الاصطناعي للجمع ===
-      var mk=x.iso.slice(0,7)+"|"+x.cat,mo=gm[mk]||(gm[mk]={i:0,o:0,n:0});
-      if(OUT[x.cat]||x.sub==="sahb")mo.o+=x.amount;else mo.i+=x.amount;mo.n++;
-    });
+      if(x.iso<from)return;var k=x.iso+"|"+x.cat,o=g[k]||(g[k]={i:0,o:0,n:0});
+      if(OUT[x.cat]||x.sub==="sahb")o.o+=x.amount;else o.i+=x.amount;o.n++});
     var L=["الصيغة: التاريخ|القسم|وارد|سحب أو صادر|عدد العمليات"];
-    L.push("=== مجاميع شهرية جاهزة - استخدم هذه الأرقام مباشرة ولا تجمع السطور اليومية ===");
-    Object.keys(gm).sort().forEach(function(k){var o=gm[k];L.push("MONTH|"+k+"|"+Math.round(o.i)+"|"+Math.round(o.o)+"|"+o.n)});
-    L.push("=== تفاصيل يومية (للمرجع فقط، لا تجمعها إذا وجدت المجاميع الشهرية) ===");
     Object.keys(g).sort().forEach(function(k){var o=g[k];L.push(k+"|"+Math.round(o.i)+"|"+Math.round(o.o)+"|"+o.n)});
     var names=Object.keys(LBL).map(function(k){return k+"="+LBL[k]}).join("، ");
     var al="";try{al=window.__jdIns.alerts().slice(0,5).map(function(a){return a.title}).join(" ؛ ")}catch(e){}
-    return "الأقسام: "+names+"\nملاحظة: saderat وsalary كل مبالغها صادر.\nتعليمات صارمة: إذا سئلت عن شهر، خذ الرقم من سطر MONTH لذلك الشهر والقسم، ولا تجمع السطور اليومية. مثال: MONTH|2026-11|salary هو مجموع تشرين الثاني كاملاً لمنفذ الرواتب.\n"+(al?"تنبيهات حالية: "+al+"\n":"")+L.join("\n")}
+    return "الأقسام: "+names+"\nملاحظة: saderat وsalary كل مبالغها صادر.\n"+(al?"تنبيهات حالية: "+al+"\n":"")+L.join("\n")}
   function askAI(q){
     var c=getCfg();if(!c.url)return Promise.reject("nocfg");
     return fetch(c.url,{method:"POST",headers:{"Content-Type":"application/json","X-App-Token":c.token||""},
@@ -3459,5 +3451,250 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
   document.body?mount():document.addEventListener("DOMContentLoaded",mount);
 })();
 </script>
+
+<!-- ===== JD-VOICE-ENTRY: إدخال عمليات بالصوت - تقول "صادرات 500 ألف" ===== -->
+<style>
+#jdVoiceBar{position:fixed;bottom:84px;left:12px;right:12px;z-index:999999;display:flex;gap:8px;align-items:center;background:#111827;color:#fff;border-radius:18px;padding:10px 12px;box-shadow:0 10px 30px rgba(0,0,0,.35);direction:rtl;font-family:inherit}
+#jdVoiceBar button{border:0;cursor:pointer}
+#jdVoiceMic{width:52px;height:52px;border-radius:50%;background:#f59e0b;font-size:24px;flex:none}
+#jdVoiceMic.rec{background:#dc2626;animation:pulse 1s infinite}
+@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.12)}100%{transform:scale(1)}}
+#jdVoiceTxt{flex:1;font-size:13px;line-height:1.6;min-height:20px}
+#jdVoiceConfirm{display:none;background:#16a34a;color:#fff;border-radius:12px;padding:10px 14px;font-weight:800;font-size:13px}
+</style>
+<div id="jdVoiceBar">
+  <button id="jdVoiceMic" type="button" title="اضغط وتكلم">🎤</button>
+  <div id="jdVoiceTxt">اضغط 🎤 وقول: <b>صادرات 500 ألف</b> أو <b>هواتف 200 ألف</b> أو <b>منفذ الرواتب 432 ألف</b></div>
+  <button id="jdVoiceConfirm" type="button">✅ تأكيد وإدخال</button>
+  <button id="jdSettleBtn" type="button" style="background:#061a3b;color:#FFD800;border-radius:12px;padding:10px 12px;font-weight:800;font-size:12px;flex:none">🔍 فحص التسوية</button>
+</div>
+<script>
+(function(){
+  var CATS=[
+    {k:"saderat", names:["صادرات","صادر","صادراتي"]},
+    {k:"salary", names:["منفذ الرواتب","رواتب","راتب","المنفذ"]},
+    {k:"electronic", names:["الدفع الإلكتروني","الكتروني","إلكتروني","دفع"]},
+    {k:"waredat", names:["واردات","واردات خارجية","خارجي","مشاريع","واتساب"]},
+    {k:"malab", names:["ملعب","الملعب","حجوزات","حجز"]},
+    {k:"hawatif", names:["هواتف","هاتف","موبايل"]},
+    {k:"albisa", names:["البسة","ملابس","ألبسة","الابسه"]},
+    {k:"super", names:["سوبر","ماركت","سوبر ماركت"]},
+    {k:"idara", names:["ادارة","إدارة"]},
+    {k:"gym", names:["جم","الجدوع جم","جيم"]}
+  ];
+  var WORD_NUM={"واحد":1,"اثنين":2,"ثلاثة":3,"اربعة":4,"خمسة":5,"ستة":6,"سبعة":7,"ثمانية":8,"تسعة":9,"عشرة":10,"عشرين":20,"ثلاثين":30,"اربعين":40,"خمسين":50,"ستين":60,"سبعين":70,"ثمانين":80,"تسعين":90,"مئة":100,"مائة":100,"ميتين":200,"مليون":1000000,"مليونين":2000000};
+  function norm(s){ return String(s||"").replace(/[٠-٩]/g,function(c){return String(c.charCodeAt(0)-1632)}).replace(/[أإآ]/g,"ا").replace(/ة/g,"ه").replace(/ى/g,"ي").toLowerCase(); }
+  function parseAmount(raw){
+    var s=norm(raw);
+    // 1) رقم صريح: 500000 أو 500,000 أو 500
+    var m=s.match(/(\d[\d,\.]*)/);
+    var num = m ? parseFloat(m[1].replace(/,/g,"")) : 0;
+    if(!num){
+      // كلمات: "خمسمئة" / "خمس مئة"
+      for(var k in WORD_NUM){ if(s.indexOf(k)>=0){ num=WORD_NUM[k]; break; } }
+    }
+    var mult=1;
+    if(/مليار/.test(s)) mult=1000000000;
+    else if(/مليون/.test(s)) mult=1000000;
+    else if(/الف|ألف/.test(s)) mult=1000;
+    // إذا قال "500 ألف" -> 500*1000
+    // إذا قال "خمسمئة ألف" -> num=500 -> 500*1000
+    // إذا قال "500" بدون ألف -> 500 فقط (ما نضرب)
+    // إذا قال "نص مليون" -> 500000
+    if(/نص مليون|نصف مليون/.test(s)) return 500000;
+    if(/ربع مليون/.test(s)) return 250000;
+    if(m && /الف|ألف|مليون|مليار/.test(s)) return Math.round(num*mult);
+    if(!m && /الف|ألف|مليون/.test(s) && num>0) return Math.round(num*mult);
+    return Math.round(num);
+  }
+  function parseCat(raw){
+    var s=norm(raw);
+    for(var i=0;i<CATS.length;i++){
+      for(var j=0;j<CATS[i].names.length;j++){
+        if(s.indexOf(norm(CATS[i].names[j]))>=0) return CATS[i];
+      }
+    }
+    return null;
+  }
+  function setReactInput(input, value){
+    var proto = window.HTMLInputElement.prototype;
+    var setter = Object.getOwnPropertyDescriptor(proto, "value").set;
+    setter.call(input, String(value));
+    input.dispatchEvent(new Event("input", {bubbles:true}));
+    input.dispatchEvent(new Event("change", {bubbles:true}));
+  }
+  var pending=null;
+  var mic=document.getElementById("jdVoiceMic"), txt=document.getElementById("jdVoiceTxt"), conf=document.getElementById("jdVoiceConfirm");
+  function speak(){
+    var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    if(!SR){ txt.innerHTML="هذا المتصفح ما يدعم الصوت، افتح التطبيق بـ <b>Chrome</b> على الأندرويد"; return; }
+    var rec=new SR(); rec.lang="ar-IQ"; rec.interimResults=false;
+    mic.classList.add("rec"); txt.textContent="🎧 اسمعك... قول: صادرات 500 ألف";
+    rec.onresult=function(e){
+      var raw=e.results[0][0].transcript;
+      mic.classList.remove("rec");
+      var cat=parseCat(raw), amt=parseAmount(raw);
+      if(!cat || !amt){
+        txt.innerHTML='ما فهمت: "<b>'+raw+'</b>"<br>جرب: <b>صادرات 500 ألف</b> - لازم تقول القسم + المبلغ';
+        conf.style.display="none"; pending=null; return;
+      }
+      pending={cat:cat, amt:amt, raw:raw};
+      txt.innerHTML='فهمت: <b>'+raw+'</b><br>القسم: <b>'+cat.names[0]+'</b> - المبلغ: <b>'+amt.toLocaleString("en-US")+'</b><br>اضغط ✅ للتأكيد';
+      conf.style.display="block";
+    };
+    rec.onerror=function(){ mic.classList.remove("rec"); txt.textContent="ما سمعت صوت، حاول مرة ثانية"; };
+    rec.onend=function(){ mic.classList.remove("rec"); };
+    try{ rec.start(); }catch(e){}
+  }
+  mic.onclick=speak;
+  conf.onclick=function(){
+    if(!pending) return;
+    // 1) نضغط على بطاقة القسم في الرئيسية حتى يفتح نموذج الإدخال الخاص به
+    var catName = pending.cat.names[0];
+    // نبحث عن زر البطاقة الذي يحتوي اسم القسم
+    var btns=[].slice.call(document.querySelectorAll("#root button"));
+    var target=null;
+    btns.forEach(function(b){ if(b.textContent && b.textContent.indexOf(catName)>=0 && !target) target=b; });
+    // إذا القسم له اسمين (منفذ الرواتب) جرب الاسم الثاني
+    if(!target && pending.cat.k==="salary"){
+      btns.forEach(function(b){ if(b.textContent && b.textContent.indexOf("الرواتب")>=0 && !target) target=b; });
+    }
+    if(target){ target.click(); }
+    // 2) بعد فتح النموذج، نملأ حقل المبلغ
+    setTimeout(function(){
+      var inputs=[].slice.call(document.querySelectorAll('input[placeholder="المبلغ"], input[placeholder*="المبلغ"]'));
+      var inp = inputs[0];
+      if(inp){
+        setReactInput(inp, pending.amt);
+        txt.innerHTML='✅ تم ملء: <b>'+catName+' - '+pending.amt.toLocaleString("en-US")+'</b><br>تأكد من القسم والمبلغ ثم اضغط <b>حفظ</b> بالنموذج.';
+        inp.focus();
+      } else {
+        txt.innerHTML='تم اختيار قسم <b>'+catName+'</b> - المبلغ: <b>'+pending.amt.toLocaleString("en-US")+'</b><br>أكمل إدخال المبلغ في النموذج واضغط حفظ.';
+      }
+      conf.style.display="none";
+      pending=null;
+    }, 600);
+  };
+})();
+</script>
+
+<!-- ===== JD-SETTLE B+C: فحص التسوية + توقع نهاية الشهر (بدون ذكاء، حساب داخل التطبيق) ===== -->
+<style>
+#jdSettleModal{position:fixed;inset:0;z-index:1000000;background:rgba(0,0,0,.55);display:none;align-items:flex-end;justify-content:center;direction:rtl}
+#jdSettleBox{background:#fff;width:100%;max-width:560px;max-height:88vh;overflow:auto;border-radius:22px 22px 0 0;padding:16px;font-family:inherit;color:#111}
+#jdSettleBox h3{margin:0 0 8px;font-size:17px}
+#jdSettleBox .tab{display:flex;gap:8px;margin:10px 0}
+#jdSettleBox .tab button{flex:1;border:1px solid #e5e7eb;background:#f9fafb;border-radius:12px;padding:10px;font-weight:800;cursor:pointer}
+#jdSettleBox .tab button.on{background:#061a3b;color:#FFD800;border-color:#061a3b}
+#jdSettleBox table{width:100%;border-collapse:collapse;font-size:13px}
+#jdSettleBox th,#jdSettleBox td{border:1px solid #e5e7eb;padding:7px 6px;text-align:right}
+#jdSettleBox th{background:#f3f4f6}
+#jdSettleBox .ok{color:#16a34a;font-weight:800}
+#jdSettleBox .bad{color:#dc2626;font-weight:800}
+#jdSettleBox .warn{color:#d97706;font-weight:800}
+</style>
+<div id="jdSettleModal"><div id="jdSettleBox">
+  <div style="display:flex;justify-content:space-between;align-items:center"><h3>🔍 فحص التسوية التلقائي</h3><button id="jdSettleClose" style="border:0;background:#f3f4f6;border-radius:10px;padding:6px 12px;cursor:pointer">✕</button></div>
+  <div id="jdSettleDate" style="font-size:12px;color:#666"></div>
+  <div class="tab"><button id="jdTabB" class="on">ب: التسوية مقابل العمليات</button><button id="jdTabC">ج: توقع نهاية الشهر</button></div>
+  <div id="jdSettleContent"></div>
+  <div style="font-size:11px;color:#888;margin-top:10px">حساب داخل التطبيق، بدون ذكاء اصطناعي - نفس الأيام للمقارنة العادلة.</div>
+</div></div>
+<script>
+(function(){
+  var LBL={saderat:"الصادرات",salary:"منفذ الرواتب",electronic:"الدفع الإلكتروني",waredat:"الواردات",malab:"الملعب",hawatif:"الهواتف",albisa:"الألبسة",super:"السوبر ماركت",idara:"الإدارة",gym:"الجم"};
+  function fmt(n){ return Number(n||0).toLocaleString("en-US"); }
+  function todayISO(){ var d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+  function getData(){ try{ return JSON.parse(localStorage.getItem("taswiya_data")||"{}")||{}; }catch(e){ return {}; } }
+  function allItems(){
+    var d=getData(), out=[];
+    Object.keys(d).forEach(function(c){
+      var v=d[c];
+      if(Array.isArray(v)){ v.forEach(function(x){ out.push({cat:c,sub:"",amount:Number(x.amount)||0,dateISO:x.dateISO||x.date||"",note:x.note||"",time:x.time||""}); }); }
+      else if(v && typeof v==="object"){ Object.keys(v).forEach(function(s){ var a=v[s]; if(Array.isArray(a)) a.forEach(function(x){ out.push({cat:c,sub:s,amount:Number(x.amount)||0,dateISO:x.dateISO||x.date||"",note:x.note||"",time:x.time||""}); }); }); }
+    });
+    return out;
+  }
+  function renderB(){
+    var today=todayISO(), items=allItems();
+    var todays=items.filter(function(x){ return x.dateISO===today; });
+    var yest=new Date(); yest.setDate(yest.getDate()-1);
+    var yISO=yest.getFullYear()+"-"+String(yest.getMonth()+1).padStart(2,"0")+"-"+String(yest.getDate()).padStart(2,"0");
+    var yests=items.filter(function(x){ return x.dateISO===yISO; });
+    // تجميع حسب القسم
+    var byCat={}; todays.forEach(function(x){ var o=byCat[x.cat]||(byCat[x.cat]={n:0,sum:0}); o.n++; o.sum+=x.amount; });
+    var byCatY={}; yests.forEach(function(x){ var o=byCatY[x.cat]||(byCatY[x.cat]={n:0,sum:0}); o.n++; o.sum+=x.amount; });
+    // كشف المكرر: نفس القسم + نفس المبلغ + نفس البيان بنفس اليوم أكثر من مرة
+    var seen={}, dups=[];
+    todays.forEach(function(x){
+      var k=x.cat+"|"+x.amount+"|"+(x.note||"");
+      if(seen[k]) dups.push(x);
+      seen[k]=1;
+    });
+    // كشف الناقص: قسم كان عنده عمليات البارحة، واليوم صفر
+    var missing=[];
+    Object.keys(byCatY).forEach(function(c){ if(!byCat[c]) missing.push(c); });
+    var total=todays.reduce(function(a,x){return a+x.amount;},0);
+    var totalY=yests.reduce(function(a,x){return a+x.amount;},0);
+    var diff=total-totalY;
+    var h="";
+    h+='<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:10px;margin-bottom:10px"><b>مجموع عمليات اليوم:</b> '+fmt(total)+' د.ع ('+todays.length+' عملية)<br><b>مجموع البارحة:</b> '+fmt(totalY)+' د.ع ('+yests.length+' عملية)<br><b>الفرق:</b> <span class="'+(diff>0?'ok':diff<0?'bad':'')+'">'+(diff>0?'▲ +':diff<0?'▼ ':('＝ '))+fmt(Math.abs(diff))+'</span></div>';
+    if(dups.length){ h+='<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:10px;margin-bottom:10px">⚠️ <b>احتمال تكرار:</b> '+dups.length+' عملية بنفس القسم والمبلغ والبيان اليوم.<br>'+dups.map(function(x){return '• '+(LBL[x.cat]||x.cat)+' - '+fmt(x.amount)+' - '+(x.note||'بدون بيان');}).join('<br>')+'</div>'; }
+    if(missing.length){ h+='<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:10px;margin-bottom:10px">⚠️ <b>أقسام ما بيها عمليات اليوم بس كانت موجودة البارحة (ممكن ناقصة):</b><br>'+missing.map(function(c){return '• '+(LBL[c]||c)+' - البارحة: '+fmt(byCatY[c].sum)+' ('+byCatY[c].n+' عملية)';}).join('<br>')+'</div>'; }
+    if(!dups.length && !missing.length){ h+='<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:10px;margin-bottom:10px">✅ <b>ما أكو فرق واضح:</b> كل الأقسام اللي اشتغلت البارحة اشتغلت اليوم، وما أكو تكرار واضح.</div>'; }
+    h+='<table><tr><th>القسم</th><th>اليوم (عدد)</th><th>اليوم (مبلغ)</th><th>البارحة (مبلغ)</th><th>الفرق</th></tr>';
+    var cats=Object.keys(LBL);
+    cats.forEach(function(c){
+      var a=byCat[c]||{n:0,sum:0}, b=byCatY[c]||{n:0,sum:0}, d=a.sum-b.sum;
+      if(a.sum===0 && b.sum===0) return;
+      h+='<tr><td>'+LBL[c]+'</td><td>'+a.n+'</td><td>'+fmt(a.sum)+'</td><td>'+fmt(b.sum)+'</td><td class="'+(d>0?'ok':d<0?'bad':'')+'">'+(d>0?'▲ +':d<0?'▼ -':'＝ ')+fmt(Math.abs(d))+'</td></tr>';
+    });
+    h+='</table>';
+    h+='<div style="font-size:11px;color:#888;margin-top:8px">التسوية = مجموع العمليات المدخلة. إذا الفرق مو صفر بين التسوية اليدوية والعمليات، راجع القسم اللي فرقه أكبر.</div>';
+    return h;
+  }
+  function renderC(){
+    var now=new Date(), y=now.getFullYear(), m=now.getMonth();
+    var daysInMonth=new Date(y,m+1,0).getDate();
+    var todayDay=now.getDate();
+    var passed=todayDay; // من 1 إلى اليوم
+    var remaining=daysInMonth-todayDay;
+    var items=allItems();
+    var monthItems=items.filter(function(x){
+      if(!x.dateISO) return false;
+      var p=x.dateISO.split("-"); return Number(p[0])===y && Number(p[1])===m+1;
+    });
+    var total=monthItems.reduce(function(a,x){return a+x.amount;},0);
+    var avg=passed>0 ? total/passed : 0;
+    var forecast=Math.round(avg*daysInMonth);
+    var h="";
+    h+='<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:10px;margin-bottom:10px"><b>توقع نهاية الشهر (بدون ذكاء - معدل يومي):</b><br>';
+    h+='من 1 إلى '+todayDay+' / '+daysInMonth+' - مر '+passed+' يوم، باقي '+remaining+' يوم<br>';
+    h+='مجموع لحد الآن: <b>'+fmt(total)+'</b><br>المعدل اليومي: <b>'+fmt(Math.round(avg))+'</b><br>توقع نهاية الشهر: <b>'+fmt(forecast)+'</b><br>المتبقي المتوقع: <b>'+fmt(forecast-total)+'</b></div>';
+    // تفصيل حسب القسم
+    var byCat={}; monthItems.forEach(function(x){ var o=byCat[x.cat]||(byCat[x.cat]={n:0,sum:0}); o.n++; o.sum+=x.amount; });
+    h+='<table><tr><th>القسم</th><th>لحد الآن</th><th>معدل يومي</th><th>توقع نهاية الشهر</th></tr>';
+    Object.keys(LBL).forEach(function(c){
+      var o=byCat[c]; if(!o) return;
+      var a2=o.sum/passed, f2=Math.round(a2*daysInMonth);
+      h+='<tr><td>'+LBL[c]+'</td><td>'+fmt(o.sum)+'</td><td>'+fmt(Math.round(a2))+'</td><td>'+fmt(f2)+'</td></tr>';
+    });
+    h+='</table>';
+    h+='<div style="font-size:11px;color:#888;margin-top:8px">المقارنة عادلة: المعدل محسوب من نفس الأيام اللي مرت (1 إلى '+todayDay+')، مو من شهر كامل مقابل شهر ناقص.</div>';
+    return h;
+  }
+  var modal=document.getElementById("jdSettleModal"), content=document.getElementById("jdSettleContent"), tabB=document.getElementById("jdTabB"), tabC=document.getElementById("jdTabC");
+  function open(){
+    document.getElementById("jdSettleDate").textContent="اليوم: "+todayISO();
+    content.innerHTML=renderB();
+    tabB.classList.add("on"); tabC.classList.remove("on");
+    modal.style.display="flex";
+  }
+  document.getElementById("jdSettleBtn").onclick=open;
+  document.getElementById("jdSettleClose").onclick=function(){ modal.style.display="none"; };
+  modal.onclick=function(e){ if(e.target===modal) modal.style.display="none"; };
+  tabB.onclick=function(){ content.innerHTML=renderB(); tabB.classList.add("on"); tabC.classList.remove("on"); };
+  tabC.onclick=function(){ content.innerHTML=renderC(); tabC.classList.add("on"); tabB.classList.remove("on"); };
+})();
+</script>
 </body>
-</html>
