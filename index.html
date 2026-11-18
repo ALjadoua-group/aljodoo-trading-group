@@ -3542,15 +3542,9 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
   
   <div id="jdVoicePanel">
     <div id="jdVoiceTxt" style="flex:1;font-size:13px;line-height:1.6;min-height:20px">اضغط 🎤 وقول: <b>الدفع الإلكتروني سحب 500 ألف</b> أو <b>هواتف 200 ألف</b> أو <b>منفذ الرواتب 432 ألف</b></div>
-    <button id="jdVoiceConfirm" type="button">✅ إدخال مباشر</button>     <button id="jdDictFallback" type="button" style="display:none;background:#fff;color:#111;border:0;border-radius:10px;padding:8px 10px;font-weight:800;font-size:12px">⌨️ إملاء</button>
+    <button id="jdVoiceConfirm" type="button">✅ إدخال مباشر</button>
   </div>
-</div>
-  <div id="jdDictBox" style="display:none;position:fixed;bottom:84px;left:12px;right:12px;z-index:999999;background:#111827;color:#fff;border-radius:14px;padding:12px;direction:rtl">
-    <div style="font-size:12px;margin-bottom:6px">اضغط داخل الحقل، بعدين دوس 🎤 بلوحة مفاتيح الآيفون وقول الجملة:</div>
-    <input id="jdDictInput" type="text" placeholder="الدفع الإلكتروني سحب 500 ألف..." style="width:100%;padding:10px;border-radius:10px;border:0;font-size:14px;box-sizing:border-box" />
-    <button id="jdDictGo" type="button" style="margin-top:8px;width:100%;background:#f59e0b;color:#111;border:0;border-radius:10px;padding:10px;font-weight:800">✅ إدخال من النص</button>
-  </div>
-<script>
+</div><script>
 (function(){
   var CATS=[
     {k:"saderat", names:["صادرات","صادر","صادراتي"]},
@@ -3632,13 +3626,11 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
   function speak(){
     var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
     if(!SR){
-      txt.innerHTML='سفاري ما فعّل المايك هنا.<br>جرّب: <b>الإعدادات > Siri > تشغيل Siri</b> + <b>الإعدادات > سفاري > المايكروفون > سماح</b> + افتح التطبيق بـ <b>HTTPS</b><br>أو استخدم زر <b>⌨️ إملاء</b>.';
-      var fb=document.getElementById("jdDictFallback"); if(fb) fb.style.display="block";
+      txt.innerHTML='هذا المتصفح ما يدعم الصوت، افتح التطبيق بـ <b>Chrome</b>';
       return;
     }
     var rec=new SR();
-    var isSafari=/^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-    rec.lang=isSafari ? "ar-SA" : "ar-IQ";
+    rec.lang="ar-IQ";
     rec.interimResults=false; rec.continuous=false;
     mic.classList.add("rec"); txt.textContent="🎧 اسمعك... قول: صادرات 500 ألف";
     window.__jdOnVoiceResult=function(e){
@@ -3681,24 +3673,10 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
       }
       conf.style.display="block";     };
     rec.onresult=window.__jdOnVoiceResult;
-    rec.onerror=function(e){
-      mic.classList.remove("rec");
-      var err=(e&&e.error)||"";
-      if(err==="not-allowed"||err==="service-not-allowed"){
-        txt.innerHTML='سفاري منع المايك.<br>روح: <b>الإعدادات > Siri > شغّل Siri</b> ثم <b>الإعدادات > سفاري > المايكروفون > سماح</b> وحدّث الصفحة.<br>أو استخدم زر <b>⌨️ إملاء</b>.';
-        var fb2=document.getElementById("jdDictFallback"); if(fb2) fb2.style.display="block";
-      } else if(err==="no-speech"){ txt.textContent="ما سمعت صوت، اضغط 🎤 مرة ثانية وقول الجملة"; }
-      else if(err==="network"){ txt.textContent="مشكلة شبكة - سفاري يحتاج إنترنت للتعرف على الصوت"; }
-      else { txt.textContent="ما سمعت صوت، حاول مرة ثانية"; }
-    };
+    rec.onerror=function(){ mic.classList.remove("rec"); txt.textContent="ما سمعت صوت، حاول مرة ثانية"; };
     rec.onend=function(){ mic.classList.remove("rec"); };
-    try{ rec.start(); }catch(e){ mic.classList.remove("rec"); txt.innerHTML='❌ ما كدرت أفتح المايك: '+e.message+'<br>جرب <b>⌨️ إملاء</b> بالأسفل.'; var fb3=document.getElementById("jdDictFallback"); if(fb3) fb3.style.display="block"; }
   }
-  var dictBtn2=document.getElementById("jdDictFallback");
-  if(dictBtn2){ dictBtn2.onclick=function(e){ e.stopPropagation(); var box=document.getElementById("jdDictBox"); box.style.display = box.style.display==="none" ? "block" : "none"; if(box.style.display==="block") document.getElementById("jdDictInput").focus(); }; }
-  var dictGo=document.getElementById("jdDictGo");
-  if(dictGo){ dictGo.onclick=function(){ var raw=document.getElementById("jdDictInput").value.trim(); if(!raw) return; if(window.__jdOnVoiceResult) window.__jdOnVoiceResult({results:[[{transcript:raw}]]}); document.getElementById("jdDictBox").style.display="none"; document.getElementById("jdDictInput").value=""; }; }
-  // ضغطة واحدة - delegated حتى لو React أعاد رسم الزر، مع رد فعل فوري حتى لو التعرف على الصوت فشل
+    // Chrome فقط - ضغطة واحدة - delegated حتى لو React أعاد رسم الزر، مع رد فعل فوري حتى لو التعرف على الصوت فشل
   function jdMicClick(e){
     try{
       if(e){ e.preventDefault(); e.stopPropagation(); }
