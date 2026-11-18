@@ -3492,7 +3492,7 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
     {k:"idara", names:["ادارة","إدارة"]},
     {k:"gym", names:["جم","الجدوع جم","جيم"]}
   ];
-  var WORD_NUM={"واحد":1,"اثنين":2,"ثلاثة":3,"اربعة":4,"خمسة":5,"ستة":6,"سبعة":7,"ثمانية":8,"تسعة":9,"عشرة":10,"عشرين":20,"ثلاثين":30,"اربعين":40,"خمسين":50,"ستين":60,"سبعين":70,"ثمانين":80,"تسعين":90,"مئة":100,"مائة":100,"ميتين":200,"مليون":1000000,"مليونين":2000000};
+  var WORD_NUM={"واحد":1,"اثنين":2,"ثلاثة":3,"اربعة":4,"خمسة":5,"ستة":6,"سبعة":7,"ثمانية":8,"تسعة":9,"عشرة":10,"عشرين":20,"ثلاثين":30,"اربعين":40,"خمسين":50,"ستين":60,"سبعين":70,"ثمانين":80,"تسعين":90,"مئة":100,"مائة":100,"ميتين":200,"خمسميه":500,"خمسمئة":500,"خمسمائة":500,"ميه":100,"مليون":1000000,"مليونين":2000000};
   function norm(s){ return String(s||"").replace(/[٠-٩]/g,function(c){return String(c.charCodeAt(0)-1632)}).replace(/[أإآ]/g,"ا").replace(/ة/g,"ه").replace(/ى/g,"ي").toLowerCase(); }
   function parseAmount(raw){
     var s=norm(raw);
@@ -3564,16 +3564,27 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
     else if(m[2]==="الف") mult=1000;
     return Math.round(n*mult);
   }
-  function parseNote(raw, cat, amt){
+  function parseNote(raw, cat, amt, sub){
     var s=String(raw||"").trim();
     // صيغة صريحة: "بيان ..." أو "ملاحظة ..." أو "اسم ..."
     var m=s.match(/(?:بيان|ملاحظه|ملاحظة|اسم)\s*[:\-]?\s*(.+)/);
-    if(m) return m[1].trim();
+    if(m){
+      var nb=m[1].trim();
+      // حتى بعد "بيان" ممكن يجي "عمولة ..." - احذفها من البيان
+      nb=nb.replace(/عموله?\s*.*/,"").trim();
+      return nb;
+    }
     // غير ذلك: خذ أي كلام بعد المبلغ (مثلاً: "صادرات 500 ألف محمد القائم" -> البيان = "محمد القائم")
     // نحذف القسم والمبلغ والعمولة من النص، والباقي هو البيان
     var t=s;
     // احذف كلمة القسم
     if(cat){ cat.names.forEach(function(n){ t=t.replace(n,""); }); }
+    // احذف كلمة الفرع (سحب/إيداع/وارد...) - حتى لا تنحسب بيان
+    if(cat && sub){
+      (SUBS[cat.k]||[]).forEach(function(sb){ if(sb.k===sub){ sb.names.forEach(function(n){ t=t.replace(n,""); }); } });
+    }
+    // احذف كل أسماء الأفرع عموماً حتى لو الفرع ما انكشف - مثلاً "سحب" لوحدها
+    ["سحب","ايداع","إيداع","وارد","اوليه","أولية","نقد","صرفيات","حجوزات","طائره","طائرة","صباحي","مسائي","خارجي","واتساب"].forEach(function(w){ t=t.replace(w,""); });
     // احذف العمولة كاملة
     t=t.replace(/عمولة[^،,]*$/,"").replace(/عمولة.*?(ألف|مليون|مليار|\d+)/,"");
     // احذف المبلغ: رقم + (ألف/مليون) أو كلمات الأرقام
@@ -3604,18 +3615,28 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
     rec.onresult=function(e){
       var raw=e.results[0][0].transcript;
       mic.classList.remove("rec");
-      var cat=parseCat(raw), amt=parseAmount(raw), comm=parseCommission(raw), note=parseNote(raw, cat, amt), sub=parseSub(raw, cat);
+      var cat=parseCat(raw), sub=parseSub(raw, cat), amt=parseAmount(raw), comm=parseCommission(raw), note=parseNote(raw, cat, amt, sub);
       if(!cat || !amt){
         txt.innerHTML='ما فهمت: "<b>'+raw+'</b>"<br>جرب: <b>صادرات 500 ألف</b> - لازم تقول القسم + المبلغ';
         conf.style.display="none"; pending=null; return;
       }
       pending={cat:cat, amt:amt, raw:raw, comm:comm, note:note, sub:sub};
       var subHtml = sub ? '<br>الفرع: <b>'+(SUB_LABEL[sub]||sub)+'</b>' : '';
+      // عرض تفصيلي للتأكد: كل عنصر بسطر حتى يبين أي خطأ قبل الإدخال
       txt.innerHTML='فهمت: <b>'+raw+'</b><br>القسم: <b>'+cat.names[0]+'</b> - المبلغ: <b>'+amt.toLocaleString("en-US")+'</b>'
         + subHtml
         + (comm? '<br>العمولة: <b>'+comm.toLocaleString("en-US")+'</b>' : '')
         + (note? '<br>البيان: <b>'+note+'</b>' : '')
         + (sub ? '<br>اضغط ✅ إدخال مباشر' : '<br><b style="color:#fbbf24">⚠️ ما ذكرت الفرع - اختر الفرع ثم اضغط ✅</b><div id="jdSubBtns" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px"></div>');
+      if(sub && amt){
+        // فهم كامل: قسم + فرع + مبلغ -> ادخل مباشرة بدون زر تأكيد
+        txt.innerHTML='فهمت: <b>'+raw+'</b><br>القسم: <b>'+cat.names[0]+'</b> • الفرع: <b>'+(SUB_LABEL[sub]||sub)+'</b> - المبلغ: <b>'+amt.toLocaleString("en-US")+'</b>'
+          + (comm? '<br>العمولة: <b>'+comm.toLocaleString("en-US")+'</b>' : '')
+          + (note? '<br>البيان: <b>'+note+'</b>' : '')
+          + '<br>⏳ جاري الإدخال مباشرة...';
+        setTimeout(doDirectEntry, 400);
+        return;
+      }
       if(!sub){
         conf.style.display="block";
         setTimeout(function(){
@@ -3635,8 +3656,12 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
     rec.onend=function(){ mic.classList.remove("rec"); };
     try{ rec.start(); }catch(e){}
   }
-  mic.onclick=function(){ if(!bar.classList.contains("open")){ bar.classList.add("open"); return; } speak(); };
-  conf.onclick=function(){
+  // ضغطة واحدة = يستمع فوراً ويدخل العملية - بدون ضغطة ثانية وبدون زر تأكيد
+  mic.onclick=function(){
+    bar.classList.add("open");
+    speak();
+  };
+  function doDirectEntry(){
     if(!pending) return;
     // إدخال مباشر: بدون فتح القسم، بدون نموذج - نرسل العملية لـ Firebase مثل ما يسوي زر الحفظ الأصلي
     var SUB={saderat:"awaliya",waredat:"khareji",malab:"hujuzat",hawatif:"wared",albisa:"wared",super:"sabah",idara:"wared",electronic:"ida",salary:"sarfiyat",gym:"wared"};
@@ -3650,7 +3675,11 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
     txt.innerHTML='⏳ جاري إدخال: <b>'+pending.cat.names[0]+' - '+pending.amt.toLocaleString("en-US")+'</b>...';
     conf.style.display="none";
     var done=function(){
+      // منع وهم الفرع القديم: لا نعتمد على آخر فرع أبداً - كل عملية جديدة لازم تذكر فرعها صراحة
+      // ونعرض آخر عملية بوضوح حتى تعرف أنت وين دخلت، وما تتوهم أن النموذج باقي على نفس الفرع
+      try{ localStorage.setItem("jd_last_voice", JSON.stringify({cat:pending.cat.names[0], sub:SUB_LABEL[pending.sub]||pending.sub, amt:pending.amt, at:new Date().toLocaleTimeString("ar-EG",{hour:"2-digit",minute:"2-digit"}) })); }catch(e){}
       txt.innerHTML='✅ تم إدخال العملية مباشرة:<br><b>'+pending.cat.names[0]+' • '+(SUB_LABEL[pending.sub]||pending.sub)+' - '+pending.amt.toLocaleString("en-US")+' د.ع</b>'
+        + '<br><span style="color:#fbbf24">⚠️ تنبيه: العملية دخلت بالفرع المذكور فقط. العملية الجاية لازم تذكر فرعها من جديد - لا تعتمد على الفرع القديم.</span>'
         + (pending.comm? '<br>العمولة: '+pending.comm.toLocaleString("en-US") : '')
         + (pending.note? '<br>البيان: '+pending.note : '')
         + '<br>ظهرت الآن في البطاقة والقسم، بدون فتح نموذج.';
@@ -3662,7 +3691,8 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
       if(window.__fbSetTx){ var pr=window.__fbSetTx(H); if(pr&&pr.then) pr.then(done).catch(done); else done(); }
       else { txt.innerHTML='❌ ما كدرت أوصل لقاعدة البيانات، حاول مرة ثانية'; }
     }catch(e){ txt.innerHTML='❌ صار خطأ: '+e.message; }
-  };
+  }
+  conf.onclick=doDirectEntry;
 })();
 </script>
 
