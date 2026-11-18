@@ -3251,7 +3251,42 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
     b.push(["الإجمالي",fmt(tot.in),fmt(tot.out),fmt(tot.in-tot.out),tot.n]);
     return{h:"<b>مقارنة الأقسام — "+esc(p.label)+"</b>"+table(["القسم","وارد","سحب/صادر","الصافي","عدد"],b)+
       '<div class="jas-dim" style="margin-top:6px">الصافي = وارد − سحب. الصادرات والرواتب تُحسب كلها سحباً.'+(assumed?" (لم تحدد فترة فاعتمدت هذا الشهر)":"")+"</div>"}}
-  function ansDay(kind,p,secs,assumed){
+     // مقارنة موحدة للكل: محسوبة بالكود (مو بالذكاء) حتى تطلع نفس الأرقام بكل التلفونات إذا البيانات متزامنة
+   function ansCompareFull(p,assumed){
+     var now=new Date(), d=now.getDate();
+     var daysInMonth=new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+     var pm=new Date(now.getFullYear(), now.getMonth()-1, 1);
+     var lastSameEnd=new Date(pm.getFullYear(), pm.getMonth(), Math.min(d, new Date(pm.getFullYear(), pm.getMonth()+1, 0).getDate()));
+     var out=[];
+     SEC.forEach(function(s){
+       var cur=agg(p.from, p.to, [s.k]);
+       var prev=agg(iso(pm), iso(lastSameEnd), [s.k]);
+       if(!cur.n && !prev.n) return;
+       var isOut=(s.k==="saderat"||s.k==="salary");
+       var base=isOut ? cur.out : cur.in;
+       var basePrev=isOut ? prev.out : prev.in;
+       var diff=base-basePrev;
+       var pc=basePrev>0 ? Math.round(Math.abs(diff)/basePrev*100) : 0;
+       var forecast=d>0 ? Math.round(base/d*daysInMonth) : base;
+       var trend=diff>0 ? "صاعد" : diff<0 ? "نازل" : "ثابت";
+       var arrow=diff>0 ? "▲" : diff<0 ? "▼" : "＝";
+       out.push({s:s, base:base, basePrev:basePrev, diff:diff, pc:pc, forecast:forecast, trend:trend, arrow:arrow});
+     });
+     if(!out.length) return {h:"لا توجد عمليات مسجّلة في "+esc(p.label)+"."};
+     out.sort(function(a,b){return b.base-a.base});
+     var h="<b>مقارنة الأقسام — "+esc(p.label)+" (محسوبة، نفسها للكل)</b>";
+     out.forEach(function(o){
+       h+='<div style="margin-top:12px;border-top:1px solid #eee;padding-top:8px"><b>'+o.arrow+' '+esc(o.s.l)+'</b><br>'
+         +'هذا الشهر: <b>'+fmt(o.base)+'</b><br>'
+         +'الشهر الماضي (نفس الأيام): <b>'+fmt(o.basePrev)+'</b><br>'
+         +(o.diff!==0 ? (o.diff>0?'▲ أعلى بـ ':'▼ أقل بـ ')+fmt(Math.abs(o.diff))+' ('+o.pc+'%)<br>' : '＝ نفس الشهر الماضي<br>')
+         +'🔮 توقع نهاية الشهر: <b>'+fmt(o.forecast)+'</b> • الاتجاه: '+o.trend
+         +'</div>';
+     });
+     h+='<div class="jas-dim" style="margin-top:8px">التوقع = هذا الشهر ÷ '+d+' يوم × '+daysInMonth+' يوم. الأرقام محسوبة من بياناتك، مو من الذكاء، لذلك تطلع نفسها بكل جهاز إذا البيانات متزامنة.</div>';
+     return {h:h};
+   }
+   function ansDay(kind,p,secs,assumed){
     var r=agg(p.from,p.to,secs),ks=Object.keys(r.days),oo=onlyOut(secs);
     if(!ks.length)return{h:"لا توجد عمليات مسجّلة في "+esc(p.label)+(secs.length?" ضمن "+esc(secs.map(function(k){return LBL[k]}).join("، ")):"")+"."};
     var val=function(k){return oo?r.days[k].out:r.days[k].in};
@@ -3336,7 +3371,9 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
   function route(raw){
     var q=norm(raw),now=new Date();
     if(/^(مساعده|help|ساعدني|وش تسوي|ماذا تفعل)/.test(q))return{h:help()};
-    if(getCfg().url&&/لماذا|ليش|سبب|حلل|تحليل|اقترح|نصيح|تتوقع|قيم|ملاحظات|اشرح|شرح/.test(q))return null;
+    // قارن / حلل: لا ترسل للذكاء أبداً - الذكاء يعطي صياغة مختلفة كل مرة، والكود يعطي نفس الأرقام للكل
+     if(/قارن|مقارن|حلل|تحليل|مقارنة/.test(q)){ var pp=period(q,now)||{from:iso(new Date(now.getFullYear(),now.getMonth(),1)),to:iso(now),label:"هذا الشهر"}; return ansCompareFull(pp,false); }
+     if(getCfg().url&&/لماذا|ليش|سبب|اقترح|نصيح|تتوقع|قيم|ملاحظات|اشرح|شرح/.test(q))return null;
     if(/ملخص/.test(q)){var p0=period(q,now)||{from:iso(now),to:iso(now)},day=p0.to;lastSum=summary(day);return{sum:lastSum}}
     var secs=[];SEC.forEach(function(s){if(s.re.test(q))secs.push(s.k)});
     if(/واردات\s*خارجي/.test(q)&&secs.indexOf("waredat")<0)secs.push("waredat");
