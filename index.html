@@ -666,7 +666,21 @@ html.jd-dark #root button.rounded-\[20px\].p-4 > div.mt-3 > div span{ color:#fff
       });
     };
 
-    const prjCol = collection(db, "aljodoo_settings");
+         // إعدادات الذكاء المشتركة للكل: الرابط + الرمز السري ينحفظون مرة واحدة بـ Firebase وينزلون تلقائياً عند الكل
+     const aiCfgRef = doc(db, "aljodoo_settings", "ai_cfg");
+     window.__fbSetAiCfg = function(cfg){
+       return window.__fbAuthReady.then(function(){
+         return setDoc(aiCfgRef, Object.assign({}, cfg, { updatedAt: Date.now() })).catch(function(e){ console.error("Firebase set ai_cfg error:", e); });
+       });
+     };
+     window.__fbSubscribeAiCfg = function(callback){
+       window.__fbAuthReady.then(function(){
+         onSnapshot(aiCfgRef, function(snap){
+           if(snap.exists()){ var d=snap.data(); callback({url:d.url||"", token:d.token||"", updatedAt:d.updatedAt||0}); }
+         }, function(err){ console.error("Firebase ai_cfg sync error:", err); });
+       });
+     };
+     const prjCol = collection(db, "aljodoo_settings");
     window.__fbSetProject = function(p){
       var n = notifySave("تم حفظ المشروع ✓", "تم الحفظ على الجهاز، سيُرفع عند عودة الإنترنت");
       return trackPending(window.__fbAuthReady.then(function(){
@@ -3349,8 +3363,24 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
     return L.join("\n")}
 
   // ---------- الذكاء الاصطناعي عبر وسيط (اختياري)
-  function getCfg(){try{return JSON.parse(localStorage.getItem(CFGK)||"{}")||{}}catch(e){return{}}}
-  function setCfg(o){try{localStorage.setItem(CFGK,JSON.stringify(o))}catch(e){}}
+  var JD_AI_DEFAULT_URL="https://jadou-ai.heetya" + "lajmy.workers.dev/";
+   var jdSharedAiCfg=null;
+   function getCfg(){ var c={}; try{c=JSON.parse(localStorage.getItem(CFGK)||"{}")||{}}catch(e){c={}} if(!c.url && jdSharedAiCfg && jdSharedAiCfg.url) c.url=jdSharedAiCfg.url; if(!c.token && jdSharedAiCfg && jdSharedAiCfg.token) c.token=jdSharedAiCfg.token; if(!c.url) c.url=JD_AI_DEFAULT_URL; return c; }
+   function setCfg(o){try{localStorage.setItem(CFGK,JSON.stringify(o))}catch(e){} try{ if(window.__fbSetAiCfg && o.url) window.__fbSetAiCfg({url:o.url, token:o.token||""}); }catch(e){} }
+   try{
+     if(window.__fbSubscribeAiCfg){
+       window.__fbSubscribeAiCfg(function(shared){
+         if(!shared) return;
+         jdSharedAiCfg=shared;
+         try{
+           var cur=JSON.parse(localStorage.getItem(CFGK)||"{}")||{};
+           if(cur.url!==shared.url || cur.token!==shared.token){
+             localStorage.setItem(CFGK, JSON.stringify({url:shared.url, token:shared.token||""}));
+           }
+         }catch(e){}
+       });
+     }
+   }catch(e){}
   function digest(){
     var from=iso(addDays(new Date(),-120)),g={};
     rows().forEach(function(x){
@@ -3424,7 +3454,7 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
     var ex=document.getElementById("jasSetCard");
     if(ex){ex.scrollIntoView({block:"center"});return}
     var c=getCfg();
-    var sd=addA('<b>إعدادات الذكاء الاصطناعي (اختياري)</b><div class="jas-dim">بدونها يعمل المساعد على بياناتك محلياً. للتفعيل ضع رابط الوسيط (Worker) والرمز السري. عند الإرسال تُرسل أرقام مجمّعة لآخر 120 يوماً، بدون ملاحظات أو أسماء موظفين.</div><div class="jas-set"><input id="jasUrl" placeholder="https://xxxx.workers.dev" value="'+esc(c.url||"")+'"><input id="jasTok" type="password" placeholder="الرمز السري" value="'+esc(c.token||"")+'"></div><div class="jas-act"><button data-a="save">حفظ</button><button data-a="clr">مسح الإعدادات</button></div>');sd.id="jasSetCard"}
+    var sd=addA('<b>إعدادات الذكاء الاصطناعي (مشتركة للكل)</b><div class="jas-dim">بدونها يعمل المساعد على بياناتك محلياً. للتفعيل ضع رابط الوسيط (Worker) والرمز السري. عند الإرسال تُرسل أرقام مجمّعة لآخر 120 يوماً، بدون ملاحظات أو أسماء موظفين.</div><div class="jas-set"><input id="jasUrl" placeholder="https://xxxx.workers.dev" value="'+esc(c.url||"")+'"><input id="jasTok" type="password" placeholder="الرمز السري" value="'+esc(c.token||"")+'"></div><div class="jas-act"><button data-a="save">حفظ</button><button data-a="clr">مسح الإعدادات</button></div>');sd.id="jasSetCard"}
   function polish(text,btn){
     if(!getCfg().url){addA("الصياغة الودّية تحتاج تفعيل الذكاء الاصطناعي من ⚙️.");return}
     btn.disabled=true;
