@@ -3259,6 +3259,25 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
     var pick=(kind==="worst")?ks[0]:ks[ks.length-1],avg=ks.reduce(function(s,k){return s+val(k)},0)/ks.length;
     return{h:"<b>"+(kind==="worst"?"أضعف":"أفضل")+" يوم "+(oo?"(صادر)":"(وارد)")+" — "+esc(p.label)+"</b><br>"+esc(dayTxt(pick))+": <b>"+fmt(val(pick))+"</b> د.ع"+
       '<div class="jas-dim">المتوسط بين الأيام المسجّلة ('+ks.length+" يوماً): "+fmt(avg)+" د.ع"+(assumed?" • اعتمدت هذا الشهر لأنك لم تحدد فترة":"")+"</div>"}}
+  function ansVsPrev(kind,secs,now){
+    var t=iso(now),cs,ps,pe,pf,l1,l2,l3,oo=onlyOut(secs),M=kind==="month";
+    if(M){
+      var d=now.getDate(),pm=new Date(now.getFullYear(),now.getMonth()-1,1),pl=new Date(now.getFullYear(),now.getMonth(),0);
+      cs=new Date(now.getFullYear(),now.getMonth(),1);ps=pm;pe=new Date(pm.getFullYear(),pm.getMonth(),Math.min(d,pl.getDate()));pf=pl;
+      l1="هذا الشهر (حتى اليوم "+d+")";l2="الشهر الماضي (نفس الأيام)";l3="الشهر الماضي كاملاً"}
+    else{
+      var off=(now.getDay()+1)%7,ws=addDays(now,-off);
+      cs=ws;ps=addDays(ws,-7);pe=addDays(ps,off);pf=addDays(ws,-1);
+      l1="هذا الأسبوع (حتى اليوم)";l2="الأسبوع الماضي (نفس الأيام)";l3="الأسبوع الماضي كاملاً"}
+    var a=agg(iso(cs),t,secs),b=agg(iso(ps),iso(pe),secs),c=agg(iso(ps),iso(pf),secs);
+    var nm=secs.length?secs.map(function(k){return LBL[k]}).join(" + "):"كل الأقسام";
+    if(!a.n&&!b.n&&!c.n)return{h:"لا توجد عمليات مسجّلة لـ <b>"+esc(nm)+"</b> في الفترتين."};
+    function row(l,r){return[l,fmt(r.in),fmt(r.out),fmt(r.in-r.out),r.n]}
+    var h="<b>"+esc(nm)+" — مقارنة بـ"+(M?"الشهر":"الأسبوع")+" الماضي</b>"+table(["الفترة","وارد","سحب/صادر","الصافي","عدد"],[row(l1,a),row(l2,b),row(l3,c)]);
+    var va=oo?a.out:a.in,vb=oo?b.out:b.in,w=oo?"الصادر":"الوارد";
+    if(vb>0){var pc=(va-vb)/vb*100;h+='<div style="margin-top:6px">'+w+" "+(pc>=0?"أعلى":"أقل")+" بنسبة <b>"+Math.abs(pc).toFixed(1)+"%</b> عن نفس الفترة من "+(M?"الشهر":"الأسبوع")+" الماضي.</div>"}
+    else h+='<div class="jas-dim" style="margin-top:6px">لا يوجد '+w+" في الفترة المقابلة لحساب النسبة.</div>";
+    return{h:h}}
   function ansTotals(p,secs,metric,assumed){
     var r=agg(p.from,p.to,secs),nm=secs.length?secs.map(function(k){return LBL[k]}).join(" + "):"كل الأقسام";
     if(!r.n)return{h:"لا توجد عمليات مسجّلة لـ <b>"+esc(nm)+"</b> في "+esc(p.label)+"."};
@@ -3317,9 +3336,12 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
   function route(raw){
     var q=norm(raw),now=new Date();
     if(/^(مساعده|help|ساعدني|وش تسوي|ماذا تفعل)/.test(q))return{h:help()};
+    if(getCfg().url&&/لماذا|ليش|سبب|حلل|تحليل|اقترح|نصيح|تتوقع|قيم|ملاحظات|اشرح|شرح/.test(q))return null;
     if(/ملخص/.test(q)){var p0=period(q,now)||{from:iso(now),to:iso(now)},day=p0.to;lastSum=summary(day);return{sum:lastSum}}
     var secs=[];SEC.forEach(function(s){if(s.re.test(q))secs.push(s.k)});
     if(/واردات\s*خارجي/.test(q)&&secs.indexOf("waredat")<0)secs.push("waredat");
+    var mv=q.match(/(مقارنه|مقابل|عن|مع)\s*(بال|ال|ب)?(شهر|اسبوع)\s*(ال)?(ماضي|سابق)/);
+    if(mv)return ansVsPrev(mv[3]==="شهر"?"month":"week",secs,now);
     var p=period(q,now),assumed=false;
     var wantsNum=/كم|مجموع|اجمالي|مقارن|قارن|رتب|ترتيب|اضعف|افضل|اعلى|اقل|اكثر|صافي|عدد|وارد|سحب|مبلغ/.test(q);
     if(!wantsNum&&!p&&!secs.length)return null;
@@ -3379,7 +3401,7 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
     if(document.getElementById("jdAsst"))return;
     var ov=document.createElement("div");ov.id="jdAsst";ov.className="jdov";
     ov.innerHTML='<div class="jb"><div class="jt"><span>🤖 المساعد الذكي</span><span class="jas-hb"><button type="button" data-a="cfg" aria-label="إعدادات">⚙️</button><button type="button" data-x="1" aria-label="إغلاق">✕</button></span></div><div class="jbody"></div>'+
-      '<div class="jas-chips"><button class="jas-chip" data-q="ملخص اليوم">📅 ملخص اليوم</button><button class="jas-chip" data-q="ملخص أمس">ملخص أمس</button><button class="jas-chip" data-q="قارن الأقسام هذا الشهر">قارن الأقسام</button><button class="jas-chip" data-q="أضعف يوم هذا الشهر">أضعف يوم</button><button class="jas-chip" data-q="كم صادرات الأسبوع الماضي؟">صادرات الأسبوع الماضي</button></div>'+
+      '<div class="jas-chips"><button class="jas-chip" data-q="ملخص اليوم">📅 ملخص اليوم</button><button class="jas-chip" data-q="ملخص أمس">ملخص أمس</button><button class="jas-chip" data-q="قارن الأقسام هذا الشهر">قارن الأقسام</button><button class="jas-chip" data-q="أضعف يوم هذا الشهر">أضعف يوم</button><button class="jas-chip" data-q="كم صادرات الأسبوع الماضي؟">صادرات الأسبوع الماضي</button><button class="jas-chip" data-q="حلل أداء الأقسام هذا الشهر مقارنة بالشهر الماضي">🧠 حلل لي</button></div>'+
       '<div class="jas-bar"><input id="jasIn" placeholder="اسأل عن بياناتك..." autocomplete="off"><button type="button" data-a="go">إرسال</button></div></div>';
     ov.addEventListener("click",function(e){
       var t=e.target;if(t===ov){ov.classList.remove("open");return}
