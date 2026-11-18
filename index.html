@@ -3474,7 +3474,7 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
   </div>
   
   <div id="jdVoicePanel">
-    <div id="jdVoiceTxt" style="flex:1;font-size:13px;line-height:1.6;min-height:20px">اضغط 🎤 وقول: <b>صادرات 500 ألف</b> أو <b>هواتف 200 ألف</b> أو <b>منفذ الرواتب 432 ألف</b></div>
+    <div id="jdVoiceTxt" style="flex:1;font-size:13px;line-height:1.6;min-height:20px">اضغط 🎤 وقول: <b>الدفع الإلكتروني سحب 500 ألف</b> أو <b>هواتف 200 ألف</b> أو <b>منفذ الرواتب 432 ألف</b></div>
     <button id="jdVoiceConfirm" type="button">✅ إدخال مباشر</button>
   </div>
 </div>
@@ -3522,6 +3522,31 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
     for(var i=0;i<CATS.length;i++){
       for(var j=0;j<CATS[i].names.length;j++){
         if(s.indexOf(norm(CATS[i].names[j]))>=0) return CATS[i];
+      }
+    }
+    return null;
+  }
+  var SUBS={
+    saderat:[{k:"awaliya",names:["اوليه","أولية","اولي"]},{k:"naqd",names:["نقد","كاش"]},{k:"sarfiyat",names:["صرفيات","صرف","مصاريف"]}],
+    salary:[{k:"sarfiyat",names:["منفذ الرواتب","رواتب"]}],
+    waredat:[{k:"khareji",names:["خارجي"]},{k:"whatsapp",names:["واتساب","مشاريع"]},{k:"mashari3",names:["جدول المشاريع","جدول"]}],
+    malab:[{k:"hujuzat",names:["حجوزات","حجز"]},{k:"taira",names:["طائره","طائرة","طياره"]},{k:"sahb",names:["سحب"]}],
+    hawatif:[{k:"wared",names:["وارد"]},{k:"sahb",names:["سحب"]}],
+    albisa:[{k:"wared",names:["وارد"]},{k:"sahb",names:["سحب"]}],
+    super:[{k:"sabah",names:["صباحي","صباح"]},{k:"masai",names:["مسائي","مساء"]},{k:"sahb",names:["سحب"]}],
+    idara:[{k:"wared",names:["وارد"]},{k:"sahb",names:["سحب"]}],
+    electronic:[{k:"ida",names:["ايداع","إيداع"]},{k:"sahb",names:["سحب"]}],
+    gym:[{k:"wared",names:["وارد"]},{k:"sahb",names:["سحب"]}],
+    wakeel:[{k:"mablagh",names:["قيمه المبلغ","مبلغ"]},{k:"tasdeed",names:["تسديد"]}]
+  };
+  var SUB_LABEL={awaliya:"أولية",naqd:"نقد",sarfiyat:"صرفيات / منفذ",khareji:"خارجي",whatsapp:"واتساب / مشاريع",mashari3:"جدول المشاريع",hujuzat:"حجوزات",taira:"طائرة",sahb:"سحب",wared:"وارد",sabah:"صباحي",masai:"مسائي",ida:"إيداع",mablagh:"قيمة المبلغ",tasdeed:"تسديد"};
+  function parseSub(raw, cat){
+    if(!cat) return null;
+    var s=norm(raw);
+    var list=SUBS[cat.k]||[];
+    for(var i=0;i<list.length;i++){
+      for(var j=0;j<list[i].names.length;j++){
+        if(s.indexOf(norm(list[i].names[j]))>=0) return list[i].k;
       }
     }
     return null;
@@ -3579,16 +3604,31 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
     rec.onresult=function(e){
       var raw=e.results[0][0].transcript;
       mic.classList.remove("rec");
-      var cat=parseCat(raw), amt=parseAmount(raw), comm=parseCommission(raw), note=parseNote(raw, cat, amt);
+      var cat=parseCat(raw), amt=parseAmount(raw), comm=parseCommission(raw), note=parseNote(raw, cat, amt), sub=parseSub(raw, cat);
       if(!cat || !amt){
         txt.innerHTML='ما فهمت: "<b>'+raw+'</b>"<br>جرب: <b>صادرات 500 ألف</b> - لازم تقول القسم + المبلغ';
         conf.style.display="none"; pending=null; return;
       }
-      pending={cat:cat, amt:amt, raw:raw, comm:comm, note:note};
+      pending={cat:cat, amt:amt, raw:raw, comm:comm, note:note, sub:sub};
+      var subHtml = sub ? '<br>الفرع: <b>'+(SUB_LABEL[sub]||sub)+'</b>' : '';
       txt.innerHTML='فهمت: <b>'+raw+'</b><br>القسم: <b>'+cat.names[0]+'</b> - المبلغ: <b>'+amt.toLocaleString("en-US")+'</b>'
+        + subHtml
         + (comm? '<br>العمولة: <b>'+comm.toLocaleString("en-US")+'</b>' : '')
         + (note? '<br>البيان: <b>'+note+'</b>' : '')
-        + '<br>اضغط ✅ إدخال مباشر - راح تدخل العملية فوراً بدون فتح القسم';
+        + (sub ? '<br>اضغط ✅ إدخال مباشر' : '<br><b style="color:#fbbf24">⚠️ ما ذكرت الفرع - اختر الفرع ثم اضغط ✅</b><div id="jdSubBtns" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px"></div>');
+      if(!sub){
+        conf.style.display="block";
+        setTimeout(function(){
+          var wrap=document.getElementById("jdSubBtns"); if(!wrap) return;
+          (SUBS[cat.k]||[]).forEach(function(s){
+            var b=document.createElement("button");
+            b.type="button"; b.textContent=SUB_LABEL[s.k]||s.k;
+            b.style.cssText="background:#fff;color:#111;border:0;border-radius:10px;padding:8px 12px;font-weight:800;cursor:pointer";
+            b.onclick=function(){ pending.sub=s.k; var btns=wrap.querySelectorAll("button"); btns.forEach(function(x){x.style.background="#fff";}); b.style.background="#f59e0b"; txt.innerHTML=txt.innerHTML.replace("ما ذكرت الفرع - اختر الفرع ثم اضغط","الفرع: "+(SUB_LABEL[s.k]||s.k)+" - اضغط"); };
+            wrap.appendChild(b);
+          });
+        }, 50);
+      }
       conf.style.display="block";
     };
     rec.onerror=function(){ mic.classList.remove("rec"); txt.textContent="ما سمعت صوت، حاول مرة ثانية"; };
@@ -3603,19 +3643,20 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
     var d=new Date();
     var iso=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
     var userName=""; try{ var u=JSON.parse(localStorage.getItem("taswiya_session_user")||"null"); if(u&&u.name) userName=u.name; }catch(e){}
+    if(!pending.sub){ txt.innerHTML='⚠️ اختر الفرع أولاً من الأزرار فوق، بعدين اضغط ✅'; return; }
     var noteText = pending.note ? pending.note : ("صوتي: "+pending.raw);
-    var H={id:String(Date.now()),amount:pending.amt,note:noteText,date:d.toLocaleDateString("ar-EG"),dateISO:iso,user:userName,cat:pending.cat.k,sub:SUB[pending.cat.k]||"wared",time:d.toLocaleTimeString("ar-EG",{hour:"2-digit",minute:"2-digit"})};
+    var H={id:String(Date.now()),amount:pending.amt,note:noteText,date:d.toLocaleDateString("ar-EG"),dateISO:iso,user:userName,cat:pending.cat.k,sub:pending.sub,time:d.toLocaleTimeString("ar-EG",{hour:"2-digit",minute:"2-digit"})};
     if(pending.comm) H.commission=pending.comm;
     txt.innerHTML='⏳ جاري إدخال: <b>'+pending.cat.names[0]+' - '+pending.amt.toLocaleString("en-US")+'</b>...';
     conf.style.display="none";
     var done=function(){
-      txt.innerHTML='✅ تم إدخال العملية مباشرة:<br><b>'+pending.cat.names[0]+' - '+pending.amt.toLocaleString("en-US")+' د.ع</b>'
+      txt.innerHTML='✅ تم إدخال العملية مباشرة:<br><b>'+pending.cat.names[0]+' • '+(SUB_LABEL[pending.sub]||pending.sub)+' - '+pending.amt.toLocaleString("en-US")+' د.ع</b>'
         + (pending.comm? '<br>العمولة: '+pending.comm.toLocaleString("en-US") : '')
         + (pending.note? '<br>البيان: '+pending.note : '')
         + '<br>ظهرت الآن في البطاقة والقسم، بدون فتح نموذج.';
       pending=null;
       // تحديث فوري للبطاقات بدون انتظار Firebase
-      setTimeout(function(){ txt.innerHTML='اضغط 🎤 وقول: <b>صادرات 500 ألف</b>'; bar.classList.remove("open"); }, 3500);
+      setTimeout(function(){ txt.innerHTML='اضغط 🎤 وقول: <b>الدفع الإلكتروني سحب 500 ألف</b>'; bar.classList.remove("open"); }, 3500);
     };
     try{
       if(window.__fbSetTx){ var pr=window.__fbSetTx(H); if(pr&&pr.then) pr.then(done).catch(done); else done(); }
