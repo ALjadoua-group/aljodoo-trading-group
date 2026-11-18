@@ -3455,6 +3455,10 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
 <!-- ===== JD-VOICE-ENTRY: إدخال عمليات بالصوت - تقول "صادرات 500 ألف" ===== -->
 <style>
 #jdVoiceBar{position:fixed;bottom:16px;left:12px;z-index:999999;display:flex;gap:8px;align-items:center;direction:rtl;font-family:inherit}
+#jdVoiceBar.jd-near-wa{position:static;bottom:auto;left:auto}
+#jdWaWrap{display:flex;gap:8px;align-items:stretch;position:sticky;top:8px;z-index:99998;background:transparent}
+#jdWaWrap > button{flex:1}
+#jdWaWrap #jdVoiceBar{flex:none}
 #jdVoicePanel{display:none;align-items:center;gap:8px;background:#111827;color:#fff;border-radius:18px;padding:10px 12px;box-shadow:0 10px 30px rgba(0,0,0,.35);max-width:calc(100vw - 140px)}
 #jdVoiceBar.open #jdVoicePanel{display:flex}
 #jdVoiceClose{position:absolute;top:-8px;left:-4px;width:22px;height:22px;border-radius:50%;background:#fff;color:#111;font-size:11px;border:0;box-shadow:0 2px 8px rgba(0,0,0,.3);cursor:pointer;display:none}
@@ -3471,10 +3475,10 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
     <button id="jdVoiceMic" type="button" title="إدخال بالصوت">🎤</button>
     <button id="jdVoiceClose" type="button" title="تصغير">✕</button>
   </div>
-  <button id="jdSettleBtn" type="button" title="فحص التسوية (ب + ج)" style="width:52px;height:52px;border-radius:50%;background:#061a3b;color:#FFD800;font-size:22px;flex:none;box-shadow:0 6px 18px rgba(0,0,0,.3);border:2px solid #FFD800">🔍</button>
+  
   <div id="jdVoicePanel">
     <div id="jdVoiceTxt" style="flex:1;font-size:13px;line-height:1.6;min-height:20px">اضغط 🎤 وقول: <b>صادرات 500 ألف</b> أو <b>هواتف 200 ألف</b> أو <b>منفذ الرواتب 432 ألف</b></div>
-    <button id="jdVoiceConfirm" type="button">✅ تأكيد وإدخال</button>
+    <button id="jdVoiceConfirm" type="button">✅ إدخال مباشر</button>
   </div>
 </div>
 <script>
@@ -3552,7 +3556,7 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
         conf.style.display="none"; pending=null; return;
       }
       pending={cat:cat, amt:amt, raw:raw};
-      txt.innerHTML='فهمت: <b>'+raw+'</b><br>القسم: <b>'+cat.names[0]+'</b> - المبلغ: <b>'+amt.toLocaleString("en-US")+'</b><br>اضغط ✅ للتأكيد';
+      txt.innerHTML='فهمت: <b>'+raw+'</b><br>القسم: <b>'+cat.names[0]+'</b> - المبلغ: <b>'+amt.toLocaleString("en-US")+'</b><br>اضغط ✅ إدخال مباشر - راح تدخل العملية فوراً بدون فتح القسم';
       conf.style.display="block";
     };
     rec.onerror=function(){ mic.classList.remove("rec"); txt.textContent="ما سمعت صوت، حاول مرة ثانية"; };
@@ -3562,152 +3566,53 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
   mic.onclick=function(){ if(!bar.classList.contains("open")){ bar.classList.add("open"); return; } speak(); };
   conf.onclick=function(){
     if(!pending) return;
-    // 1) نضغط على بطاقة القسم في الرئيسية حتى يفتح نموذج الإدخال الخاص به
-    var catName = pending.cat.names[0];
-    // نبحث عن زر البطاقة الذي يحتوي اسم القسم
-    var btns=[].slice.call(document.querySelectorAll("#root button"));
-    var target=null;
-    btns.forEach(function(b){ if(b.textContent && b.textContent.indexOf(catName)>=0 && !target) target=b; });
-    // إذا القسم له اسمين (منفذ الرواتب) جرب الاسم الثاني
-    if(!target && pending.cat.k==="salary"){
-      btns.forEach(function(b){ if(b.textContent && b.textContent.indexOf("الرواتب")>=0 && !target) target=b; });
-    }
-    if(target){ target.click(); }
-    // 2) بعد فتح النموذج، نملأ حقل المبلغ
-    setTimeout(function(){
-      var inputs=[].slice.call(document.querySelectorAll('input[placeholder="المبلغ"], input[placeholder*="المبلغ"]'));
-      var inp = inputs[0];
-      if(inp){
-        setReactInput(inp, pending.amt);
-        txt.innerHTML='✅ تم ملء: <b>'+catName+' - '+pending.amt.toLocaleString("en-US")+'</b><br>تأكد من القسم والمبلغ ثم اضغط <b>حفظ</b> بالنموذج.';
-        inp.focus();
-      } else {
-        txt.innerHTML='تم اختيار قسم <b>'+catName+'</b> - المبلغ: <b>'+pending.amt.toLocaleString("en-US")+'</b><br>أكمل إدخال المبلغ في النموذج واضغط حفظ.';
-      }
-      conf.style.display="none";
+    // إدخال مباشر: بدون فتح القسم، بدون نموذج - نرسل العملية لـ Firebase مثل ما يسوي زر الحفظ الأصلي
+    var SUB={saderat:"awaliya",waredat:"khareji",malab:"hujuzat",hawatif:"wared",albisa:"wared",super:"sabah",idara:"wared",electronic:"ida",salary:"sarfiyat",gym:"wared"};
+    var d=new Date();
+    var iso=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+    var userName=""; try{ var u=JSON.parse(localStorage.getItem("taswiya_session_user")||"null"); if(u&&u.name) userName=u.name; }catch(e){}
+    var H={id:String(Date.now()),amount:pending.amt,note:"صوتي: "+pending.raw,date:d.toLocaleDateString("ar-EG"),dateISO:iso,user:userName,cat:pending.cat.k,sub:SUB[pending.cat.k]||"wared",time:d.toLocaleTimeString("ar-EG",{hour:"2-digit",minute:"2-digit"})};
+    txt.innerHTML='⏳ جاري إدخال: <b>'+pending.cat.names[0]+' - '+pending.amt.toLocaleString("en-US")+'</b>...';
+    conf.style.display="none";
+    var done=function(){
+      txt.innerHTML='✅ تم إدخال العملية مباشرة:<br><b>'+pending.cat.names[0]+' - '+pending.amt.toLocaleString("en-US")+' د.ع</b><br>ظهرت الآن في البطاقة والقسم، بدون فتح نموذج.';
       pending=null;
-    }, 600);
+      // تحديث فوري للبطاقات بدون انتظار Firebase
+      setTimeout(function(){ txt.innerHTML='اضغط 🎤 وقول: <b>صادرات 500 ألف</b>'; bar.classList.remove("open"); }, 3500);
+    };
+    try{
+      if(window.__fbSetTx){ var pr=window.__fbSetTx(H); if(pr&&pr.then) pr.then(done).catch(done); else done(); }
+      else { txt.innerHTML='❌ ما كدرت أوصل لقاعدة البيانات، حاول مرة ثانية'; }
+    }catch(e){ txt.innerHTML='❌ صار خطأ: '+e.message; }
   };
 })();
 </script>
 
-<!-- ===== JD-SETTLE B+C: فحص التسوية + توقع نهاية الشهر (بدون ذكاء، حساب داخل التطبيق) ===== -->
-<style>
-#jdSettleModal{position:fixed;inset:0;z-index:1000000;background:rgba(0,0,0,.55);display:none;align-items:flex-end;justify-content:center;direction:rtl}
-#jdSettleBox{background:#fff;width:100%;max-width:560px;max-height:88vh;overflow:auto;border-radius:22px 22px 0 0;padding:16px;font-family:inherit;color:#111}
-#jdSettleBox h3{margin:0 0 8px;font-size:17px}
-#jdSettleBox .tab{display:flex;gap:8px;margin:10px 0}
-#jdSettleBox .tab button{flex:1;border:1px solid #e5e7eb;background:#f9fafb;border-radius:12px;padding:10px;font-weight:800;cursor:pointer}
-#jdSettleBox .tab button.on{background:#061a3b;color:#FFD800;border-color:#061a3b}
-#jdSettleBox table{width:100%;border-collapse:collapse;font-size:13px}
-#jdSettleBox th,#jdSettleBox td{border:1px solid #e5e7eb;padding:7px 6px;text-align:right}
-#jdSettleBox th{background:#f3f4f6}
-#jdSettleBox .ok{color:#16a34a;font-weight:800}
-#jdSettleBox .bad{color:#dc2626;font-weight:800}
-#jdSettleBox .warn{color:#d97706;font-weight:800}
-</style>
-<div id="jdSettleModal"><div id="jdSettleBox">
-  <div style="display:flex;justify-content:space-between;align-items:center"><h3>🔍 فحص التسوية التلقائي</h3><button id="jdSettleClose" style="border:0;background:#f3f4f6;border-radius:10px;padding:6px 12px;cursor:pointer">✕</button></div>
-  <div id="jdSettleDate" style="font-size:12px;color:#666"></div>
-  <div class="tab"><button id="jdTabB" class="on">ب: التسوية مقابل العمليات</button><button id="jdTabC">ج: توقع نهاية الشهر</button></div>
-  <div id="jdSettleContent"></div>
-  <div style="font-size:11px;color:#888;margin-top:10px">حساب داخل التطبيق، بدون ذكاء اصطناعي - نفس الأيام للمقارنة العادلة.</div>
-</div></div>
+
 <script>
 (function(){
-  var LBL={saderat:"الصادرات",salary:"منفذ الرواتب",electronic:"الدفع الإلكتروني",waredat:"الواردات",malab:"الملعب",hawatif:"الهواتف",albisa:"الألبسة",super:"السوبر ماركت",idara:"الإدارة",gym:"الجم"};
-  function fmt(n){ return Number(n||0).toLocaleString("en-US"); }
-  function todayISO(){ var d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
-  function getData(){ try{ return JSON.parse(localStorage.getItem("taswiya_data")||"{}")||{}; }catch(e){ return {}; } }
-  function allItems(){
-    var d=getData(), out=[];
-    Object.keys(d).forEach(function(c){
-      var v=d[c];
-      if(Array.isArray(v)){ v.forEach(function(x){ out.push({cat:c,sub:"",amount:Number(x.amount)||0,dateISO:x.dateISO||x.date||"",note:x.note||"",time:x.time||""}); }); }
-      else if(v && typeof v==="object"){ Object.keys(v).forEach(function(s){ var a=v[s]; if(Array.isArray(a)) a.forEach(function(x){ out.push({cat:c,sub:s,amount:Number(x.amount)||0,dateISO:x.dateISO||x.date||"",note:x.note||"",time:x.time||""}); }); }); }
-    });
-    return out;
+  // ألصق زر المايك جنب زر "مشاركة ملخص اليوم على واتساب" على اليسار، وثبّته (sticky) حتى يبقى ظاهر مع التمرير
+  function attach(){
+    var bar=document.getElementById("jdVoiceBar");
+    if(!bar || bar.dataset.attached) return;
+    var btns=[].slice.call(document.querySelectorAll("#root button"));
+    var wa=null;
+    btns.forEach(function(b){ if(b.textContent && b.textContent.indexOf("مشاركة ملخص اليوم على واتساب")>=0) wa=b; });
+    if(!wa) return;
+    if(wa.parentElement && wa.parentElement.id==="jdWaWrap") return;
+    var wrap=document.createElement("div"); wrap.id="jdWaWrap";
+    wa.parentNode.insertBefore(wrap, wa);
+    wrap.appendChild(wa);
+    // في RTL، العنصر الثاني يظهر على اليسار - لذلك نضيف المايك بعد زر واتساب في DOM فيظهر على يساره
+    wrap.appendChild(bar);
+    bar.classList.add("jd-near-wa");
+    bar.dataset.attached="1";
   }
-  function renderB(){
-    var today=todayISO(), items=allItems();
-    var todays=items.filter(function(x){ return x.dateISO===today; });
-    var yest=new Date(); yest.setDate(yest.getDate()-1);
-    var yISO=yest.getFullYear()+"-"+String(yest.getMonth()+1).padStart(2,"0")+"-"+String(yest.getDate()).padStart(2,"0");
-    var yests=items.filter(function(x){ return x.dateISO===yISO; });
-    // تجميع حسب القسم
-    var byCat={}; todays.forEach(function(x){ var o=byCat[x.cat]||(byCat[x.cat]={n:0,sum:0}); o.n++; o.sum+=x.amount; });
-    var byCatY={}; yests.forEach(function(x){ var o=byCatY[x.cat]||(byCatY[x.cat]={n:0,sum:0}); o.n++; o.sum+=x.amount; });
-    // كشف المكرر: نفس القسم + نفس المبلغ + نفس البيان بنفس اليوم أكثر من مرة
-    var seen={}, dups=[];
-    todays.forEach(function(x){
-      var k=x.cat+"|"+x.amount+"|"+(x.note||"");
-      if(seen[k]) dups.push(x);
-      seen[k]=1;
-    });
-    // كشف الناقص: قسم كان عنده عمليات البارحة، واليوم صفر
-    var missing=[];
-    Object.keys(byCatY).forEach(function(c){ if(!byCat[c]) missing.push(c); });
-    var total=todays.reduce(function(a,x){return a+x.amount;},0);
-    var totalY=yests.reduce(function(a,x){return a+x.amount;},0);
-    var diff=total-totalY;
-    var h="";
-    h+='<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:10px;margin-bottom:10px"><b>مجموع عمليات اليوم:</b> '+fmt(total)+' د.ع ('+todays.length+' عملية)<br><b>مجموع البارحة:</b> '+fmt(totalY)+' د.ع ('+yests.length+' عملية)<br><b>الفرق:</b> <span class="'+(diff>0?'ok':diff<0?'bad':'')+'">'+(diff>0?'▲ +':diff<0?'▼ ':('＝ '))+fmt(Math.abs(diff))+'</span></div>';
-    if(dups.length){ h+='<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:10px;margin-bottom:10px">⚠️ <b>احتمال تكرار:</b> '+dups.length+' عملية بنفس القسم والمبلغ والبيان اليوم.<br>'+dups.map(function(x){return '• '+(LBL[x.cat]||x.cat)+' - '+fmt(x.amount)+' - '+(x.note||'بدون بيان');}).join('<br>')+'</div>'; }
-    if(missing.length){ h+='<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:10px;margin-bottom:10px">⚠️ <b>أقسام ما بيها عمليات اليوم بس كانت موجودة البارحة (ممكن ناقصة):</b><br>'+missing.map(function(c){return '• '+(LBL[c]||c)+' - البارحة: '+fmt(byCatY[c].sum)+' ('+byCatY[c].n+' عملية)';}).join('<br>')+'</div>'; }
-    if(!dups.length && !missing.length){ h+='<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:10px;margin-bottom:10px">✅ <b>ما أكو فرق واضح:</b> كل الأقسام اللي اشتغلت البارحة اشتغلت اليوم، وما أكو تكرار واضح.</div>'; }
-    h+='<table><tr><th>القسم</th><th>اليوم (عدد)</th><th>اليوم (مبلغ)</th><th>البارحة (مبلغ)</th><th>الفرق</th></tr>';
-    var cats=Object.keys(LBL);
-    cats.forEach(function(c){
-      var a=byCat[c]||{n:0,sum:0}, b=byCatY[c]||{n:0,sum:0}, d=a.sum-b.sum;
-      if(a.sum===0 && b.sum===0) return;
-      h+='<tr><td>'+LBL[c]+'</td><td>'+a.n+'</td><td>'+fmt(a.sum)+'</td><td>'+fmt(b.sum)+'</td><td class="'+(d>0?'ok':d<0?'bad':'')+'">'+(d>0?'▲ +':d<0?'▼ -':'＝ ')+fmt(Math.abs(d))+'</td></tr>';
-    });
-    h+='</table>';
-    h+='<div style="font-size:11px;color:#888;margin-top:8px">التسوية = مجموع العمليات المدخلة. إذا الفرق مو صفر بين التسوية اليدوية والعمليات، راجع القسم اللي فرقه أكبر.</div>';
-    return h;
-  }
-  function renderC(){
-    var now=new Date(), y=now.getFullYear(), m=now.getMonth();
-    var daysInMonth=new Date(y,m+1,0).getDate();
-    var todayDay=now.getDate();
-    var passed=todayDay; // من 1 إلى اليوم
-    var remaining=daysInMonth-todayDay;
-    var items=allItems();
-    var monthItems=items.filter(function(x){
-      if(!x.dateISO) return false;
-      var p=x.dateISO.split("-"); return Number(p[0])===y && Number(p[1])===m+1;
-    });
-    var total=monthItems.reduce(function(a,x){return a+x.amount;},0);
-    var avg=passed>0 ? total/passed : 0;
-    var forecast=Math.round(avg*daysInMonth);
-    var h="";
-    h+='<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:10px;margin-bottom:10px"><b>توقع نهاية الشهر (بدون ذكاء - معدل يومي):</b><br>';
-    h+='من 1 إلى '+todayDay+' / '+daysInMonth+' - مر '+passed+' يوم، باقي '+remaining+' يوم<br>';
-    h+='مجموع لحد الآن: <b>'+fmt(total)+'</b><br>المعدل اليومي: <b>'+fmt(Math.round(avg))+'</b><br>توقع نهاية الشهر: <b>'+fmt(forecast)+'</b><br>المتبقي المتوقع: <b>'+fmt(forecast-total)+'</b></div>';
-    // تفصيل حسب القسم
-    var byCat={}; monthItems.forEach(function(x){ var o=byCat[x.cat]||(byCat[x.cat]={n:0,sum:0}); o.n++; o.sum+=x.amount; });
-    h+='<table><tr><th>القسم</th><th>لحد الآن</th><th>معدل يومي</th><th>توقع نهاية الشهر</th></tr>';
-    Object.keys(LBL).forEach(function(c){
-      var o=byCat[c]; if(!o) return;
-      var a2=o.sum/passed, f2=Math.round(a2*daysInMonth);
-      h+='<tr><td>'+LBL[c]+'</td><td>'+fmt(o.sum)+'</td><td>'+fmt(Math.round(a2))+'</td><td>'+fmt(f2)+'</td></tr>';
-    });
-    h+='</table>';
-    h+='<div style="font-size:11px;color:#888;margin-top:8px">المقارنة عادلة: المعدل محسوب من نفس الأيام اللي مرت (1 إلى '+todayDay+')، مو من شهر كامل مقابل شهر ناقص.</div>';
-    return h;
-  }
-  var modal=document.getElementById("jdSettleModal"), content=document.getElementById("jdSettleContent"), tabB=document.getElementById("jdTabB"), tabC=document.getElementById("jdTabC");
-  function open(){
-    document.getElementById("jdSettleDate").textContent="اليوم: "+todayISO();
-    content.innerHTML=renderB();
-    tabB.classList.add("on"); tabC.classList.remove("on");
-    modal.style.display="flex";
-  }
-  document.getElementById("jdSettleBtn").onclick=open;
-  document.getElementById("jdSettleClose").onclick=function(){ modal.style.display="none"; };
-  modal.onclick=function(e){ if(e.target===modal) modal.style.display="none"; };
-  tabB.onclick=function(){ content.innerHTML=renderB(); tabB.classList.add("on"); tabC.classList.remove("on"); };
-  tabC.onclick=function(){ content.innerHTML=renderC(); tabC.classList.add("on"); tabB.classList.remove("on"); };
+  // راقب تغير الصفحات داخل التطبيق (التنقل بين الرئيسية والتسوية)
+  var obs=new MutationObserver(function(){ attach(); });
+  obs.observe(document.body, {childList:true, subtree:true});
+  setInterval(attach, 1000);
+  attach();
 })();
 </script>
 </body>
