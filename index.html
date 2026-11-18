@@ -3317,15 +3317,23 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
   function getCfg(){try{return JSON.parse(localStorage.getItem(CFGK)||"{}")||{}}catch(e){return{}}}
   function setCfg(o){try{localStorage.setItem(CFGK,JSON.stringify(o))}catch(e){}}
   function digest(){
-    var from=iso(addDays(new Date(),-120)),g={};
+    var from=iso(addDays(new Date(),-120)),g={},gm={};
     rows().forEach(function(x){
-      if(x.iso<from)return;var k=x.iso+"|"+x.cat,o=g[k]||(g[k]={i:0,o:0,n:0});
-      if(OUT[x.cat]||x.sub==="sahb")o.o+=x.amount;else o.i+=x.amount;o.n++});
+      if(x.iso<from)return;
+      var k=x.iso+"|"+x.cat,o=g[k]||(g[k]={i:0,o:0,n:0});
+      if(OUT[x.cat]||x.sub==="sahb")o.o+=x.amount;else o.i+=x.amount;o.n++;
+      // === إصلاح: مجموع شهري جاهز حتى لا يضطر الذكاء الاصطناعي للجمع ===
+      var mk=x.iso.slice(0,7)+"|"+x.cat,mo=gm[mk]||(gm[mk]={i:0,o:0,n:0});
+      if(OUT[x.cat]||x.sub==="sahb")mo.o+=x.amount;else mo.i+=x.amount;mo.n++;
+    });
     var L=["الصيغة: التاريخ|القسم|وارد|سحب أو صادر|عدد العمليات"];
+    L.push("=== مجاميع شهرية جاهزة - استخدم هذه الأرقام مباشرة ولا تجمع السطور اليومية ===");
+    Object.keys(gm).sort().forEach(function(k){var o=gm[k];L.push("MONTH|"+k+"|"+Math.round(o.i)+"|"+Math.round(o.o)+"|"+o.n)});
+    L.push("=== تفاصيل يومية (للمرجع فقط، لا تجمعها إذا وجدت المجاميع الشهرية) ===");
     Object.keys(g).sort().forEach(function(k){var o=g[k];L.push(k+"|"+Math.round(o.i)+"|"+Math.round(o.o)+"|"+o.n)});
     var names=Object.keys(LBL).map(function(k){return k+"="+LBL[k]}).join("، ");
     var al="";try{al=window.__jdIns.alerts().slice(0,5).map(function(a){return a.title}).join(" ؛ ")}catch(e){}
-    return "الأقسام: "+names+"\nملاحظة: saderat وsalary كل مبالغها صادر.\n"+(al?"تنبيهات حالية: "+al+"\n":"")+L.join("\n")}
+    return "الأقسام: "+names+"\nملاحظة: saderat وsalary كل مبالغها صادر.\nتعليمات صارمة: إذا سئلت عن شهر، خذ الرقم من سطر MONTH لذلك الشهر والقسم، ولا تجمع السطور اليومية. مثال: MONTH|2026-11|salary هو مجموع تشرين الثاني كاملاً لمنفذ الرواتب.\n"+(al?"تنبيهات حالية: "+al+"\n":"")+L.join("\n")}
   function askAI(q){
     var c=getCfg();if(!c.url)return Promise.reject("nocfg");
     return fetch(c.url,{method:"POST",headers:{"Content-Type":"application/json","X-App-Token":c.token||""},
