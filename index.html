@@ -984,7 +984,7 @@ if('serviceWorker' in navigator){
 /* يكتشف تفعيل الوضع الداكن من التطبيق ويضيف الكلاس jd-dark على <html> */
 (function(){
   var root=document.documentElement,meta=null,orig=null,queued=false;
-  function isDark(){return !!document.querySelector('#root [class*="bg-[#0f172a] text-white"]');}
+  function isDark(){var c=document.documentElement.classList;if(c.contains('jd-winter-light'))return false;if(c.contains('jd-winter-dark'))return true;return !!document.querySelector('#root [class*="bg-[#0f172a] text-white"]');}
   function apply(){
     queued=false;
     var d=isDark();
@@ -3512,6 +3512,8 @@ html.jd-winter-dark #jdWinterPanel p{ color:#a9bccd; }
 html.jd-winter-dark .jdWRow button{ background:rgba(255,255,255,.10); border-color:rgba(255,255,255,.2); color:#fff; }
 html.jd-winter-dark .jdWRow button.sel{ background:#7DD3FC; color:#0E1E33; border-color:#7DD3FC; }
 
+html.jd-winter-light #root > div{ color:#1f2d3a !important; }
+html.jd-winter-dark #root > div{ color:#fff !important; }
 /* ===== لمسة البطاقات الشتوية (شكل فقط) ===== */
 html.jd-winter-light #root button.rounded-\[20px\], html.jd-winter-dark #root button.rounded-\[20px\]{ position:relative !important; overflow:hidden !important; border-radius:30px !important; border-width:1.5px !important; }
 html.jd-winter-light #root button.rounded-\[20px\]::before, html.jd-winter-dark #root button.rounded-\[20px\]::before{ content:"❄"; position:absolute; top:8px; left:14px; font-size:46px; line-height:1; pointer-events:none; opacity:.16; }
@@ -3521,6 +3523,15 @@ html.jd-winter-light #root button.rounded-\[20px\] > div:first-child > div:first
 html.jd-winter-light #root button.rounded-\[20px\] .text-\[12px\].font-bold.mt-1, html.jd-winter-dark #root button.rounded-\[20px\] .text-\[12px\].font-bold.mt-1{ font-size:24px !important; line-height:1.2 !important; }
 html.jd-winter-dark #root button.rounded-\[20px\] > div.font-bold, html.jd-winter-dark #root button.rounded-\[20px\] > div.text-\[12px\]{ color:#fff !important; }
 html.jd-winter-dark #root button.rounded-\[20px\] .rounded-full{ background:rgba(255,255,255,.12) !important; color:#e6f4ff !important; }
+
+/* ===== بطاقات الرئيسية بشكل الصورة (شكل فقط) ===== */
+html.jd-winter-dark #root button.rounded-\[20px\].p-4{ background:linear-gradient(150deg,rgba(130,170,210,.30),rgba(30,58,95,.55)) !important; border:1.5px solid rgba(255,255,255,.30) !important; box-shadow:0 12px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.25) !important; }
+html.jd-winter-light #root button.rounded-\[20px\].p-4{ background:linear-gradient(150deg,rgba(255,255,255,.85),rgba(200,222,236,.65)) !important; }
+html.jd-winter-light #root button.rounded-\[20px\].p-4, html.jd-winter-dark #root button.rounded-\[20px\].p-4{ padding:18px !important; }
+html.jd-winter-light #root button.rounded-\[20px\].p-4 > div.mt-3, html.jd-winter-dark #root button.rounded-\[20px\].p-4 > div.mt-3{ display:none !important; }
+html.jd-winter-light #root button.rounded-\[20px\].p-4 > div:first-child > div:last-child, html.jd-winter-dark #root button.rounded-\[20px\].p-4 > div:first-child > div:last-child{ display:none !important; }
+html.jd-winter-light #root button.rounded-\[20px\].p-4 > div:first-child > div:first-child, html.jd-winter-dark #root button.rounded-\[20px\].p-4 > div:first-child > div:first-child{ width:68px !important; height:68px !important; border-radius:22px !important; }
+html.jd-winter-light #root button.rounded-\[20px\].p-4::after, html.jd-winter-dark #root button.rounded-\[20px\].p-4::after{ content:attr(data-jdday); display:block; margin-top:14px; font-size:12px; font-weight:700; opacity:.65; text-align:right; }
 </style>
 <div id="jdSnow"></div>
 <div id="jdWinterBackdrop"></div>
@@ -3546,6 +3557,7 @@ html.jd-winter-dark #root button.rounded-\[20px\] .rounded-full{ background:rgba
       h.classList.toggle('jd-hide-btn', S.showBtn==='off');
       if(S.enabled==='off'){ h.classList.remove('jd-winter-light','jd-winter-dark'); S.theme='off'; }
       if(S.theme==='off'){ h.classList.remove('jd-winter-light','jd-winter-dark'); }
+      if(S.enabled!=='off'&&S.theme==='light') h.classList.remove('jd-dark'); else if(S.enabled!=='off'&&S.theme==='dark') h.classList.add('jd-dark'); else h.classList.toggle('jd-dark', !!document.querySelector('#root [class*="bg-[#0f172a] text-white"]'));
       var snow=document.getElementById('jdSnow');
       if(snow){
         snow.classList.toggle('on', S.snow==='on' && S.theme!=='off' && S.enabled!=='off');
@@ -3571,5 +3583,14 @@ html.jd-winter-dark #root button.rounded-\[20px\] .rounded-full{ background:rgba
     apply();
   }catch(e){}
 })();
-</script></body>
+</script><script>
+(function(){
+  function today(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+  function sync(){try{var inp=document.querySelector('#root input[type=date]');var v=inp&&inp.value;var t=(!v||v===today())?'❄ اليوم':'❄ '+v.split('-').reverse().join('/');
+    document.querySelectorAll('#root button.rounded-\\[20px\\].p-4').forEach(function(b){if(b.getAttribute('data-jdday')!==t)b.setAttribute('data-jdday',t)})}catch(e){}}
+  function mount(){new MutationObserver(function(){clearTimeout(window.__jdDayQ);window.__jdDayQ=setTimeout(sync,150)}).observe(document.body,{childList:true,subtree:true});setInterval(sync,3000);sync()}
+  document.body?mount():document.addEventListener('DOMContentLoaded',mount);
+})();
+</script>
+</body>
 </html>
