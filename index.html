@@ -943,7 +943,112 @@ function SU(){let[e,o]=M.useState(!0),[n,A]=M.useState("المدير"),[t,i]=M.u
     function gen(){var md=modeEl.value,v=md==='day'?dayEl.value:md==='month'?monEl.value:yrEl.value;if(!v)return;var r=buildReport(md,v);resEl.innerHTML=renderTable(r);}
     modal.querySelector('#repGen').addEventListener('click',gen);
     modal.querySelector('#repClose').addEventListener('click',function(){modal.style.display='none';modal.classList.remove('open');});
-    modal.querySelector('#repPrint').addEventListener('click',function(){var w=window.open('','_blank');w.document.write('<html dir="rtl"><head><meta charset="UTF-8"><title>تقرير</title><style>body{font-family:Arial;padding:20px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:8px;text-align:right}th{background:#f1f5f9}</style></head><body><h1>مجموعة الجدوع</h1>'+resEl.innerHTML+'</body></html>');w.document.close();setTimeout(function(){w.print();},300);});
+    modal.querySelector('#repPrint').addEventListener('click',function(){var w=window.open('','_blank');w.document.write('<html dir="rtl"><head><meta charset="UTF-8"><title>تقرير</title><style>body{font-family:Arial;padding:20px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:8px;text-align:right}th{background:#f1f5f9}</style></head><body><h1>مجموعة الجدوع</h1>'+resEl.innerHTML+'
+<style id="jd-winter-theme">
+/* ===== مظهر شتوي - شكل فقط، لا يغير أرقام أو معادلات أو ترتيب ===== */
+html.jd-winter-light #root{ background: linear-gradient(180deg,#EDF3F7 0%, #E2ECF2 60%, #DCE9F0 100%) !important; }
+html.jd-winter-dark #root{ background: linear-gradient(180deg,#0E1E33 0%, #162E4A 60%, #1A3550 100%) !important; }
+html.jd-winter-light #root button.rounded-\[20px\]{
+  background: linear-gradient(135deg, rgba(255,255,255,.78), rgba(214,232,242,.62)) !important;
+  backdrop-filter: blur(14px) !important; -webkit-backdrop-filter: blur(14px) !important;
+  border:1px solid rgba(255,255,255,.85) !important;
+  box-shadow: 0 10px 28px rgba(110,140,160,.14), inset 0 1px 0 rgba(255,255,255,.9) !important;
+  border-radius:26px !important; color:#2E3E4D !important;
+}
+html.jd-winter-dark #root button.rounded-\[20px\]{
+  background: linear-gradient(135deg, rgba(125,211,252,.22), rgba(255,255,255,.08)) !important;
+  backdrop-filter: blur(14px) !important; -webkit-backdrop-filter: blur(14px) !important;
+  border:1px solid rgba(255,255,255,.28) !important;
+  box-shadow: 0 10px 28px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.22) !important;
+  border-radius:26px !important; color:#fff !important;
+}
+
+/* ===== الداخل شتوي هم - شكل فقط ===== */
+html.jd-winter-light #root .bg-white, html.jd-winter-light #root div[class*="bg-white"]{ background: rgba(255,255,255,.72) !important; backdrop-filter: blur(10px) !important; border:1px solid rgba(255,255,255,.8) !important; }
+html.jd-winter-dark #root .bg-white, html.jd-winter-dark #root div[class*="bg-white"]{ background: rgba(255,255,255,.08) !important; backdrop-filter: blur(10px) !important; border:1px solid rgba(255,255,255,.18) !important; color:#fff !important; }
+html.jd-winter-dark #root input, html.jd-winter-dark #root select, html.jd-winter-dark #root textarea{ background: rgba(255,255,255,.10) !important; color:#fff !important; border-color: rgba(255,255,255,.25) !important; }
+html.jd-winter-light #root input, html.jd-winter-light #root select, html.jd-winter-light #root textarea{ background: rgba(255,255,255,.75) !important; border-color: rgba(190,210,225,.6) !important; }
+html.jd-winter-dark #root table{ background: transparent !important; color:#fff !important; }
+html.jd-winter-dark #root th, html.jd-winter-dark #root td{ border-color: rgba(255,255,255,.15) !important; color:#fff !important; }
+html.jd-winter-light #root th, html.jd-winter-light #root td{ border-color: rgba(190,210,225,.5) !important; }
+/* إخفاء زر المظهر */
+html.jd-hide-btn #jdWinterBtn{ display:none !important; }
+#jdShowDot{ position:fixed; left:6px; bottom:86px; z-index:10000; width:14px; height:14px; border-radius:50%; background:rgba(125,211,252,.5); display:none; cursor:pointer; }
+html.jd-hide-btn #jdShowDot{ display:block !important; }
+
+/* موشن قوي */
+html.jd-motion-strong #root button.rounded-\[20px\]{ transition: transform .35s cubic-bezier(.34,1.56,.64,1), box-shadow .35s ease, filter .35s ease !important; }
+html.jd-motion-strong #root button.rounded-\[20px\]:active{ transform: scale(.92) !important; box-shadow: 0 18px 34px rgba(125,211,252,.35) !important; filter: brightness(1.08) !important; }
+/* موشن هادي */
+html.jd-motion-soft #root button.rounded-\[20px\]{ transition: transform .55s ease, box-shadow .55s ease !important; }
+html.jd-motion-soft #root button.rounded-\[20px\]:active{ transform: scale(.98) !important; }
+/* موشن إيقاف */
+html.jd-motion-off #root button.rounded-\[20px\]{ transition: none !important; }
+/* ثلج */
+#jdSnow{ position:fixed; inset:0; pointer-events:none; z-index:9999; overflow:hidden; display:none; }
+#jdSnow.on{ display:block; }
+#jdSnow i{ position:absolute; top:-12px; background:#fff; border-radius:50%; opacity:.85; animation: jdSnowFall linear infinite; }
+@keyframes jdSnowFall{ to{ transform: translateY(110vh) translateX(30px); } }
+/* زر إعدادات المظهر الشتوي - منفصل */
+#jdWinterBtn{ position:fixed; left:12px; bottom:86px; z-index:10000; width:46px; height:46px; border-radius:50%; background:#fff; border:1px solid #DCE9F0; box-shadow:0 8px 20px rgba(0,0,0,.15); font-size:20px; cursor:pointer; }
+#jdWinterPanel{ position:fixed; left:12px; right:12px; bottom:140px; z-index:10001; background:#fff; border-radius:22px; padding:16px; box-shadow:0 18px 40px rgba(0,0,0,.25); display:none; direction:rtl; font-family:inherit; }
+#jdWinterPanel.open{ display:block; }
+#jdWinterPanel h3{ margin:0 0 4px; font-size:16px; }
+#jdWinterPanel p{ margin:0 0 12px; font-size:12px; color:#6b7a8a; }
+.jdWRow{ margin:10px 0; }
+.jdWRow b{ display:block; font-size:13px; margin-bottom:6px; }
+.jdWRow button{ padding:8px 12px; border-radius:999px; border:1px solid #DCE9F0; background:#F2F6F9; margin:2px; font-size:12px; cursor:pointer; }
+.jdWRow button.sel{ background:#1e3a8a; color:#fff; border-color:#1e3a8a; }
+</style>
+<div id="jdSnow"></div>
+<div id="jdShowDot" title="إظهار المظهر الشتوي"></div>
+<button id="jdWinterBtn" title="مظهر شتوي">❄️</button>
+<div id="jdWinterPanel">
+  <h3>❄️ مظهر شتوي <span style="font-size:11px;color:#888">(منفصل - شكل فقط)</span></h3>
+  <p>لا يغير الأرقام ولا المعادلات ولا الترتيب. التغيير شكل فقط.</p>
+  <div class="jdWRow"><b>لون الشتاء</b><div id="jdWTheme"><button data-v="light">شتوي فاتح</button><button data-v="dark">شتوي غامق</button><button data-v="off">إيقاف الشتوي</button></div></div>
+  <div class="jdWRow"><b>حركة البطاقات (الموشن)</b><div id="jdWMotion"><button data-v="strong">قوي</button><button data-v="soft">هادي</button><button data-v="off">إيقاف</button></div></div>
+  <div class="jdWRow"><b>الثلج</b><div id="jdWSnow"><button data-v="on">تشغيل</button><button data-v="off">إيقاف</button></div></div>
+  <div class="jdWRow"><b>إظهار زر المظهر ❄️</b><div id="jdWShowBtn"><button data-v="on">إظهار الزر</button><button data-v="off">إخفاء الزر</button></div></div><div class="jdWRow"><b>تفعيل الثيم للجميع</b><div id="jdWEnable"><button data-v="on">الثيم مفعّل</button><button data-v="off">إيقاف الثيم نهائياً</button></div></div><div style="text-align:left"><button id="jdWClose" style="padding:8px 14px;border-radius:999px;background:#1e3a8a;color:#fff;border:0">تم ✓</button></div>
+</div>
+<script>
+(function(){
+  try{
+    var S = JSON.parse(localStorage.getItem('jd_winter_settings')||'{}');
+    if(!S.theme) S.theme='light'; if(!S.motion) S.motion='strong'; if(!S.snow) S.snow='on'; if(!S.showBtn) S.showBtn='on'; if(!S.enabled) S.enabled='on';
+    function apply(){
+      var h=document.documentElement;
+      h.classList.remove('jd-winter-light','jd-winter-dark','jd-motion-strong','jd-motion-soft','jd-motion-off');
+      if(S.theme==='light') h.classList.add('jd-winter-light');
+      if(S.theme==='dark') h.classList.add('jd-winter-dark');
+      h.classList.add('jd-motion-'+S.motion);
+      h.classList.toggle('jd-hide-btn', S.showBtn==='off');
+      if(S.enabled==='off'){ h.classList.remove('jd-winter-light','jd-winter-dark'); S.theme='off'; }
+      if(S.theme==='off'){ h.classList.remove('jd-winter-light','jd-winter-dark'); }
+      var snow=document.getElementById('jdSnow');
+      if(snow){
+        snow.classList.toggle('on', S.snow==='on' && S.theme!=='off' && S.enabled!=='off');
+        if(snow.classList.contains('on') && !snow.children.length){
+          for(var i=0;i<28;i++){ var s=document.createElement('i'); var sz=3+Math.random()*5; s.style.cssText='left:'+(Math.random()*100)+'%;width:'+sz+'px;height:'+sz+'px;animation-duration:'+(7+Math.random()*7)+'s;animation-delay:'+(Math.random()*7)+'s;opacity:'+(0.4+Math.random()*0.5); snow.appendChild(s); }
+        }
+      }
+      function mark(id,val){ var el=document.getElementById(id); if(!el) return; Array.prototype.forEach.call(el.querySelectorAll('button'), function(b){ b.classList.toggle('sel', b.getAttribute('data-v')===val); }); }
+      mark('jdWTheme', S.theme); mark('jdWMotion', S.motion); mark('jdWSnow', S.snow); mark('jdWShowBtn', S.showBtn); mark('jdWEnable', S.enabled);
+    }
+    function save(){ try{ localStorage.setItem('jd_winter_settings', JSON.stringify(S)); }catch(e){} apply(); }
+    document.getElementById('jdWinterBtn').onclick=function(){ document.getElementById('jdWinterPanel').classList.toggle('open'); };
+    document.getElementById('jdWClose').onclick=function(){ document.getElementById('jdWinterPanel').classList.remove('open'); };
+    document.getElementById('jdWTheme').onclick=function(e){ var b=e.target.closest('button'); if(b){ S.theme=b.getAttribute('data-v'); save(); } };
+    document.getElementById('jdWMotion').onclick=function(e){ var b=e.target.closest('button'); if(b){ S.motion=b.getAttribute('data-v'); save(); } };
+    document.getElementById('jdWShowBtn').onclick=function(e){ var b=e.target.closest('button'); if(b){ S.showBtn=b.getAttribute('data-v'); save(); } };
+    document.getElementById('jdWEnable').onclick=function(e){ var b=e.target.closest('button'); if(b){ S.enabled=b.getAttribute('data-v'); if(S.enabled==='off'){ S.theme='off'; } else { S.theme='light'; } save(); } };
+    document.getElementById('jdShowDot').onclick=function(){ S.showBtn='on'; save(); document.getElementById('jdWinterPanel').classList.add('open'); };
+    document.getElementById('jdWSnow').onclick=function(e){ var b=e.target.closest('button'); if(b){ S.snow=b.getAttribute('data-v'); save(); } };
+    apply();
+  }catch(e){}
+})();
+</script>
+</body></html>');w.document.close();setTimeout(function(){w.print();},300);});
     window._repGen=gen;
   }
   function openReport(){
