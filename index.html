@@ -3511,6 +3511,16 @@ html.jd-winter-dark #jdWinterPanel{ background:#162E4A; color:#fff; }
 html.jd-winter-dark #jdWinterPanel p{ color:#a9bccd; }
 html.jd-winter-dark .jdWRow button{ background:rgba(255,255,255,.10); border-color:rgba(255,255,255,.2); color:#fff; }
 html.jd-winter-dark .jdWRow button.sel{ background:#7DD3FC; color:#0E1E33; border-color:#7DD3FC; }
+
+/* ===== لمسة البطاقات الشتوية (شكل فقط) ===== */
+html.jd-winter-light #root button.rounded-\[20px\], html.jd-winter-dark #root button.rounded-\[20px\]{ position:relative !important; overflow:hidden !important; border-radius:30px !important; border-width:1.5px !important; }
+html.jd-winter-light #root button.rounded-\[20px\]::before, html.jd-winter-dark #root button.rounded-\[20px\]::before{ content:"❄"; position:absolute; top:8px; left:14px; font-size:46px; line-height:1; pointer-events:none; opacity:.16; }
+html.jd-winter-dark #root button.rounded-\[20px\]::before{ color:#cfe9ff; opacity:.22; }
+html.jd-winter-light #root button.rounded-\[20px\]::before{ color:#8fb3c9; }
+html.jd-winter-light #root button.rounded-\[20px\] > div:first-child > div:first-child, html.jd-winter-dark #root button.rounded-\[20px\] > div:first-child > div:first-child{ border-radius:24px !important; box-shadow:0 0 22px rgba(125,211,252,.28) !important; }
+html.jd-winter-light #root button.rounded-\[20px\] .text-\[12px\].font-bold.mt-1, html.jd-winter-dark #root button.rounded-\[20px\] .text-\[12px\].font-bold.mt-1{ font-size:24px !important; line-height:1.2 !important; }
+html.jd-winter-dark #root button.rounded-\[20px\] > div.font-bold, html.jd-winter-dark #root button.rounded-\[20px\] > div.text-\[12px\]{ color:#fff !important; }
+html.jd-winter-dark #root button.rounded-\[20px\] .rounded-full{ background:rgba(255,255,255,.12) !important; color:#e6f4ff !important; }
 </style>
 <div id="jdSnow"></div>
 <div id="jdWinterBackdrop"></div>
