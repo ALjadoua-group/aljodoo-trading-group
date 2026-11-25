@@ -943,7 +943,23 @@ function SU(){let[e,o]=M.useState(!0),[n,A]=M.useState("المدير"),[t,i]=M.u
     function gen(){var md=modeEl.value,v=md==='day'?dayEl.value:md==='month'?monEl.value:yrEl.value;if(!v)return;var r=buildReport(md,v);resEl.innerHTML=renderTable(r);}
     modal.querySelector('#repGen').addEventListener('click',gen);
     modal.querySelector('#repClose').addEventListener('click',function(){modal.style.display='none';modal.classList.remove('open');});
-    modal.querySelector('#repPrint').addEventListener('click',function(){var w=window.open('','_blank');w.document.write('<html dir="rtl"><head><meta charset="UTF-8"><title>تقرير</title><style>body{font-family:Arial;padding:20px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:8px;text-align:right}th{background:#f1f5f9}</style></head><body><h1>مجموعة الجدوع</h1>'+resEl.innerHTML+'</body></html>');w.document.close();setTimeout(function(){w.print();},300);});
+    modal.querySelector('#repPrint').addEventListener('click',function(){var w=window.open('','_blank');w.document.write('<html dir="rtl"><head><meta charset="UTF-8"><title>تقرير</title><style>body{font-family:Arial;padding:20px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:8px;text-align:right}th{background:#f1f5f9}</style></head><body><h1>مجموعة الجدوع</h1>'+resEl.innerHTML+'
+<style id="jd-glass-card-colors-v1">
+/* إعادة تلوين بطاقات الصفحة الرئيسية فقط — دون تغيير ترتيبها أو مقاساتها أو وظائفها */
+#root button.rounded-\[20px\].p-4{
+  background:linear-gradient(135deg,rgba(255,255,255,.94) 0%,rgba(232,247,239,.88) 52%,rgba(215,239,226,.84) 100%) !important;
+  border-color:rgba(22,101,72,.34) !important;
+  box-shadow:0 8px 24px rgba(16,75,54,.10),inset 0 1px 0 rgba(255,255,255,.88) !important;
+  -webkit-backdrop-filter:blur(12px) saturate(135%) !important;
+  backdrop-filter:blur(12px) saturate(135%) !important;
+}
+html.jd-dark #root button.rounded-\[20px\].p-4{
+  background:linear-gradient(135deg,rgba(25,91,68,.92) 0%,rgba(15,65,54,.92) 55%,rgba(11,48,43,.94) 100%) !important;
+  border-color:rgba(133,205,166,.38) !important;
+  box-shadow:0 8px 26px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.10) !important;
+}
+</style>
+</body></html>');w.document.close();setTimeout(function(){w.print();},300);});
     window._repGen=gen;
   }
   function openReport(){
