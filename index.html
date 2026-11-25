@@ -3467,5 +3467,32 @@ html #reportHeaderBtn,html #jdInsBtn{display:none!important}
   document.body?mount():document.addEventListener("DOMContentLoaded",mount);
 })();
 </script>
+
+<style id="jd-home-cards-glass-fix">
+/* Corrected: target the actual home category cards; override their inline per-category colors. */
+html:not(.jd-dark) #root main .grid.grid-cols-2.lg\:grid-cols-5.gap-3.md\:gap-4 > button.rounded-\[20px\].p-4 {
+  background: linear-gradient(145deg, rgba(255,255,255,.94), rgba(232,247,241,.88)) !important;
+  border: 1.5px solid rgba(27,128,103,.34) !important;
+  box-shadow: 0 8px 24px rgba(24,72,61,.09), inset 0 1px 0 rgba(255,255,255,.9) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(125%) !important;
+  backdrop-filter: blur(12px) saturate(125%) !important;
+  color: #173c35 !important;
+}
+html:not(.jd-dark) #root main .grid.grid-cols-2.lg\:grid-cols-5.gap-3.md\:gap-4 > button.rounded-\[20px\].p-4 > div:first-child > div:first-child {
+  border: 2px solid rgba(27,128,103,.42) !important;
+  border-radius: 22px !important;
+  box-shadow: 0 3px 12px rgba(24,72,61,.10) !important;
+}
+html:not(.jd-dark) #root main .grid.grid-cols-2.lg\:grid-cols-5.gap-3.md\:gap-4 > button.rounded-\[20px\].p-4 .text-black { color: #173c35 !important; }
+html.jd-dark #root main .grid.grid-cols-2.lg\:grid-cols-5.gap-3.md\:gap-4 > button.rounded-\[20px\].p-4 {
+  background: linear-gradient(145deg, rgba(25,48,57,.97), rgba(18,37,46,.96)) !important;
+  border: 1.5px solid rgba(104,190,160,.42) !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.05) !important;
+  color: #e7f5ef !important;
+}
+html.jd-dark #root main .grid.grid-cols-2.lg\:grid-cols-5.gap-3.md\:gap-4 > button.rounded-\[20px\].p-4 > div:first-child > div:first-child {
+  border: 2px solid rgba(104,190,160,.5) !important;
+}
+</style>
 </body>
 </html>
